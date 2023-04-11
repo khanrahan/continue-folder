@@ -16,6 +16,7 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `Month`
 - `Version`
 	- Scan the other folders present and if found, will increment to the new version number.  *Similar* to the version token for pattern browsing.
+    - Use optional hashes for padding.  `{version###}`
 - `Year`
 
 ## Example Workflow
