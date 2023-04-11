@@ -4,7 +4,7 @@ Plugin for [Autodesk Flame software](http://www.autodesk.com/products/flame).
 
 Create a new reel on the Desktop and/or a system folder in MediaHub Files using tokens.
 
-![screenshot](screenshot.jpg?raw=true)
+![screenshot](screenshot.jpg)
 
 ## Tokens
 - `AM/PM`
