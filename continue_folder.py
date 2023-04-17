@@ -37,10 +37,10 @@ from PySide2 import QtWidgets
 
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (1, 0, 0)
+VERSION_INFO = (1, 0, 1)
 VERSION = '.'.join([str(num) for num in VERSION_INFO])
 TITLE_VERSION = '{} v{}'.format(TITLE, VERSION)
-MESSAGE_PREFIX = '[PYTHON API]'
+MESSAGE_PREFIX = '[PYTHON HOOK]'
 
 
 class FlameButton(QtWidgets.QPushButton):
