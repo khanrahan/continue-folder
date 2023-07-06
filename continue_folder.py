@@ -1,7 +1,14 @@
 '''
-Continue Folder
+Script Name: Continue Folder
+Written By: Kieran Hanrahan
+
+Script Version: 1.0.2
+Flame Version: 2021.1
 
 URL: http://www.github.com/khanrahan/continue-folder
+
+Creation Date: 04.10.23
+Update Date: 07.05.23
 
 Description:
 
@@ -37,7 +44,7 @@ from PySide2 import QtWidgets
 
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (1, 0, 1)
+VERSION_INFO = (1, 0, 2)
 VERSION = '.'.join([str(num) for num in VERSION_INFO])
 TITLE_VERSION = '{} v{}'.format(TITLE, VERSION)
 MESSAGE_PREFIX = '[PYTHON HOOK]'
@@ -229,7 +236,7 @@ class FlamePushButton(QtWidgets.QPushButton):
         self.setMinimumSize(button_width, 28)
         self.setMaximumSize(button_width, 28)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
-        #self.clicked.connect(connect)  # produces error on 2021.1
+        # self.clicked.connect(connect)  # produces error on 2021.1
         self.setStyleSheet('''
             QPushButton {
                 color: rgb(154, 154, 154);
@@ -711,7 +718,9 @@ class ContinueFolder(object):
             'Version':
                 # the regex for Version is a named capture group excluding zero padding
                 ['{version}', '{version#*}', '0*(?P<version>[1-9][0-9]*)', '1'],
-            'Year':
+            'Year (##)':
+                ['{YY}', None, '[0-9]{2}', self.now.strftime('%y')],
+            'Year (####)':
                 ['{YYYY}', None, '[0-9]{4}', self.now.strftime('%Y')]}
 
     @staticmethod
