@@ -1,4 +1,4 @@
-'''
+"""
 Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
@@ -29,7 +29,7 @@ To Install:
 
     For a specific user, copy this file to:
     /opt/Autodesk/user/<user name>/python
-'''
+"""
 
 
 import os
@@ -50,7 +50,7 @@ MESSAGE_PREFIX = '[PYTHON HOOK]'
 
 
 class FlameButton(QtWidgets.QPushButton):
-    '''
+    """
     Custom Qt Flame Button Widget v2.1
 
     button_name: button text [str]
@@ -63,7 +63,7 @@ class FlameButton(QtWidgets.QPushButton):
 
         button = FlameButton(
             'Button Name', do_something__when_pressed, button_color='blue')
-    '''
+    """
 
     def __init__(self, button_name, connect, button_color='normal', button_width=150,
                  button_max_width=150):
@@ -75,12 +75,12 @@ class FlameButton(QtWidgets.QPushButton):
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.clicked.connect(connect)
         if button_color == 'normal':
-            self.setStyleSheet('''
+            self.setStyleSheet("""
                 QPushButton {
                     color: rgb(154, 154, 154);
                     background-color: rgb(58, 58, 58);
                     border: none;
-                    font: 14px "Discreet"}
+                    font: 14px 'Discreet'}
                 QPushButton:hover {
                     border: 1px solid rgb(90, 90, 90)}
                 QPushButton:pressed {
@@ -94,14 +94,14 @@ class FlameButton(QtWidgets.QPushButton):
                 QToolTip {
                     color: rgb(170, 170, 170);
                     background-color: rgb(71, 71, 71);
-                    border: 10px solid rgb(71, 71, 71)}''')
+                    border: 10px solid rgb(71, 71, 71)}""")
         elif button_color == 'blue':
-            self.setStyleSheet('''
+            self.setStyleSheet("""
                 QPushButton {
                     color: rgb(190, 190, 190);
                     background-color: rgb(0, 110, 175);
                     border: none;
-                    font: 12px "Discreet"}
+                    font: 12px 'Discreet'}
                 QPushButton:hover {
                     border: 1px solid rgb(90, 90, 90)}
                 QPushButton:pressed {
@@ -114,11 +114,11 @@ class FlameButton(QtWidgets.QPushButton):
                 QToolTip {
                     color: rgb(170, 170, 170);
                     background-color: rgb(71, 71, 71);
-                    border: 10px solid rgb(71, 71, 71)}''')
+                    border: 10px solid rgb(71, 71, 71)}""")
 
 
 class FlameLabel(QtWidgets.QLabel):
-    '''
+    """
     Custom Qt Flame Label Widget v2.1
 
     label_name:  text displayed [str]
@@ -129,7 +129,7 @@ class FlameLabel(QtWidgets.QLabel):
     Usage:
 
         label = FlameLabel('Label Name', 'normal', 300)
-    '''
+    """
 
     def __init__(self, label_name, label_type='normal', label_width=150):
         super(FlameLabel, self).__init__()
@@ -142,34 +142,34 @@ class FlameLabel(QtWidgets.QLabel):
         # Set label stylesheet based on label_type
 
         if label_type == 'normal':
-            self.setStyleSheet('''
+            self.setStyleSheet("""
                 QLabel {
                     color: rgb(154, 154, 154);
-                    font: 14px "Discreet"}
+                    font: 14px 'Discreet'}
                 QLabel:disabled {
-                    color: rgb(106, 106, 106)}''')
+                    color: rgb(106, 106, 106)}""")
         elif label_type == 'underline':
             self.setAlignment(QtCore.Qt.AlignCenter)
-            self.setStyleSheet('''
+            self.setStyleSheet("""
                 QLabel {
                     color: rgb(154, 154, 154);
                     border-bottom: 1px inset rgb(40, 40, 40);
-                    font: 14px "Discreet"}
+                    font: 14px 'Discreet'}
                 QLabel:disabled {
-                    color: rgb(106, 106, 106)}''')
+                    color: rgb(106, 106, 106)}""")
         elif label_type == 'background':
-            self.setStyleSheet('''
+            self.setStyleSheet("""
                 QLabel {
                     color: rgb(154, 154, 154);
                     background-color: rgb(30, 30, 30);
                     padding-left: 5px;
-                    font: 14px "Discreet"}
+                    font: 14px 'Discreet'}
                 QLabel:disabled {
-                    color: rgb(106, 106, 106)}''')
+                    color: rgb(106, 106, 106)}""")
 
 
 class FlameLineEdit(QtWidgets.QLineEdit):
-    '''
+    """
     Custom Qt Flame Line Edit Widget v2.1
 
     Main window should include this: window.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -181,7 +181,7 @@ class FlameLineEdit(QtWidgets.QLineEdit):
     Usage:
 
         line_edit = FlameLineEdit('Some text here')
-    '''
+    """
 
     def __init__(self, text, width=150, max_width=2000):
         super(FlameLineEdit, self).__init__()
@@ -191,7 +191,7 @@ class FlameLineEdit(QtWidgets.QLineEdit):
         self.setMinimumWidth(width)
         self.setMaximumWidth(max_width)
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
-        self.setStyleSheet('''
+        self.setStyleSheet("""
             QLineEdit {
                 color: rgb(154, 154, 154);
                 background-color: rgb(55, 65, 75);
@@ -199,7 +199,7 @@ class FlameLineEdit(QtWidgets.QLineEdit):
                 selection-background-color: rgb(184, 177, 167);
                 border: 1px solid rgb(55, 65, 75);
                 padding-left: 5px;
-                font: 14px "Discreet"}
+                font: 14px 'Discreet'}
             QLineEdit:focus {background-color: rgb(73, 86, 99)}
             QLineEdit:hover {border: 1px solid rgb(90, 90, 90)}
             QLineEdit:disabled {
@@ -209,11 +209,11 @@ class FlameLineEdit(QtWidgets.QLineEdit):
             QToolTip {
                 color: rgb(170, 170, 170);
                 background-color: rgb(71, 71, 71);
-                border: none}''')
+                border: none}""")
 
 
 class FlamePushButton(QtWidgets.QPushButton):
-    '''
+    """
     Custom Qt Flame Push Button Widget v2.1
 
     button_name: text displayed on button [str]
@@ -224,7 +224,7 @@ class FlamePushButton(QtWidgets.QPushButton):
     Usage:
 
         pushbutton = FlamePushButton('Button Name', False)
-    '''
+    """
 
     def __init__(self, button_name, button_checked, connect=None, button_width=150):
         super(FlamePushButton, self).__init__()
@@ -236,7 +236,7 @@ class FlamePushButton(QtWidgets.QPushButton):
         self.setMaximumSize(button_width, 28)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         # self.clicked.connect(connect)  # produces error on 2021.1
-        self.setStyleSheet('''
+        self.setStyleSheet("""
             QPushButton {
                 color: rgb(154, 154, 154);
                 background-color: qlineargradient(
@@ -254,7 +254,7 @@ class FlamePushButton(QtWidgets.QPushButton):
                     stop: .94 rgb(44, 54, 68));
                 border-left: 1px solid rgb(58, 58, 58);
                 border-right: 1px solid rgb(44, 54, 68);
-                padding-left: 5px; font: 14px "Discreet"}
+                padding-left: 5px; font: 14px 'Discreet'}
             QPushButton:checked {
                 color: rgb(217, 217, 217);
                 background-color: qlineargradient(
@@ -287,11 +287,11 @@ class FlamePushButton(QtWidgets.QPushButton):
             QToolTip {
                 color: rgb(170, 170, 170);
                 background-color: rgb(71, 71, 71);
-                border: 10px solid rgb(71, 71, 71)}''')
+                border: 10px solid rgb(71, 71, 71)}""")
 
 
 class FlamePushButtonMenu(QtWidgets.QPushButton):
-    '''
+    """
     Custom Qt Flame Menu Push Button Widget v3.1
 
     button_name: text displayed on button [str]
@@ -316,7 +316,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         Started as v2.1
         v3.1 adds a functionionality to set the width of the menu to be the same as the
         button.
-    '''
+    """
 
     def __init__(self, button_name, menu_options, menu_width=240, max_menu_width=2000,
                  menu_action=None):
@@ -331,12 +331,12 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         self.setMinimumWidth(menu_width)
         self.setMaximumWidth(max_menu_width)  # is max necessary?
         self.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.setStyleSheet('''
+        self.setStyleSheet("""
             QPushButton {
                 color: rgb(154, 154, 154);
                 background-color: rgb(45, 55, 68);
                 border: none;
-                font: 14px "Discreet";
+                font: 14px 'Discreet';
                 padding-left: 9px;
                 text-align: left}
             QPushButton:disabled {
@@ -349,30 +349,30 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
             QToolTip {
                 color: rgb(170, 170, 170);
                 background-color: rgb(71, 71, 71);
-                border: 10px solid rgb(71, 71, 71)}''')
+                border: 10px solid rgb(71, 71, 71)}""")
 
         # Menu
         def match_width():
-            '''Match menu width to the parent push button width.'''
+            """Match menu width to the parent push button width."""
             self.pushbutton_menu.setMinimumWidth(self.size().width())
 
         self.pushbutton_menu = QtWidgets.QMenu(self)
         self.pushbutton_menu.setFocusPolicy(QtCore.Qt.NoFocus)
         self.pushbutton_menu.aboutToShow.connect(match_width)
-        self.pushbutton_menu.setStyleSheet('''
+        self.pushbutton_menu.setStyleSheet("""
             QMenu {
                 color: rgb(154, 154, 154);
                 background-color: rgb(45, 55, 68);
-                border: none; font: 14px "Discreet"}
+                border: none; font: 14px 'Discreet'}
             QMenu::item:selected {
                 color: rgb(217, 217, 217);
-                background-color: rgb(58, 69, 81)}''')
+                background-color: rgb(58, 69, 81)}""")
 
         self.populate_menu(menu_options)
         self.setMenu(self.pushbutton_menu)
 
     def create_menu(self, option, menu_action):
-        ''' '''
+        """ """
 
         self.setText(option)
 
@@ -380,7 +380,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
             menu_action()
 
     def populate_menu(self, options):
-        '''Empty the menu then reassemble the options.'''
+        """Empty the menu then reassemble the options."""
 
         self.pushbutton_menu.clear()
 
@@ -390,7 +390,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
 
 
 class FlameMessageWindow(QtWidgets.QDialog):
-    '''
+    """
     Custom Qt Flame Message Window v2.1
 
     message_title: text shown in top left of window ie. Confirm Operation [str]
@@ -415,7 +415,7 @@ class FlameMessageWindow(QtWidgets.QDialog):
         if FlameMessageWindow(
             'Confirm Operation', 'confirm', 'some important message', window):
                 do something
-    '''
+    """
 
     def __init__(self, message_title, message_type, message, parent=None):
         super(FlameMessageWindow, self).__init__()
@@ -437,13 +437,13 @@ class FlameMessageWindow(QtWidgets.QDialog):
         self.grid = QtWidgets.QGridLayout()
 
         self.main_label = FlameLabel(message_title, 'normal', label_width=500)
-        self.main_label.setStyleSheet('''
+        self.main_label.setStyleSheet("""
             color: rgb(154, 154, 154);
-            font: 18px "Discreet"''')
+            font: 18px 'Discreet'""")
 
         self.message_text_edit = QtWidgets.QTextEdit(message)
         self.message_text_edit.setDisabled(True)
-        self.message_text_edit.setStyleSheet('''
+        self.message_text_edit.setStyleSheet("""
             QTextEdit {
                 color: rgb(154, 154, 154);
                 background-color: rgb(36, 36, 36);
@@ -452,7 +452,7 @@ class FlameMessageWindow(QtWidgets.QDialog):
                 border: none;
                 padding-left: 20px;
                 padding-right: 20px;
-                font: 12px "Discreet"}''')
+                font: 12px 'Discreet'}""")
 
         if message_type in ('confirm', 'warning'):
             self.confirm_button = FlameButton(
@@ -532,7 +532,7 @@ class FlameMessageWindow(QtWidgets.QDialog):
 
 
 class FlameTokenPushButton(QtWidgets.QPushButton):
-    '''
+    """
     Custom Qt Flame Token Push Button Widget v2.1
 
     button_name: Text displayed on button [str]
@@ -545,7 +545,7 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
 
         token_dict = {'Token 1': '<Token1>', 'Token2': '<Token2>'}
         token_push_button = FlameTokenPushButton('Add Token', token_dict, token_dest)
-    '''
+    """
 
     def __init__(self, button_name, token_dict, token_dest, button_width=110,
                  button_max_width=300):
@@ -556,12 +556,12 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
         self.setMinimumWidth(button_width)
         self.setMaximumWidth(button_max_width)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.setStyleSheet('''
+        self.setStyleSheet("""
             QPushButton {
                 color: rgb(154, 154, 154);
                 background-color: rgb(45, 55, 68);
                 border: none;
-                font: 14px "Discreet";
+                font: 14px 'Discreet';
                 padding-left: 6px;
                 text-align: left}
             QPushButton:hover {
@@ -576,7 +576,7 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
             QToolTip {
                 color: rgb(170, 170, 170);
                 background-color: rgb(71, 71, 71);
-                border: 10px solid rgb(71, 71, 71)}''')
+                border: 10px solid rgb(71, 71, 71)}""")
 
         def token_action_menu():
 
@@ -593,27 +593,27 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
 
         token_menu = QtWidgets.QMenu(self)
         token_menu.setFocusPolicy(QtCore.Qt.NoFocus)
-        token_menu.setStyleSheet('''
+        token_menu.setStyleSheet("""
             QMenu {
                 color: rgb(154, 154, 154);
                 background-color: rgb(45, 55, 68);
-                border: none; font: 14px "Discreet"}
+                border: none; font: 14px 'Discreet'}
             QMenu::item:selected {
                 color: rgb(217, 217, 217);
-                background-color: rgb(58, 69, 81)}''')
+                background-color: rgb(58, 69, 81)}""")
 
         self.setMenu(token_menu)
         token_action_menu()
 
 
 class ContinueFolder(object):
-    '''
+    """
     Creates a new folder on the Desktop or in the Media Hub using tokens.
 
     Currently, the only special token is {version} which will look for a number sequence
     and return the next number in the sequence. All of the other tokens are standard
     things like: day, hour, minute.
-    '''
+    """
 
     def __init__(self, path):
 
@@ -670,23 +670,23 @@ class ContinueFolder(object):
 
     @staticmethod
     def message(string):
-        '''Print message to shell window and append global MESSAGE_PREFIX.'''
+        """Print message to shell window and append global MESSAGE_PREFIX."""
 
         print(' '.join([MESSAGE_PREFIX, string]))
 
     def load_presets(self):
-        '''Load preset file if preset and store XML tree & root'''
+        """Load preset file if preset and store XML tree & root"""
 
         if os.path.isfile(self.presets_xml):
             self.presets_xml_tree = et.parse(self.presets_xml)
         else:
-            default = '''<continue_folder_presets></continue_folder_presets>'''
+            default = """<continue_folder_presets></continue_folder_presets>"""
             self.presets_xml_tree = et.ElementTree(et.fromstring(default))
 
         self.presets_xml_root = self.presets_xml_tree.getroot()
 
     def generate_tokens(self):
-        '''Each item has a list with the shorthand token, a token regex, a pattern regex
+        """Each item has a list with the shorthand token, a token regex, a pattern regex
         and then the value.
 
         {name : [ token, token_regex, pattern_regex, value ], ...}
@@ -697,7 +697,7 @@ class ContinueFolder(object):
             necessary on tokens that take optional modifiers, ie. {version###}
         pattern_regex = regex to extract the token data from the folder name
         value = starting value
-        '''
+        """
 
         self.tokens = {
             'am/pm':
@@ -724,14 +724,14 @@ class ContinueFolder(object):
 
     @staticmethod
     def capture_tokens(regex, folder):
-        '''
+        """
         Args:
             regex (str): regex that match tokens wrapped in curly braces
             folder (str): folder name to be tested
 
         Returns:
             Regex match object
-        '''
+        """
 
         try:
             result = re.match(regex, folder)
@@ -741,7 +741,7 @@ class ContinueFolder(object):
         return result
 
     def load_pattern(self):
-        '''Load the first preset's pattern or use the default pattern.'''
+        """Load the first preset's pattern or use the default pattern."""
 
         if self.presets_xml_root.findall('preset'):
             # load pattern for first element in list of presets
@@ -751,13 +751,13 @@ class ContinueFolder(object):
             self.pattern = '{version}'
 
     def generate_pattern_regex(self):
-        '''Generate a regex based on the token pattern.  This regex will be used to find
+        """Generate a regex based on the token pattern.  This regex will be used to find
         matching folders.
 
         Use the token regex if available otherwise just token.
 
         for example, {YYYY}_{MM}_{DD} would become [0-9]{4}_[0-9]{2}_[0-9]{2}
-        '''
+        """
 
         self.pattern_regex = self.pattern
 
@@ -769,9 +769,9 @@ class ContinueFolder(object):
                 self.pattern_regex = re.sub(values[0], values[2], self.pattern_regex)
 
     def find_folders(self):
-        '''Appends tuples to self.folders list.  The tuples contain the folder name, and
+        """Appends tuples to self.folders list.  The tuples contain the folder name, and
         then the version number if present.
-        '''
+        """
 
         # Always clear the list before searching again with new regex
         self.folders = []
@@ -794,13 +794,13 @@ class ContinueFolder(object):
                 self.folders.append(tuple(match))
 
     def update_version_token(self):
-        '''Scan folders that matched the pattern regex to find if a version is present.
+        """Scan folders that matched the pattern regex to find if a version is present.
         If so, find the highest version number and set value in self.tokens to be one
         higher.
-        '''
+        """
 
         def find_version_padding():
-            '''Find if the version number is padded with zeroes.'''
+            """Find if the version number is padded with zeroes."""
 
             # find hashes preceeded by {version and trailed by }
             # using re.match starts searching from beginning of a string so
@@ -826,7 +826,7 @@ class ContinueFolder(object):
         self.tokens['Version'][3] = str(version).zfill(self.version_padding)
 
     def resolve_tokens(self):
-        '''Replace tokens with values.'''
+        """Replace tokens with values."""
 
         self.folder_new = self.pattern
 
@@ -838,9 +838,9 @@ class ContinueFolder(object):
                 self.folder_new = re.sub(values[0], values[3], self.folder_new)
 
     def create_desktop_reel(self):
-        '''Create reel on bottom of the current desktop that starts a folder
+        """Create reel on bottom of the current desktop that starts a folder
         sequence or continues an existing folder sequence.
-        '''
+        """
 
         import flame
 
@@ -850,9 +850,9 @@ class ContinueFolder(object):
         self.message('Reel created!')
 
     def create_media_hub_folder(self):
-        '''Create folder in media hub that starts a folder sequence or continues
+        """Create folder in media hub that starts a folder sequence or continues
         the existing folder sequence.
-        '''
+        """
 
         import flame
 
@@ -861,10 +861,10 @@ class ContinueFolder(object):
         self.message('MediaHub folder created!')
 
     def save_preset_window(self):
-        '''Smaller window with save dialog.'''
+        """Smaller window with save dialog."""
 
         def duplicate_check():
-            '''Check that preset to be saved would not be a duplicate.'''
+            """Check that preset to be saved would not be a duplicate."""
 
             duplicate = False
             preset_name = self.line_edit_preset_name.text()
@@ -876,7 +876,7 @@ class ContinueFolder(object):
             return duplicate
 
         def save_preset():
-            '''Save new preset to XML file.'''
+            """Save new preset to XML file."""
 
             new_preset = et.Element('preset', name=self.line_edit_preset_name.text())
             new_pattern = et.SubElement(new_preset, 'pattern')
@@ -896,7 +896,7 @@ class ContinueFolder(object):
                     'Check permissions on {}'.format(os.path.dirname(__file__)))
 
         def overwrite_preset():
-            '''Replace pattern in presets XML tree then save to XML file.'''
+            """Replace pattern in presets XML tree then save to XML file."""
 
             preset_name = self.line_edit_preset_name.text()
 
@@ -915,14 +915,14 @@ class ContinueFolder(object):
                     'Check permissions on {}'.format(os.path.dirname(__file__)))
 
         def sort_presets():
-            '''Alphabetically sort presets by name attribute.'''
+            """Alphabetically sort presets by name attribute."""
 
             self.presets_xml_root[:] = sorted(
                 self.presets_xml_root,
                 key=lambda child: (child.tag, child.get('name')))
 
         def save_button():
-            '''Triggered when the Save button at the bottom is pressed.'''
+            """Triggered when the Save button at the bottom is pressed."""
 
             duplicate = duplicate_check()
 
@@ -947,7 +947,7 @@ class ContinueFolder(object):
                 self.save_window.close()
 
         def cancel_button():
-            '''Triggered when the Cancel button at the bottom is pressed.'''
+            """Triggered when the Cancel button at the bottom is pressed."""
 
             self.save_window.close()
 
@@ -1007,7 +1007,7 @@ class ContinueFolder(object):
     def main_window(self):
 
         def get_selected_preset():
-            '''Get preset that should be displayed or return empty string.'''
+            """Get preset that should be displayed or return empty string."""
 
             try:
                 selected_preset = self.presets_xml_root.findall('preset')[0].get('name')
@@ -1017,7 +1017,7 @@ class ContinueFolder(object):
             return selected_preset
 
         def get_preset_names():
-            '''Return just the names of the presets '''
+            """Return just the names of the presets """
 
             try:
                 preset_names = [
@@ -1029,7 +1029,7 @@ class ContinueFolder(object):
             return preset_names
 
         def update_folder():
-            '''Update folder when pattern is changed.'''
+            """Update folder when pattern is changed."""
 
             self.pattern = self.line_edit_pattern.text()
             self.generate_pattern_regex()
@@ -1039,7 +1039,7 @@ class ContinueFolder(object):
             self.line_edit_folder.setText(self.folder_new)
 
         def update_pattern():
-            '''Update pattern when preset is changed.'''
+            """Update pattern when preset is changed."""
 
             preset_name = self.btn_preset.text()
 
@@ -1050,7 +1050,7 @@ class ContinueFolder(object):
                         break  # should not be any duplicates
 
         def preset_delete_button():
-            '''Triggered when the Delete button on the Preset line is pressed.'''
+            """Triggered when the Delete button on the Preset line is pressed."""
 
             if FlameMessageWindow(
                     'Confirm Operation', 'confirm', 'Are you sure want to'
@@ -1074,12 +1074,12 @@ class ContinueFolder(object):
             update_pattern()
 
         def preset_save_button():
-            '''Triggered when the Save button the Presets line is pressed.'''
+            """Triggered when the Save button the Presets line is pressed."""
 
             self.save_preset_window()
 
         def okay_button():
-            '''Triggered when the Okay button at the bottom is pressed.'''
+            """Triggered when the Okay button at the bottom is pressed."""
 
             if self.btn_destination_reel.isChecked():  # Desktop Reel
                 self.create_desktop_reel()
@@ -1090,7 +1090,7 @@ class ContinueFolder(object):
             self.window.close()
 
         def cancel_button():
-            '''Triggered when the Cancel button at the bottom is pressed.'''
+            """Triggered when the Cancel button at the bottom is pressed."""
 
             self.message('Cancelled!')
             self.window.close()
@@ -1183,14 +1183,14 @@ class ContinueFolder(object):
 
 
 def process_selection(selection):
-    '''Execute script on all selected folders in MediaHub.'''
+    """Execute script on all selected folders in MediaHub."""
 
     for folder in selection:
         ContinueFolder(folder.path)
 
 
 def scope_folders(selection):
-    '''Determine if selection is a folder in the MediaHub > Files tab.'''
+    """Determine if selection is a folder in the MediaHub > Files tab."""
 
     import flame
 
