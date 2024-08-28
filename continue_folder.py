@@ -850,7 +850,7 @@ class ContinueFolder:
 
                 self.message(f'{self.line_edit_preset_name.text()} preset saved to ' +
                              f'{self.presets_xml}')
-            except (IOError, OSError):
+            except OSError:
                 FlameMessageWindow(
                     'Error', 'error',
                     f'Check permissions on {os.path.dirname(__file__)}')
@@ -868,7 +868,7 @@ class ContinueFolder:
 
                 self.message(f'{self.line_edit_preset_name.text()} preset saved to ' +
                              f'{self.presets_xml}')
-            except (IOError, OSError):
+            except OSError:
                 FlameMessageWindow(
                     'Error', 'error',
                     f'Check permissions on {os.path.dirname(__file__)}')
