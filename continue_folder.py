@@ -35,7 +35,7 @@ To Install:
 import datetime as dt
 import os
 import re
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as ETree
 from functools import partial
 
 import flame
@@ -646,10 +646,10 @@ class ContinueFolder:
     def load_presets(self):
         """Load preset file if preset and store XML tree & root."""
         if os.path.isfile(self.presets_xml):
-            self.presets_xml_tree = et.parse(self.presets_xml)
+            self.presets_xml_tree = ETree.parse(self.presets_xml)
         else:
             default = """<continue_folder_presets></continue_folder_presets>"""
-            self.presets_xml_tree = et.ElementTree(et.fromstring(default))
+            self.presets_xml_tree = ETree.ElementTree(ETree.fromstring(default))
 
         self.presets_xml_root = self.presets_xml_tree.getroot()
 
@@ -838,8 +838,8 @@ class ContinueFolder:
 
         def save_preset():
             """Save new preset to XML file."""
-            new_preset = et.Element('preset', name=self.line_edit_preset_name.text())
-            new_pattern = et.SubElement(new_preset, 'pattern')
+            new_preset = ETree.Element('preset', name=self.line_edit_preset_name.text())
+            new_pattern = ETree.SubElement(new_preset, 'pattern')
             new_pattern.text = self.line_edit_preset_pattern.text()
 
             self.presets_xml_root.append(new_preset)
