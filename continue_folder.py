@@ -972,7 +972,7 @@ class ContinueFolder:
             return selected_preset
 
         def get_preset_names():
-            """Return just the names of the presets"""
+            """Return just the names of the presets."""
             try:
                 preset_names = [
                     preset.get('name') for preset in
