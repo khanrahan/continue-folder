@@ -28,9 +28,13 @@ You want to have a Library that will mirror a folder of exports on the server:
  5. Drag this reel to the Library of exports
  6. Finally, drag the reel from the Library of exports into the MediaHub Files section to create a folder with the same name as the reel containing your clips
 
-## Installation
-**Tested & working on 2021.1 & 2024 PR180**
+## Compatibility
+|Release Version|Flame Version|
+|---|---|
+|v2.X.X|Flame 2022 up to 2024.2|
+|v1.X.X|Flame 2021 up to 2021.2|
 
+## Installation
 To make available to all users on the workstation, copy `continue_folder.py` to `/opt/Autodesk/shared/python`
 
 For specific users, copy to `/opt/Autodesk/user/<user name>/python`

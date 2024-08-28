@@ -2,21 +2,19 @@
 Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
-Script Version: 1.0.2
-Flame Version: 2021.1
+Script Version: 2.0.0
+Flame Version: 2022
 
 URL: http://www.github.com/khanrahan/continue-folder
 
 Creation Date: 04.10.23
-Update Date: 07.05.23
+Update Date: 08.27.24
 
 Description:
 
     Create a new reel on the Desktop and/or folder in the MediaHub Files tab using
     tokens, including a token to continue a number sequence in a sequence of existing
     folders.
-
-    Tested on 2021.1 & 2024 PR180
 
 Menus:
 
@@ -42,7 +40,7 @@ import flame
 from PySide2 import QtCore, QtGui, QtWidgets
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (1, 0, 2, 'dev')
+VERSION_INFO = (2, 0, 0)
 VERSION = '.'.join([str(num) for num in VERSION_INFO])
 TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON]'
