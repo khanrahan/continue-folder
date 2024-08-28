@@ -578,7 +578,7 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
         token_action_menu()
 
 
-class ContinueFolder(object):
+class ContinueFolder:
     """Creates a new folder on the Desktop or in the Media Hub using tokens.
 
     Currently, the only special token is {version} which will look for a number sequence
