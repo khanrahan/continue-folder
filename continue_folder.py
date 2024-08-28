@@ -50,8 +50,7 @@ MESSAGE_PREFIX = '[PYTHON HOOK]'
 
 
 class FlameButton(QtWidgets.QPushButton):
-    """
-    Custom Qt Flame Button Widget v2.1
+    """Custom Qt Flame Button Widget v2.1
 
     button_name: button text [str]
     connect: execute when clicked [function]
@@ -60,11 +59,9 @@ class FlameButton(QtWidgets.QPushButton):
     button_max_width: (optional) default is 150 [int]
 
     Usage:
-
         button = FlameButton(
             'Button Name', do_something__when_pressed, button_color='blue')
     """
-
     def __init__(self, button_name, connect, button_color='normal', button_width=150,
                  button_max_width=150):
         super(FlameButton, self).__init__()
@@ -118,8 +115,7 @@ class FlameButton(QtWidgets.QPushButton):
 
 
 class FlameLabel(QtWidgets.QLabel):
-    """
-    Custom Qt Flame Label Widget v2.1
+    """Custom Qt Flame Label Widget v2.1
 
     label_name:  text displayed [str]
     label_type:  (optional) select from different styles:
@@ -127,10 +123,8 @@ class FlameLabel(QtWidgets.QLabel):
     label_width: (optional) default is 150 [int]
 
     Usage:
-
         label = FlameLabel('Label Name', 'normal', 300)
     """
-
     def __init__(self, label_name, label_type='normal', label_width=150):
         super(FlameLabel, self).__init__()
 
@@ -169,8 +163,7 @@ class FlameLabel(QtWidgets.QLabel):
 
 
 class FlameLineEdit(QtWidgets.QLineEdit):
-    """
-    Custom Qt Flame Line Edit Widget v2.1
+    """Custom Qt Flame Line Edit Widget v2.1
 
     Main window should include this: window.setFocusPolicy(QtCore.Qt.StrongFocus)
 
@@ -179,10 +172,8 @@ class FlameLineEdit(QtWidgets.QLineEdit):
     max_width: (optional) maximum width of widget. default is 2000. [int]
 
     Usage:
-
         line_edit = FlameLineEdit('Some text here')
     """
-
     def __init__(self, text, width=150, max_width=2000):
         super(FlameLineEdit, self).__init__()
 
@@ -213,8 +204,7 @@ class FlameLineEdit(QtWidgets.QLineEdit):
 
 
 class FlamePushButton(QtWidgets.QPushButton):
-    """
-    Custom Qt Flame Push Button Widget v2.1
+    """Custom Qt Flame Push Button Widget v2.1
 
     button_name: text displayed on button [str]
     button_checked: True or False [bool]
@@ -222,10 +212,8 @@ class FlamePushButton(QtWidgets.QPushButton):
     button_width: (optional) default is 150. [int]
 
     Usage:
-
         pushbutton = FlamePushButton('Button Name', False)
     """
-
     def __init__(self, button_name, button_checked, connect=None, button_width=150):
         super(FlamePushButton, self).__init__()
 
@@ -291,8 +279,7 @@ class FlamePushButton(QtWidgets.QPushButton):
 
 
 class FlamePushButtonMenu(QtWidgets.QPushButton):
-    """
-    Custom Qt Flame Menu Push Button Widget v3.1
+    """Custom Qt Flame Menu Push Button Widget v3.1
 
     button_name: text displayed on button [str]
     menu_options: list of options show when button is pressed [list]
@@ -301,7 +288,6 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
     menu_action: (optional) execute when button is changed. [function]
 
     Usage:
-
         push_button_menu_options = ['Item 1', 'Item 2', 'Item 3', 'Item 4']
         menu_push_button = FlamePushButtonMenu(
             'push_button_name', push_button_menu_options)
@@ -317,7 +303,6 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         v3.1 adds a functionionality to set the width of the menu to be the same as the
         button.
     """
-
     def __init__(self, button_name, menu_options, menu_width=240, max_menu_width=2000,
                  menu_action=None):
         super(FlamePushButtonMenu, self).__init__()
@@ -372,8 +357,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         self.setMenu(self.pushbutton_menu)
 
     def create_menu(self, option, menu_action):
-        """ """
-
+        """Create menu item."""
         self.setText(option)
 
         if menu_action:
@@ -381,7 +365,6 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
 
     def populate_menu(self, options):
         """Empty the menu then reassemble the options."""
-
         self.pushbutton_menu.clear()
 
         for option in options:
@@ -390,8 +373,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
 
 
 class FlameMessageWindow(QtWidgets.QDialog):
-    """
-    Custom Qt Flame Message Window v2.1
+    """Custom Qt Flame Message Window v2.1
 
     message_title: text shown in top left of window ie. Confirm Operation [str]
     message_type: confirm, message, error, warning [str] confirm and warning return True
@@ -400,14 +382,12 @@ class FlameMessageWindow(QtWidgets.QDialog):
     parent: optional - parent window [object]
 
     Message Window Types:
-
         confirm: confirm and cancel button / grey left bar - returns True or False
         message: ok button / blue left bar
         error: ok button / yellow left bar
         warning: confirm and cancel button / red left bar - returns True of False
 
     Usage:
-
         FlameMessageWindow('Error', 'error', 'some important message')
 
         or
@@ -416,7 +396,6 @@ class FlameMessageWindow(QtWidgets.QDialog):
             'Confirm Operation', 'confirm', 'some important message', window):
                 do something
     """
-
     def __init__(self, message_title, message_type, message, parent=None):
         super(FlameMessageWindow, self).__init__()
 
@@ -487,16 +466,13 @@ class FlameMessageWindow(QtWidgets.QDialog):
         self.exec_()
 
     def __bool__(self):
-
         return self.confirmed
 
     def cancel(self):
-
         self.close()
         self.confirmed = False
 
     def confirm(self):
-
         self.close()
         self.confirmed = True
 
@@ -532,8 +508,7 @@ class FlameMessageWindow(QtWidgets.QDialog):
 
 
 class FlameTokenPushButton(QtWidgets.QPushButton):
-    """
-    Custom Qt Flame Token Push Button Widget v2.1
+    """Custom Qt Flame Token Push Button Widget v2.1
 
     button_name: Text displayed on button [str]
     token_dict: Dictionary defining tokens. {'Token Name': '<Token>'} [dict]
@@ -542,11 +517,9 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
     button_max_width: (optional) default is 300 [int]
 
     Usage:
-
         token_dict = {'Token 1': '<Token1>', 'Token2': '<Token2>'}
         token_push_button = FlameTokenPushButton('Add Token', token_dict, token_dest)
     """
-
     def __init__(self, button_name, token_dict, token_dest, button_width=110,
                  button_max_width=300):
         super(FlameTokenPushButton, self).__init__()
@@ -607,14 +580,12 @@ class FlameTokenPushButton(QtWidgets.QPushButton):
 
 
 class ContinueFolder(object):
-    """
-    Creates a new folder on the Desktop or in the Media Hub using tokens.
+    """Creates a new folder on the Desktop or in the Media Hub using tokens.
 
     Currently, the only special token is {version} which will look for a number sequence
     and return the next number in the sequence. All of the other tokens are standard
     things like: day, hour, minute.
     """
-
     def __init__(self, path):
 
         self.message(TITLE_VERSION)
@@ -671,12 +642,10 @@ class ContinueFolder(object):
     @staticmethod
     def message(string):
         """Print message to shell window and append global MESSAGE_PREFIX."""
-
         print(' '.join([MESSAGE_PREFIX, string]))
 
     def load_presets(self):
-        """Load preset file if preset and store XML tree & root"""
-
+        """Load preset file if preset and store XML tree & root."""
         if os.path.isfile(self.presets_xml):
             self.presets_xml_tree = et.parse(self.presets_xml)
         else:
@@ -686,7 +655,9 @@ class ContinueFolder(object):
         self.presets_xml_root = self.presets_xml_tree.getroot()
 
     def generate_tokens(self):
-        """Each item has a list with the shorthand token, a token regex, a pattern regex
+        """Generate dictionary of tokens with a list for each.
+
+        Each item has a list with the shorthand token, a token regex, a pattern regex
         and then the value.
 
         {name : [ token, token_regex, pattern_regex, value ], ...}
@@ -698,7 +669,6 @@ class ContinueFolder(object):
         pattern_regex = regex to extract the token data from the folder name
         value = starting value
         """
-
         self.tokens = {
             'am/pm':
                 ['{pp}', None, '[a-z]{2}', self.now.strftime('%p').lower()],
@@ -724,7 +694,8 @@ class ContinueFolder(object):
 
     @staticmethod
     def capture_tokens(regex, folder):
-        """
+        """Capture tokens using regex.
+
         Args:
             regex (str): regex that match tokens wrapped in curly braces
             folder (str): folder name to be tested
@@ -732,7 +703,6 @@ class ContinueFolder(object):
         Returns:
             Regex match object
         """
-
         try:
             result = re.match(regex, folder)
         except re.error:  # for example, a situation where {version} is passed twice
@@ -742,7 +712,6 @@ class ContinueFolder(object):
 
     def load_pattern(self):
         """Load the first preset's pattern or use the default pattern."""
-
         if self.presets_xml_root.findall('preset'):
             # load pattern for first element in list of presets
             self.pattern = self.presets_xml_root.findall(
@@ -751,14 +720,13 @@ class ContinueFolder(object):
             self.pattern = '{version}'
 
     def generate_pattern_regex(self):
-        """Generate a regex based on the token pattern.  This regex will be used to find
-        matching folders.
+        """Generate a regex based on the token pattern.
 
-        Use the token regex if available otherwise just token.
+        This regex will be used to find matching folders.  Use the token regex if
+        available otherwise just token.
 
         for example, {YYYY}_{MM}_{DD} would become [0-9]{4}_[0-9]{2}_[0-9]{2}
         """
-
         self.pattern_regex = self.pattern
 
         for token, values in self.tokens.items():
@@ -769,10 +737,10 @@ class ContinueFolder(object):
                 self.pattern_regex = re.sub(values[0], values[2], self.pattern_regex)
 
     def find_folders(self):
-        """Appends tuples to self.folders list.  The tuples contain the folder name, and
-        then the version number if present.
-        """
+        """Appends tuples to self.folders list.
 
+        The tuples contain the folder name, and then the version number if present.
+        """
         # Always clear the list before searching again with new regex
         self.folders = []
 
@@ -795,13 +763,13 @@ class ContinueFolder(object):
 
     def update_version_token(self):
         """Scan folders that matched the pattern regex to find if a version is present.
+
         If so, find the highest version number and set value in self.tokens to be one
         higher.
         """
 
         def find_version_padding():
             """Find if the version number is padded with zeroes."""
-
             # find hashes preceeded by {version and trailed by }
             # using re.match starts searching from beginning of a string so
             # ?:.* is a non-capturing group for anything preceeding {version
@@ -827,7 +795,6 @@ class ContinueFolder(object):
 
     def resolve_tokens(self):
         """Replace tokens with values."""
-
         self.folder_new = self.pattern
 
         for token, values in self.tokens.items():
@@ -838,10 +805,10 @@ class ContinueFolder(object):
                 self.folder_new = re.sub(values[0], values[3], self.folder_new)
 
     def create_desktop_reel(self):
-        """Create reel on bottom of the current desktop that starts a folder
-        sequence or continues an existing folder sequence.
-        """
+        """Create reel on bottom of the current desktop.
 
+        This will start a folder sequence or continue an existing folder sequence.
+        """
         import flame
 
         desktop = flame.project.current_project.current_workspace.desktop
@@ -850,10 +817,10 @@ class ContinueFolder(object):
         self.message('Reel created!')
 
     def create_media_hub_folder(self):
-        """Create folder in media hub that starts a folder sequence or continues
-        the existing folder sequence.
-        """
+        """Create folder in Media Hub.
 
+        This will start a folder sequence or continue the existing folder sequence.
+        """
         import flame
 
         os.mkdir(os.path.join(self.path, self.folder_new))
@@ -865,7 +832,6 @@ class ContinueFolder(object):
 
         def duplicate_check():
             """Check that preset to be saved would not be a duplicate."""
-
             duplicate = False
             preset_name = self.line_edit_preset_name.text()
 
@@ -877,7 +843,6 @@ class ContinueFolder(object):
 
         def save_preset():
             """Save new preset to XML file."""
-
             new_preset = et.Element('preset', name=self.line_edit_preset_name.text())
             new_pattern = et.SubElement(new_preset, 'pattern')
             new_pattern.text = self.line_edit_preset_pattern.text()
@@ -897,7 +862,6 @@ class ContinueFolder(object):
 
         def overwrite_preset():
             """Replace pattern in presets XML tree then save to XML file."""
-
             preset_name = self.line_edit_preset_name.text()
 
             for preset in self.presets_xml_root.findall('preset'):
@@ -916,14 +880,12 @@ class ContinueFolder(object):
 
         def sort_presets():
             """Alphabetically sort presets by name attribute."""
-
             self.presets_xml_root[:] = sorted(
                 self.presets_xml_root,
                 key=lambda child: (child.tag, child.get('name')))
 
         def save_button():
             """Triggered when the Save button at the bottom is pressed."""
-
             duplicate = duplicate_check()
 
             if duplicate:
@@ -948,7 +910,6 @@ class ContinueFolder(object):
 
         def cancel_button():
             """Triggered when the Cancel button at the bottom is pressed."""
-
             self.save_window.close()
 
         self.save_window = QtWidgets.QWidget()
@@ -1005,10 +966,9 @@ class ContinueFolder(object):
         return self.window
 
     def main_window(self):
-
+        """The main GUI window."""
         def get_selected_preset():
             """Get preset that should be displayed or return empty string."""
-
             try:
                 selected_preset = self.presets_xml_root.findall('preset')[0].get('name')
             except IndexError:  # if findall() returns empty list
@@ -1017,8 +977,7 @@ class ContinueFolder(object):
             return selected_preset
 
         def get_preset_names():
-            """Return just the names of the presets """
-
+            """Return just the names of the presets"""
             try:
                 preset_names = [
                     preset.get('name') for preset in
@@ -1030,7 +989,6 @@ class ContinueFolder(object):
 
         def update_folder():
             """Update folder when pattern is changed."""
-
             self.pattern = self.line_edit_pattern.text()
             self.generate_pattern_regex()
             self.find_folders()
@@ -1040,7 +998,6 @@ class ContinueFolder(object):
 
         def update_pattern():
             """Update pattern when preset is changed."""
-
             preset_name = self.btn_preset.text()
 
             if preset_name:  # might be empty str if all presets were deleted
@@ -1051,7 +1008,6 @@ class ContinueFolder(object):
 
         def preset_delete_button():
             """Triggered when the Delete button on the Preset line is pressed."""
-
             if FlameMessageWindow(
                     'Confirm Operation', 'confirm', 'Are you sure want to'
                     + ' permanently delete this preset?' + '<br/>' + 'This operation'
@@ -1075,12 +1031,10 @@ class ContinueFolder(object):
 
         def preset_save_button():
             """Triggered when the Save button the Presets line is pressed."""
-
             self.save_preset_window()
 
         def okay_button():
             """Triggered when the Okay button at the bottom is pressed."""
-
             if self.btn_destination_reel.isChecked():  # Desktop Reel
                 self.create_desktop_reel()
             if self.btn_destination_folder.isChecked():  # Media Hub
@@ -1091,7 +1045,6 @@ class ContinueFolder(object):
 
         def cancel_button():
             """Triggered when the Cancel button at the bottom is pressed."""
-
             self.message('Cancelled!')
             self.window.close()
 
@@ -1184,14 +1137,12 @@ class ContinueFolder(object):
 
 def process_selection(selection):
     """Execute script on all selected folders in MediaHub."""
-
     for folder in selection:
         ContinueFolder(folder.path)
 
 
 def scope_folders(selection):
     """Determine if selection is a folder in the MediaHub > Files tab."""
-
     import flame
 
     for item in selection:
@@ -1201,7 +1152,7 @@ def scope_folders(selection):
 
 
 def get_mediahub_files_custom_ui_actions():
-
+    """Add right click menu items."""
     return [{'name': 'Create...',
              'actions': [{'name': 'Continue Folder',
                           'isVisible': scope_folders,
