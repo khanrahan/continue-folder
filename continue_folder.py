@@ -1144,10 +1144,7 @@ def scope_folders(selection):
     """Determine if selection is a folder in the MediaHub > Files tab."""
     import flame
 
-    for item in selection:
-        if isinstance(item, flame.PyMediaHubFilesFolder):
-            return True
-    return False
+    return any(isinstance(item, flame.PyMediaHubFilesFolder) for item in selection)
 
 
 def get_mediahub_files_custom_ui_actions():
