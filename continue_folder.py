@@ -32,15 +32,14 @@ To Install:
 """
 
 
+import datetime as dt
 import os
 import re
-import datetime as dt
 import xml.etree.ElementTree as et
 from functools import partial
-from PySide2 import QtCore
-from PySide2 import QtGui
-from PySide2 import QtWidgets
 
+import flame
+from PySide2 import QtCore, QtGui, QtWidgets
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (1, 0, 2, 'dev')
@@ -809,8 +808,6 @@ class ContinueFolder(object):
 
         This will start a folder sequence or continue an existing folder sequence.
         """
-        import flame
-
         desktop = flame.project.current_project.current_workspace.desktop
         # create_real will not take utf-8, only ascii
         desktop.reel_groups[0].create_reel(self.folder_new.encode('ascii', 'ignore'))
@@ -821,8 +818,6 @@ class ContinueFolder(object):
 
         This will start a folder sequence or continue the existing folder sequence.
         """
-        import flame
-
         os.mkdir(os.path.join(self.path, self.folder_new))
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
         self.message('MediaHub folder created!')
@@ -1142,8 +1137,6 @@ def process_selection(selection):
 
 def scope_folders(selection):
     """Determine if selection is a folder in the MediaHub > Files tab."""
-    import flame
-
     return any(isinstance(item, flame.PyMediaHubFilesFolder) for item in selection)
 
 
