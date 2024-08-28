@@ -45,7 +45,7 @@ from PySide2 import QtWidgets
 TITLE = 'Continue Folder'
 VERSION_INFO = (1, 0, 2, 'dev')
 VERSION = '.'.join([str(num) for num in VERSION_INFO])
-TITLE_VERSION = '{} v{}'.format(TITLE, VERSION)
+TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON HOOK]'
 
 
@@ -589,7 +589,7 @@ class ContinueFolder(object):
     def __init__(self, path):
 
         self.message(TITLE_VERSION)
-        self.message('Script called from {}'.format(__file__))
+        self.message(f'Script called from {__file__}')
 
         self.path = path
 
@@ -853,12 +853,12 @@ class ContinueFolder(object):
             try:
                 self.presets_xml_tree.write(self.presets_xml)
 
-                self.message('{} preset saved to {}'.format(
-                    self.line_edit_preset_name.text(), self.presets_xml))
+                self.message(f'{self.line_edit_preset_name.text()} preset saved to ' +
+                             f'{self.presets_xml}')
             except (IOError, OSError):
                 FlameMessageWindow(
                     'Error', 'error',
-                    'Check permissions on {}'.format(os.path.dirname(__file__)))
+                    f'Check permissions on {os.path.dirname(__file__)}')
 
         def overwrite_preset():
             """Replace pattern in presets XML tree then save to XML file."""
@@ -871,12 +871,12 @@ class ContinueFolder(object):
             try:
                 self.presets_xml_tree.write(self.presets_xml)
 
-                self.message('{} preset saved to {}'.format(
-                    self.line_edit_preset_name.text(), self.presets_xml))
+                self.message(f'{self.line_edit_preset_name.text()} preset saved to ' +
+                             f'{self.presets_xml}')
             except (IOError, OSError):
                 FlameMessageWindow(
                     'Error', 'error',
-                    'Check permissions on {}'.format(os.path.dirname(__file__)))
+                    f'Check permissions on {os.path.dirname(__file__)}')
 
         def sort_presets():
             """Alphabetically sort presets by name attribute."""
@@ -1018,8 +1018,7 @@ class ContinueFolder(object):
                     if preset.get('name') == preset_name:
                         self.presets_xml_root.remove(preset)
                         self.message(
-                            '{} preset deleted from {}'.format(
-                                preset_name, self.presets_xml))
+                            f'{preset_name} preset deleted from {self.presets_xml}')
 
                 self.presets_xml_tree.write(self.presets_xml)
 
