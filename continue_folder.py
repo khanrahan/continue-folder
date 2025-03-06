@@ -8,7 +8,7 @@ Flame Version:  2025
 URL: http://www.github.com/khanrahan/continue-folder
 
 Creation Date: 04.10.23
-Update Date: 08.27.24
+Update Date: 03.06.25
 
 Description:
 
