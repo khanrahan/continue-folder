@@ -1025,15 +1025,6 @@ class ContinueFolder:
 
     def main_window(self):
         """The main GUI window."""
-        def get_selected_preset():
-            """Get preset that should be displayed or return empty string."""
-            try:
-                selected_preset = self.settings_xml_presets.findall('preset')[0].get('name')
-            except IndexError:  # if findall() returns empty list
-                selected_preset = ''
-
-            return selected_preset
-
         def get_preset_names():
             """Return just the names of the presets."""
             try:
@@ -1044,6 +1035,15 @@ class ContinueFolder:
                 preset_names = []
 
             return preset_names
+
+        def get_selected_preset():
+            """Get preset that should be displayed or return empty string."""
+            try:
+                selected_preset = get_preset_names()[0]
+            except IndexError:  # if get_preset_names returns empty list
+                selected_preset = ''
+
+            return selected_preset
 
         def update_folder():
             """Update folder when pattern is changed."""
