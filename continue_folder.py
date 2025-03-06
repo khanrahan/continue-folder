@@ -3,7 +3,7 @@ Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
 Script Version: 2.0.0
-Flame Version: 2022
+Flame Version:  2025
 
 URL: http://www.github.com/khanrahan/continue-folder
 
@@ -37,7 +37,7 @@ import xml.etree.ElementTree as ETree
 from functools import partial
 
 import flame
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (2, 0, 0)
@@ -404,7 +404,7 @@ class FlameMessageWindow(QtWidgets.QDialog):
         self.setMaximumSize(QtCore.QSize(500, 330))
         self.setStyleSheet('background-color: rgb(36, 36, 36)')
 
-        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
         self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                   (resolution.height() / 2) - (self.frameSize().height() / 2))
 
@@ -913,11 +913,12 @@ class ContinueFolder:
         self.save_window.setWindowTitle('Save Preset As...')
 
         # Center Window
-        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
 
         self.save_window.move(
             (resolution.width() / 2) - (self.save_window_x / 2),
-            (resolution.height() / 2) - (self.save_window_y / 2 + 44))
+            (resolution.height() / 2) - (self.save_window_y / 2 + 44)
+        )
 
         # Labels
         self.label_preset_name = FlameLabel('Preset Name', 'normal')
@@ -947,7 +948,7 @@ class ContinueFolder:
         self.save_hbox01.addWidget(self.save_btn_save)
 
         self.save_vbox = QtWidgets.QVBoxLayout()
-        self.save_vbox.setMargin(20)
+        self.save_vbox.setContentsMargins(20, 20, 20, 20)
         self.save_vbox.addLayout(self.save_grid1)
         self.save_vbox.addSpacing(20)
         self.save_vbox.addLayout(self.save_hbox01)
@@ -1048,7 +1049,7 @@ class ContinueFolder:
         self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         # Center Window
-        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
 
         self.window.move(
                 (resolution.width() / 2) - (self.window_x / 2),
@@ -1115,7 +1116,7 @@ class ContinueFolder:
         self.hbox2.addWidget(self.btn_ok)
 
         self.vbox = QtWidgets.QVBoxLayout()
-        self.vbox.setMargin(20)
+        self.vbox.setContentsMargins(20, 20, 20, 20)
         self.vbox.addLayout(self.grid1)
         self.vbox.addSpacing(20)
         self.vbox.addLayout(self.hbox2)
@@ -1144,5 +1145,5 @@ def get_mediahub_files_custom_ui_actions():
              'actions': [{'name': 'Continue Folder',
                           'isVisible': scope_folders,
                           'execute': process_selection,
-                          'minimumVersion': '2022'}]
+                          'minimumVersion': '2025.0.0.0'}]
             }]
