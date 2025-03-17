@@ -3,7 +3,7 @@ Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
 Script Version: 3.0.0
-Flame Version:  2025
+Flame Version: 2025
 
 URL: http://www.github.com/khanrahan/continue-folder
 
