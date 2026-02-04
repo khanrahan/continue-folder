@@ -42,6 +42,7 @@ from functools import partial
 import flame
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from continue_folder_flame_button import FlameButton
 from continue_folder_flame_line_edit import FlameLineEdit
 
 TITLE = 'Continue Folder'
@@ -52,71 +53,6 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
-
-class FlameButton(QtWidgets.QPushButton):
-    """Custom Qt Flame Button Widget v2.1
-
-    button_name: button text [str]
-    connect: execute when clicked [function]
-    button_color: (optional) normal, blue [str]
-    button_width: (optional) default is 150 [int]
-    button_max_width: (optional) default is 150 [int]
-
-    Usage:
-        button = FlameButton(
-            'Button Name', do_something__when_pressed, button_color='blue')
-    """
-    def __init__(self, button_name, connect, button_color='normal', button_width=150,
-                 button_max_width=150):
-        super().__init__()
-
-        self.setText(button_name)
-        self.setMinimumSize(QtCore.QSize(button_width, 28))
-        self.setMaximumSize(QtCore.QSize(button_max_width, 28))
-        self.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.clicked.connect(connect)
-        if button_color == 'normal':
-            self.setStyleSheet("""
-                QPushButton {
-                    color: rgb(154, 154, 154);
-                    background-color: rgb(58, 58, 58);
-                    border: none;
-                    font: 14px 'Discreet'}
-                QPushButton:hover {
-                    border: 1px solid rgb(90, 90, 90)}
-                QPushButton:pressed {
-                    color: rgb(159, 159, 159);
-                    background-color: rgb(66, 66, 66);
-                    border: 1px solid rgb(90, 90, 90)}
-                QPushButton:disabled {
-                    color: rgb(116, 116, 116);
-                    background-color: rgb(58, 58, 58);
-                    border: none}
-                QToolTip {
-                    color: rgb(170, 170, 170);
-                    background-color: rgb(71, 71, 71);
-                    border: 10px solid rgb(71, 71, 71)}""")
-        elif button_color == 'blue':
-            self.setStyleSheet("""
-                QPushButton {
-                    color: rgb(190, 190, 190);
-                    background-color: rgb(0, 110, 175);
-                    border: none;
-                    font: 12px 'Discreet'}
-                QPushButton:hover {
-                    border: 1px solid rgb(90, 90, 90)}
-                QPushButton:pressed {
-                    color: rgb(159, 159, 159);
-                    border: 1px solid rgb(90, 90, 90)
-                QPushButton:disabled {
-                    color: rgb(116, 116, 116);
-                    background-color: rgb(58, 58, 58);
-                    border: none}
-                QToolTip {
-                    color: rgb(170, 170, 170);
-                    background-color: rgb(71, 71, 71);
-                    border: 10px solid rgb(71, 71, 71)}""")
-
 
 class FlameLabel(QtWidgets.QLabel):
     """Custom Qt Flame Label Widget v2.1
