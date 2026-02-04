@@ -42,6 +42,8 @@ from functools import partial
 import flame
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from continue_folder_flame_line_edit import FlameLineEdit
+
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
 VERSION = '.'.join([str(num) for num in VERSION_INFO])
@@ -162,47 +164,6 @@ class FlameLabel(QtWidgets.QLabel):
                     font: 14px 'Discreet'}
                 QLabel:disabled {
                     color: rgb(106, 106, 106)}""")
-
-
-class FlameLineEdit(QtWidgets.QLineEdit):
-    """Custom Qt Flame Line Edit Widget v2.1
-
-    Main window should include this: window.setFocusPolicy(QtCore.Qt.StrongFocus)
-
-    text: text show [str]
-    width: (optional) width of widget. default is 150. [int]
-    max_width: (optional) maximum width of widget. default is 2000. [int]
-
-    Usage:
-        line_edit = FlameLineEdit('Some text here')
-    """
-    def __init__(self, text, width=150, max_width=2000):
-        super().__init__()
-
-        self.setText(text)
-        self.setMinimumHeight(28)
-        self.setMinimumWidth(width)
-        self.setMaximumWidth(max_width)
-        self.setFocusPolicy(QtCore.Qt.ClickFocus)
-        self.setStyleSheet("""
-            QLineEdit {
-                color: rgb(154, 154, 154);
-                background-color: rgb(55, 65, 75);
-                selection-color: rgb(38, 38, 38);
-                selection-background-color: rgb(184, 177, 167);
-                border: 1px solid rgb(55, 65, 75);
-                padding-left: 5px;
-                font: 14px 'Discreet'}
-            QLineEdit:focus {background-color: rgb(73, 86, 99)}
-            QLineEdit:hover {border: 1px solid rgb(90, 90, 90)}
-            QLineEdit:disabled {
-                color: rgb(106, 106, 106);
-                background-color: rgb(55, 55, 55);
-                border: 1px solid rgb(55, 55, 55)}
-            QToolTip {
-                color: rgb(170, 170, 170);
-                background-color: rgb(71, 71, 71);
-                border: none}""")
 
 
 class FlamePushButton(QtWidgets.QPushButton):
