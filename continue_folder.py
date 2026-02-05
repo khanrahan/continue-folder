@@ -43,6 +43,7 @@ import flame
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from continue_folder_flame_button import FlameButton
+from confinue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
 
 TITLE = 'Continue Folder'
@@ -53,54 +54,6 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
-
-class FlameLabel(QtWidgets.QLabel):
-    """Custom Qt Flame Label Widget v2.1
-
-    label_name:  text displayed [str]
-    label_type:  (optional) select from different styles:
-                 normal, underline, background. default is normal [str]
-    label_width: (optional) default is 150 [int]
-
-    Usage:
-        label = FlameLabel('Label Name', 'normal', 300)
-    """
-    def __init__(self, label_name, label_type='normal', label_width=150):
-        super().__init__()
-
-        self.setText(label_name)
-        self.setMinimumSize(label_width, 28)
-        self.setMaximumHeight(28)
-        self.setFocusPolicy(QtCore.Qt.NoFocus)
-
-        # Set label stylesheet based on label_type
-
-        if label_type == 'normal':
-            self.setStyleSheet("""
-                QLabel {
-                    color: rgb(154, 154, 154);
-                    font: 14px 'Discreet'}
-                QLabel:disabled {
-                    color: rgb(106, 106, 106)}""")
-        elif label_type == 'underline':
-            self.setAlignment(QtCore.Qt.AlignCenter)
-            self.setStyleSheet("""
-                QLabel {
-                    color: rgb(154, 154, 154);
-                    border-bottom: 1px inset rgb(40, 40, 40);
-                    font: 14px 'Discreet'}
-                QLabel:disabled {
-                    color: rgb(106, 106, 106)}""")
-        elif label_type == 'background':
-            self.setStyleSheet("""
-                QLabel {
-                    color: rgb(154, 154, 154);
-                    background-color: rgb(30, 30, 30);
-                    padding-left: 5px;
-                    font: 14px 'Discreet'}
-                QLabel:disabled {
-                    color: rgb(106, 106, 106)}""")
-
 
 class FlamePushButton(QtWidgets.QPushButton):
     """Custom Qt Flame Push Button Widget v2.1
