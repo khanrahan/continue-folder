@@ -45,6 +45,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from continue_folder_flame_button import FlameButton
 from confinue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
+from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 
@@ -56,141 +57,6 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
-
-class FlameMessageWindow(QtWidgets.QDialog):
-    """Custom Qt Flame Message Window v2.1
-
-    message_title: text shown in top left of window ie. Confirm Operation [str]
-    message_type: confirm, message, error, warning [str] confirm and warning return True
-                  or False values
-    message: text displayed in body of window [str]
-    parent: optional - parent window [object]
-
-    Message Window Types:
-        confirm: confirm and cancel button / grey left bar - returns True or False
-        message: ok button / blue left bar
-        error: ok button / yellow left bar
-        warning: confirm and cancel button / red left bar - returns True of False
-
-    Usage:
-        FlameMessageWindow('Error', 'error', 'some important message')
-
-        or
-
-        if FlameMessageWindow(
-            'Confirm Operation', 'confirm', 'some important message', window):
-                do something
-    """
-    def __init__(self, message_title, message_type, message, parent=None):
-        super().__init__()
-
-        self.message_type = message_type
-
-        self.setWindowFlags(
-            QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
-        self.setMinimumSize(QtCore.QSize(500, 330))
-        self.setMaximumSize(QtCore.QSize(500, 330))
-        self.setStyleSheet('background-color: rgb(36, 36, 36)')
-
-        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
-        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                  (resolution.height() / 2) - (self.frameSize().height() / 2))
-
-        self.setParent(parent)
-
-        self.grid = QtWidgets.QGridLayout()
-
-        self.main_label = FlameLabel(message_title, 'normal', label_width=500)
-        self.main_label.setStyleSheet("""
-            color: rgb(154, 154, 154);
-            font: 18px 'Discreet'""")
-
-        self.message_text_edit = QtWidgets.QTextEdit(message)
-        self.message_text_edit.setDisabled(True)
-        self.message_text_edit.setStyleSheet("""
-            QTextEdit {
-                color: rgb(154, 154, 154);
-                background-color: rgb(36, 36, 36);
-                selection-color: rgb(190, 190, 190);
-                selection-background-color: rgb(36, 36, 36);
-                border: none;
-                padding-left: 20px;
-                padding-right: 20px;
-                font: 12px 'Discreet'}""")
-
-        if message_type in ('confirm', 'warning'):
-            self.confirm_button = FlameButton(
-                'Confirm', self.confirm, button_color='blue', button_width=110)
-            self.cancel_button = FlameButton('Cancel', self.cancel, button_width=110)
-
-            self.grid.addWidget(self.main_label, 0, 0)
-            self.grid.setRowMinimumHeight(1, 30)
-            self.grid.addWidget(self.message_text_edit, 2, 0, 4, 8)
-            self.grid.setRowMinimumHeight(9, 30)
-            self.grid.addWidget(self.cancel_button, 10, 5)
-            self.grid.addWidget(self.confirm_button, 10, 6)
-            self.grid.setRowMinimumHeight(11, 30)
-        else:
-            self.ok_button = FlameButton(
-                'Ok', self.confirm, button_color='blue', button_width=110)
-
-            self.grid.addWidget(self.main_label, 0, 0)
-            self.grid.setRowMinimumHeight(1, 30)
-            self.grid.addWidget(self.message_text_edit, 2, 0, 4, 8)
-            self.grid.setRowMinimumHeight(9, 30)
-            self.grid.addWidget(self.ok_button, 10, 6)
-            self.grid.setRowMinimumHeight(11, 30)
-
-        # Why stripping these?
-        message = message.replace('<br>', '')
-        message = message.replace('<center>', '')
-        message = message.replace('<dd>', '')
-
-        self.setLayout(self.grid)
-        self.show()
-        self.exec_()
-
-    def __bool__(self):
-        return self.confirmed
-
-    def cancel(self):
-        self.close()
-        self.confirmed = False
-
-    def confirm(self):
-        self.close()
-        self.confirmed = True
-
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-
-        if self.message_type == 'confirm':
-            line_color = QtGui.QColor(71, 71, 71)
-        elif self.message_type == 'message':
-            line_color = QtGui.QColor(0, 110, 176)
-        elif self.message_type == 'error':
-            line_color = QtGui.QColor(200, 172, 30)
-        elif self.message_type == 'warning':
-            line_color = QtGui.QColor(200, 29, 29)
-
-        painter.setPen(QtGui.QPen(line_color, 6, QtCore.Qt.SolidLine))
-        painter.drawLine(0, 0, 0, 330)
-
-        painter.setPen(QtGui.QPen(QtGui.QColor(71, 71, 71), .5, QtCore.Qt.SolidLine))
-        painter.drawLine(0, 40, 500, 40)
-
-    def mousePressEvent(self, event):
-        self.oldPosition = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-
-        try:
-            delta = QtCore.QPoint(event.globalPos() - self.oldPosition)
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.oldPosition = event.globalPos()
-        except:
-            pass
-
 
 class FlameTokenPushButton(QtWidgets.QPushButton):
     """Custom Qt Flame Token Push Button Widget v2.1
