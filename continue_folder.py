@@ -48,6 +48,7 @@ from continue_folder_flame_line_edit import FlameLineEdit
 from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
+from continue_folder_flame_token_push_button import FlameTokenPushButton
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
@@ -57,78 +58,6 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
-
-class FlameTokenPushButton(QtWidgets.QPushButton):
-    """Custom Qt Flame Token Push Button Widget v2.1
-
-    button_name: Text displayed on button [str]
-    token_dict: Dictionary defining tokens. {'Token Name': '<Token>'} [dict]
-    token_dest: LineEdit that token will be applied to [object]
-    button_width: (optional) default is 150 [int]
-    button_max_width: (optional) default is 300 [int]
-
-    Usage:
-        token_dict = {'Token 1': '<Token1>', 'Token2': '<Token2>'}
-        token_push_button = FlameTokenPushButton('Add Token', token_dict, token_dest)
-    """
-    def __init__(self, button_name, token_dict, token_dest, button_width=110,
-                 button_max_width=300):
-        super().__init__()
-
-        self.setText(button_name)
-        self.setMinimumHeight(28)
-        self.setMinimumWidth(button_width)
-        self.setMaximumWidth(button_max_width)
-        self.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.setStyleSheet("""
-            QPushButton {
-                color: rgb(154, 154, 154);
-                background-color: rgb(45, 55, 68);
-                border: none;
-                font: 14px 'Discreet';
-                padding-left: 6px;
-                text-align: left}
-            QPushButton:hover {
-                border: 1px solid rgb(90, 90, 90)}
-            QPushButton:disabled {
-                color: rgb(106, 106, 106);
-                background-color: rgb(45, 55, 68);
-                border: none}
-            QPushButton::menu-indicator {
-                subcontrol-origin: padding;
-                subcontrol-position: center right}
-            QToolTip {
-                color: rgb(170, 170, 170);
-                background-color: rgb(71, 71, 71);
-                border: 10px solid rgb(71, 71, 71)}""")
-
-        def token_action_menu():
-
-            def insert_token(token):
-                for key, value in token_dict.items():
-                    if key == token:
-                        token_name = value
-                        token_dest.insert(token_name)
-
-            # the lambda sorts aAbBcC instead of ABCabc
-            for key, value in sorted(token_dict.items(), key=lambda v: v[0].upper()):
-                del value
-                token_menu.addAction(key, partial(insert_token, key))
-
-        token_menu = QtWidgets.QMenu(self)
-        token_menu.setFocusPolicy(QtCore.Qt.NoFocus)
-        token_menu.setStyleSheet("""
-            QMenu {
-                color: rgb(154, 154, 154);
-                background-color: rgb(45, 55, 68);
-                border: none; font: 14px 'Discreet'}
-            QMenu::item:selected {
-                color: rgb(217, 217, 217);
-                background-color: rgb(58, 69, 81)}""")
-
-        self.setMenu(token_menu)
-        token_action_menu()
-
 
 class ContinueFolder:
     """Creates a new folder on the Desktop or in the Media Hub using tokens.
