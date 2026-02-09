@@ -37,18 +37,18 @@ import datetime as dt
 import os
 import re
 import xml.etree.ElementTree as ETree
-from functools import partial
 
 import flame
+from confinue_folder_flame_label import FlameLabel
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from continue_folder_flame_button import FlameButton
-from confinue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
 from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 from continue_folder_flame_token_push_button import FlameTokenPushButton
+from continue_folder_save_preset_window import SavePresetWindow
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
@@ -58,6 +58,7 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
+
 
 class ContinueFolder:
     """Creates a new folder on the Desktop or in the Media Hub using tokens.
@@ -340,81 +341,19 @@ class ContinueFolder:
         self.message('MediaHub folder created!')
 
     def save_preset_window(self):
-        """Smaller window with save dialog."""
-
+        """Show save preset dialog and save or overwrite preset on accept."""
         def check_preset_folder():
             """Check that destination folder for preset XML file is available."""
-            result = False
-
             if os.path.exists(self.settings_xml_folder):
-                result = True
-            else:
-                try:
-                    os.makedirs(self.settings_xml_folder)
-                    result = True
-                except OSError:
-                    FlameMessageWindow(
-                        'Error', 'error',
-                        f'Could not create {self.settings_xml_folder}')
-            return result
-
-        def duplicate_check():
-            """Check that preset to be saved would not be a duplicate."""
-            duplicate = False
-            preset_name = self.line_edit_preset_name.text()
-
-            for preset in self.settings_xml_presets.findall('preset'):
-                if preset.get('name') == preset_name:
-                    duplicate = True
-
-            return duplicate
-
-        def save_preset():
-            """Save new preset to XML file."""
-            new_preset = ETree.Element('preset', name=self.line_edit_preset_name.text())
-            new_pattern = ETree.SubElement(new_preset, 'pattern')
-            new_pattern.text = self.line_edit_preset_pattern.text()
-
-            self.settings_xml_presets.append(new_preset)
-            sort_presets()
-
-            if check_preset_folder():
-                try:
-                    self.settings_xml_tree.write(
-                            self.settings_xml_file,
-                            encoding='UTF-8',
-                            xml_declaration=True
-                    )
-
-                    self.message(f'{self.line_edit_preset_name.text()} preset saved ' +
-                                 f'to {self.settings_xml_file}')
-                except OSError as err:
-                    raise err
-                    FlameMessageWindow(
-                        'Error', 'error',
-                        f'Check permissions on {self.settings_xml_file}')
-
-        def overwrite_preset():
-            """Replace pattern in presets XML tree then save to XML file."""
-            preset_name = self.line_edit_preset_name.text()
-
-            for preset in self.settings_xml_presets.findall('preset'):
-                if preset.get('name') == preset_name:
-                    preset.find('pattern').text = self.line_edit_preset_pattern.text()
-
+                return True
             try:
-                self.settings_xml_tree.write(
-                        self.settings_xml_file,
-                        encoding='UTF-8',
-                        xml_declaration=True
-                )
-
-                self.message(f'{self.line_edit_preset_name.text()} preset saved ' +
-                             f'to {self.settings_xml_file}')
+                os.makedirs(self.settings_xml_folder)
+                return True
             except OSError:
                 FlameMessageWindow(
                     'Error', 'error',
-                    f'Check permissions on {self.settings_xml_file}')
+                    f'Could not create {self.settings_xml_folder}')
+                return False
 
         def sort_presets():
             """Alphabetically sort presets by name attribute."""
@@ -422,87 +361,54 @@ class ContinueFolder:
                 self.settings_xml_presets,
                 key=lambda child: (child.tag, child.get('name')))
 
-        def save_button():
-            """Triggered when the Save button at the bottom is pressed."""
-            duplicate = duplicate_check()
-
-            if duplicate:
-                if FlameMessageWindow(
-                        'Overwrite Existing Preset', 'confirm', 'Are you '
-                        + 'sure want to permanently overwrite this preset?' + '<br/>'
-                        + 'This operation cannot be undone.'):
-                    overwrite_preset()
-                    self.btn_preset.populate_menu(
-                        [preset.get('name') for preset in
-                         self.settings_xml_presets.findall('preset')])
-                    self.btn_preset.setText(self.line_edit_preset_name.text())
-                    self.save_window.close()
-
-            if not duplicate:
-                save_preset()
-                self.btn_preset.populate_menu(
-                    [preset.get('name') for preset in
-                     self.settings_xml_presets.findall('preset')])
-                self.btn_preset.setText(self.line_edit_preset_name.text())
-                self.save_window.close()
-
-        def cancel_button():
-            """Triggered when the Cancel button at the bottom is pressed."""
-            self.save_window.close()
-
-        self.save_window = QtWidgets.QWidget()
-
-        self.save_window.setMinimumSize(self.save_window_x, self.save_window_y)
-
-        self.save_window.setStyleSheet('background-color: #272727')
-        self.save_window.setWindowTitle('Save Preset As...')
-
-        # Center Window
-        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
-
-        self.save_window.move(
-            (resolution.width() / 2) - (self.save_window_x / 2),
-            (resolution.height() / 2) - (self.save_window_y / 2 + 44)
-        )
-
-        # Labels
-        self.label_preset_name = FlameLabel('Preset Name', 'normal')
-        self.label_preset_pattern = FlameLabel('Pattern', 'normal')
-
-        # Line Edits
-        self.line_edit_preset_name = FlameLineEdit(self.pattern)
-        self.line_edit_preset_pattern = FlameLineEdit(self.pattern)
-
-        # Buttons
-        self.save_btn_save = FlameButton(
-            'Save', save_button, button_color='blue', button_width=110)
-        self.save_btn_cancel = FlameButton('Cancel', cancel_button, button_width=110)
-
-        # Layout
-        self.save_grid1 = QtWidgets.QGridLayout()
-        self.save_grid1.setVerticalSpacing(10)
-        self.save_grid1.setHorizontalSpacing(10)
-        self.save_grid1.addWidget(self.label_preset_name, 0, 0)
-        self.save_grid1.addWidget(self.line_edit_preset_name, 0, 1)
-        self.save_grid1.addWidget(self.label_preset_pattern, 1, 0)
-        self.save_grid1.addWidget(self.line_edit_preset_pattern, 1, 1)
-
-        self.save_hbox01 = QtWidgets.QHBoxLayout()
-        self.save_hbox01.addStretch(1)
-        self.save_hbox01.addWidget(self.save_btn_cancel)
-        self.save_hbox01.addWidget(self.save_btn_save)
-
-        self.save_vbox = QtWidgets.QVBoxLayout()
-        self.save_vbox.setContentsMargins(20, 20, 20, 20)
-        self.save_vbox.addLayout(self.save_grid1)
-        self.save_vbox.addSpacing(20)
-        self.save_vbox.addLayout(self.save_hbox01)
-
-        self.save_window.setLayout(self.save_vbox)
-
-        self.save_window.show()
-
-        return self.window
+        save_window = SavePresetWindow(self.window)
+        save_window.name = self.pattern
+        if save_window.exec_() != QtWidgets.QDialog.Accepted:
+            return
+        preset_name = save_window.name
+        pattern = self.pattern
+        duplicate = any(
+            preset.get('name') == preset_name
+            for preset in self.settings_xml_presets.findall('preset'))
+        if duplicate:
+            if not FlameMessageWindow(
+                    'Overwrite Existing Preset', 'confirm', 'Are you '
+                    + 'sure want to permanently overwrite this preset?'
+                    + '<br/>' + 'This operation cannot be undone.'):
+                return
+            for preset in self.settings_xml_presets.findall('preset'):
+                if preset.get('name') == preset_name:
+                    pattern_el = preset.find('pattern')
+                    if pattern_el is not None:
+                        pattern_el.text = pattern
+                    else:
+                        pattern_el = ETree.SubElement(preset, 'pattern')
+                        pattern_el.text = pattern
+                    break
+        else:
+            new_preset = ETree.Element('preset', name=preset_name)
+            new_pattern = ETree.SubElement(new_preset, 'pattern')
+            new_pattern.text = pattern
+            self.settings_xml_presets.append(new_preset)
+            sort_presets()
+        if not check_preset_folder():
+            return
+        try:
+            self.settings_xml_tree.write(
+                self.settings_xml_file,
+                encoding='UTF-8',
+                xml_declaration=True)
+            self.message(
+                f'{preset_name} preset saved to {self.settings_xml_file}')
+        except OSError:
+            FlameMessageWindow(
+                'Error', 'error',
+                f'Check permissions on {self.settings_xml_file}')
+            return
+        self.btn_preset.populate_menu(
+            [preset.get('name') for preset in
+             self.settings_xml_presets.findall('preset')])
+        self.btn_preset.setText(preset_name)
 
     def main_window(self):
         """The main GUI window."""
