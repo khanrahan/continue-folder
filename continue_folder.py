@@ -38,15 +38,10 @@ import os
 import re
 
 import flame
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtWidgets
 
-from continue_folder_flame_button import FlameButton
-from confinue_folder_flame_label import FlameLabel
-from continue_folder_flame_line_edit import FlameLineEdit
 from continue_folder_flame_message_window import FlameMessageWindow
-from continue_folder_flame_push_button import FlamePushButton
-from continue_folder_flame_push_button_menu import FlamePushButtonMenu
-from continue_folder_flame_token_push_button import FlameTokenPushButton
+from continue_folder_main_window import MainWindow
 from continue_folder_save_preset_window import SavePresetWindow
 from continue_folder_settings_store import SettingsStore
 
@@ -113,16 +108,94 @@ class ContinueFolder:
         self.folder_new = ''
         self.resolve_tokens()
 
-        # Starting Dimensions
-        self.window_x = 900
-        self.window_y = 130
+        self._window = MainWindow(TITLE_VERSION, self._get_flame_parent())
+        self._window.preset = (
+            self._store.preset_names[0] if self._store.preset_names else '')
+        self._window.presets = self._store.preset_names
+        self._window.pattern = self.pattern
+        self._window.folder_new = self.folder_new
+        self._window.tokens = {
+            key: values[0] for key, values in self.tokens.items()}
 
-        self.main_window()
+        self._window.signal_preset.connect(self._on_preset_change)
+        self._window.signal_save.connect(self.save_preset_window)
+        self._window.signal_delete.connect(self._on_preset_delete)
+        self._window.signal_pattern.connect(self._on_pattern_change)
+        self._window.signal_ok.connect(self._on_ok_clicked)
+        self._window.signal_cancel.connect(self._on_cancel_clicked)
+
+        self._window.show()
 
     @staticmethod
     def message(string):
         """Print message to shell window and append global MESSAGE_PREFIX."""
         print(' '.join([MESSAGE_PREFIX, string]))
+
+    @staticmethod
+    def _get_flame_parent():
+        """Return Flame main window as parent for dialogs, or None."""
+        for widget in QtWidgets.QApplication.topLevelWidgets():
+            if widget.objectName() == 'CF Main Window':
+                return widget
+        return None
+
+    def _on_preset_change(self):
+        """Handle preset selection change; update pattern from store."""
+        preset_name = self._window.preset
+        if preset_name:
+            preset = self._store.presets.get(preset_name)
+            if preset:
+                self.pattern = getattr(preset, 'pattern', '') or ''
+                self._window.pattern = self.pattern
+        self._refresh_folder_display()
+
+    def _on_pattern_change(self, text):
+        """Handle pattern text change; recompute folder and update display."""
+        self.pattern = text
+        self._refresh_folder_display()
+
+    def _on_preset_delete(self):
+        """Handle preset delete button; confirm then delete and reload."""
+        preset_name = self._window.preset
+        if not FlameMessageWindow(
+                'Confirm Operation', 'confirm', 'Are you sure want to'
+                + ' permanently delete this preset?' + '<br/>' + 'This operation'
+                + ' cannot be undone.'):
+            return
+        try:
+            self._store.delete(name=preset_name)
+            self._store.save()
+            self.message(
+                f'{preset_name} preset deleted from {self._settings_file}')
+        except ValueError:
+            pass
+        self._store.load()
+        self._window.presets = self._store.preset_names
+        self._window.preset = (
+            self._store.preset_names[0] if self._store.preset_names else '')
+        self._on_preset_change()
+
+    def _on_ok_clicked(self):
+        """Handle OK button; create reel or folder then close."""
+        if self._window.destination_reel_checked:
+            self.create_desktop_reel()
+        if self._window.destination_folder_checked:
+            self.create_media_hub_folder()
+        self.message('Done!')
+        self._window.close()
+
+    def _on_cancel_clicked(self):
+        """Handle Cancel button."""
+        self.message('Cancelled!')
+        self._window.close()
+
+    def _refresh_folder_display(self):
+        """Recompute folder name from pattern and update window display."""
+        self.generate_pattern_regex()
+        self.find_folders()
+        self.update_version_token()
+        self.resolve_tokens()
+        self._window.folder_new = self.folder_new
 
     def generate_tokens(self):
         """Generate dictionary of tokens with a list for each.
@@ -297,7 +370,7 @@ class ContinueFolder:
 
     def save_preset_window(self):
         """Show save preset dialog and save or overwrite preset on accept."""
-        save_window = SavePresetWindow(self.window)
+        save_window = SavePresetWindow(self._window)
         save_window.name = self.pattern
         if save_window.exec_() != QtWidgets.QDialog.Accepted:
             return
@@ -323,162 +396,8 @@ class ContinueFolder:
                 'Error', 'error',
                 f'Check permissions on {self._settings_file}')
             return
-        self.btn_preset.populate_menu(self._store.preset_names)
-        self.btn_preset.setText(preset_name)
-
-    def main_window(self):
-        """The main GUI window."""
-        def get_preset_names():
-            """Return just the names of the presets."""
-            return self._store.preset_names
-
-        def get_selected_preset():
-            """Get preset that should be displayed or return empty string."""
-            names = get_preset_names()
-            return names[0] if names else ''
-
-        def update_folder():
-            """Update folder when pattern is changed."""
-            self.pattern = self.line_edit_pattern.text()
-            self.generate_pattern_regex()
-            self.find_folders()
-            self.update_version_token()
-            self.resolve_tokens()
-            self.line_edit_folder.setText(self.folder_new)
-
-        def update_pattern():
-            """Update pattern when preset is changed."""
-            preset_name = self.btn_preset.text()
-            if preset_name:
-                preset = self._store.presets.get(preset_name)
-                if preset:
-                    self.line_edit_pattern.setText(
-                        getattr(preset, 'pattern', '') or '')
-
-        def preset_delete_button():
-            """Triggered when the Delete button on the Preset line is pressed."""
-            preset_name = self.btn_preset.text()
-            if not FlameMessageWindow(
-                    'Confirm Operation', 'confirm', 'Are you sure want to'
-                    + ' permanently delete this preset?' + '<br/>' + 'This operation'
-                    + ' cannot be undone.'):
-                return
-            try:
-                self._store.delete(name=preset_name)
-                self._store.save()
-                self.message(
-                    f'{preset_name} preset deleted from {self._settings_file}')
-            except ValueError:
-                pass
-            self._store.load()
-            self.btn_preset.populate_menu(get_preset_names())
-            self.btn_preset.setText(get_selected_preset())
-            update_pattern()
-
-        def preset_save_button():
-            """Triggered when the Save button the Presets line is pressed."""
-            self.save_preset_window()
-
-        def okay_button():
-            """Triggered when the Okay button at the bottom is pressed."""
-            if self.btn_destination_reel.isChecked():  # Desktop Reel
-                self.create_desktop_reel()
-            if self.btn_destination_folder.isChecked():  # Media Hub
-                self.create_media_hub_folder()
-
-            self.message('Done!')
-            self.window.close()
-
-        def cancel_button():
-            """Triggered when the Cancel button at the bottom is pressed."""
-            self.message('Cancelled!')
-            self.window.close()
-
-        self.window = QtWidgets.QWidget()
-
-        self.window.setMinimumSize(self.window_x, self.window_y)
-        self.window.setStyleSheet('background-color: #272727')
-        self.window.setWindowTitle(TITLE_VERSION)
-        self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        # Center Window
-        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
-
-        self.window.move(
-                (resolution.width() / 2) - (self.window_x / 2),
-                (resolution.height() / 2) - (self.window_y / 2 + 44))
-
-        # Labels
-        self.label_preset = FlameLabel('Preset', 'normal')
-        self.label_pattern = FlameLabel('Pattern', 'normal')
-        self.label_folder = FlameLabel('New Folder', 'normal')
-        self.label_destination = FlameLabel('Destination', 'normal')
-
-        # Lines
-        self.line_edit_pattern = FlameLineEdit(self.pattern)
-        self.line_edit_pattern.textChanged.connect(update_folder)
-        self.line_edit_folder = FlameLabel(self.folder_new, 'background')
-
-        # Buttons
-        self.btn_preset = FlamePushButtonMenu(
-            get_selected_preset(), get_preset_names(), menu_action=update_pattern)
-        self.btn_preset.setMaximumSize(QtCore.QSize(4000, 28))  # span over to Save btn
-
-        self.btn_preset_save = FlameButton('Save', preset_save_button, button_width=110)
-        self.btn_preset_delete = FlameButton(
-            'Delete', preset_delete_button, button_width=110)
-        self.btn_tokens = FlameTokenPushButton(
-            'Add Token',
-            # self.tokens is a dict with a nested set for each key
-            # FlameTokenPushButton wants a dict that is only {token_name: token}
-            # so need to simplify it with a dict comprehension
-            {key: values[0] for key, values in self.tokens.items()},
-            self.line_edit_pattern)
-        self.btn_ok = FlameButton(
-            'Ok', okay_button, button_color='blue', button_width=110)
-
-        self.btn_cancel = FlameButton('Cancel', cancel_button, button_width=110)
-
-        self.btn_destination_reel = FlamePushButton('Desktop Reel', True)
-        self.btn_destination_folder = FlamePushButton('MediaHub Folder', False)
-
-        # Layout
-        self.hbox1 = QtWidgets.QHBoxLayout()
-        self.hbox1.addWidget(self.btn_destination_reel)
-        self.hbox1.addWidget(self.btn_destination_folder)
-        self.hbox1.addStretch()
-
-        self.grid1 = QtWidgets.QGridLayout()
-        self.grid1.setVerticalSpacing(10)
-        self.grid1.setHorizontalSpacing(10)
-        self.grid1.addWidget(self.label_preset, 0, 0)
-        self.grid1.addWidget(self.btn_preset, 0, 1)
-        self.grid1.addWidget(self.btn_preset_save, 0, 2)
-        self.grid1.addWidget(self.btn_preset_delete, 0, 3)
-        self.grid1.addWidget(self.label_pattern, 1, 0)
-        self.grid1.addWidget(self.line_edit_pattern, 1, 1)
-        self.grid1.addWidget(self.btn_tokens, 1, 2)
-        self.grid1.addWidget(self.label_folder, 2, 0)
-        self.grid1.addWidget(self.line_edit_folder, 2, 1)
-        self.grid1.addWidget(self.label_destination, 3, 0)
-        self.grid1.addLayout(self.hbox1, 3, 1)
-
-        self.hbox2 = QtWidgets.QHBoxLayout()
-        self.hbox2.addStretch(1)
-        self.hbox2.addWidget(self.btn_cancel)
-        self.hbox2.addWidget(self.btn_ok)
-
-        self.vbox = QtWidgets.QVBoxLayout()
-        self.vbox.setContentsMargins(20, 20, 20, 20)
-        self.vbox.addLayout(self.grid1)
-        self.vbox.addSpacing(20)
-        self.vbox.addLayout(self.hbox2)
-
-        self.window.setLayout(self.vbox)
-
-        self.window.show()
-
-        return self.window
+        self._window.presets = self._store.preset_names
+        self._window.preset = preset_name
 
 
 def process_selection(selection):
