@@ -36,19 +36,19 @@ To Install:
 import datetime as dt
 import os
 import re
-import xml.etree.ElementTree as ETree
 
 import flame
-from confinue_folder_flame_label import FlameLabel
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from continue_folder_flame_button import FlameButton
+from confinue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
 from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 from continue_folder_flame_token_push_button import FlameTokenPushButton
 from continue_folder_save_preset_window import SavePresetWindow
+from continue_folder_settings_store import SettingsStore
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
@@ -80,18 +80,13 @@ class ContinueFolder:
             'Desktop Reel && Media Hub',  # double & to cancel QShortcut
             'Media Hub']
 
-        # Load presets
-        self.settings_xml_folder = os.path.expanduser(CONFIG_FOLDER)
-        self.settings_xml_file = os.path.join(self.settings_xml_folder, XML)
-
-        self.settings_xml_tree = None
-        self.load_settings_tree()
-
-        self.settings_xml_root = None
-        self.get_settings_root()
-
-        self.settings_xml_presets = None
-        self.get_settings_presets()
+        # Settings store (presets XML)
+        self._settings_file = os.path.join(
+            os.path.expanduser(CONFIG_FOLDER), XML)
+        self._store = SettingsStore(
+            self._settings_file, TITLE, VERSION,
+            preset_attributes=('name', 'pattern'))
+        self.message(f'Settings loaded from {self._settings_file}')
 
         # Generate dict containing token names, shorthand, and values
         self.now = dt.datetime.now()
@@ -121,8 +116,6 @@ class ContinueFolder:
         # Starting Dimensions
         self.window_x = 900
         self.window_y = 130
-        self.save_window_x = 500
-        self.save_window_y = 100
 
         self.main_window()
 
@@ -130,32 +123,6 @@ class ContinueFolder:
     def message(string):
         """Print message to shell window and append global MESSAGE_PREFIX."""
         print(' '.join([MESSAGE_PREFIX, string]))
-
-    def load_settings_tree(self):
-        """Load preset file if present and store XML tree & root."""
-        if os.path.isfile(self.settings_xml_file):
-            parser = ETree.XMLParser(encoding='UTF-8')
-            self.settings_xml_tree = ETree.parse(self.settings_xml_file, parser=parser)
-        else:
-            settings = ETree.Element('settings')
-
-            name = ETree.SubElement(settings, 'script_name')
-            name.text = TITLE
-
-            version = ETree.SubElement(name, 'version')
-            version.text = VERSION
-
-            presets = ETree.SubElement(version, 'presets')
-            self.settings_xml_tree = ETree.ElementTree(settings)
-
-    def get_settings_root(self):
-        """Store the root object for the ElementTree of settings."""
-        self.settings_xml_root = self.settings_xml_tree.getroot()
-
-    def get_settings_presets(self):
-        """Store the element object for the ElementTree of presets."""
-        self.settings_xml_presets = self.settings_xml_root.find(
-                'script_name/version/presets')
 
     def generate_tokens(self):
         """Generate dictionary of tokens with a list for each.
@@ -213,26 +180,14 @@ class ContinueFolder:
 
         return result
 
-    def load_preset_by_index_element(self, index, element):
-        """Load element from preset located at index.
-
-        Convert None to empty string.  ElementTree saves empty string as None.
-
-        Returns str
-        """
-        preset_element = (
-            self.settings_xml_presets.findall('preset')[index].find(element).text)
-
-        if preset_element is None:
-            preset_element = ''
-
-        return preset_element
-
     def load_pattern(self):
         """Load the first preset's pattern or use the default pattern."""
-        if self.settings_xml_presets.findall('preset'):
-            # load pattern for first element in list of presets
-            self.pattern = self.load_preset_by_index_element(0, 'pattern')
+        if self._store.preset_names:
+            first_name = self._store.preset_names[0]
+            preset = self._store.presets.get(first_name)
+            self.pattern = (
+                getattr(preset, 'pattern', '') or '{version}'
+                if preset else '{version}')
         else:
             self.pattern = '{version}'
 
@@ -342,95 +297,45 @@ class ContinueFolder:
 
     def save_preset_window(self):
         """Show save preset dialog and save or overwrite preset on accept."""
-        def check_preset_folder():
-            """Check that destination folder for preset XML file is available."""
-            if os.path.exists(self.settings_xml_folder):
-                return True
-            try:
-                os.makedirs(self.settings_xml_folder)
-                return True
-            except OSError:
-                FlameMessageWindow(
-                    'Error', 'error',
-                    f'Could not create {self.settings_xml_folder}')
-                return False
-
-        def sort_presets():
-            """Alphabetically sort presets by name attribute."""
-            self.settings_xml_presets[:] = sorted(
-                self.settings_xml_presets,
-                key=lambda child: (child.tag, child.get('name')))
-
         save_window = SavePresetWindow(self.window)
         save_window.name = self.pattern
         if save_window.exec_() != QtWidgets.QDialog.Accepted:
             return
         preset_name = save_window.name
         pattern = self.pattern
-        duplicate = any(
-            preset.get('name') == preset_name
-            for preset in self.settings_xml_presets.findall('preset'))
+        duplicate = self._store.find_preset(preset_name) is not None
         if duplicate:
             if not FlameMessageWindow(
                     'Overwrite Existing Preset', 'confirm', 'Are you '
                     + 'sure want to permanently overwrite this preset?'
                     + '<br/>' + 'This operation cannot be undone.'):
                 return
-            for preset in self.settings_xml_presets.findall('preset'):
-                if preset.get('name') == preset_name:
-                    pattern_el = preset.find('pattern')
-                    if pattern_el is not None:
-                        pattern_el.text = pattern
-                    else:
-                        pattern_el = ETree.SubElement(preset, 'pattern')
-                        pattern_el.text = pattern
-                    break
+            self._store.overwrite_preset(name=preset_name, pattern=pattern)
         else:
-            new_preset = ETree.Element('preset', name=preset_name)
-            new_pattern = ETree.SubElement(new_preset, 'pattern')
-            new_pattern.text = pattern
-            self.settings_xml_presets.append(new_preset)
-            sort_presets()
-        if not check_preset_folder():
-            return
+            self._store.add_preset(name=preset_name, pattern=pattern)
+            self._store.sort()
         try:
-            self.settings_xml_tree.write(
-                self.settings_xml_file,
-                encoding='UTF-8',
-                xml_declaration=True)
+            self._store.save()
             self.message(
-                f'{preset_name} preset saved to {self.settings_xml_file}')
+                f'{preset_name} preset saved to {self._settings_file}')
         except OSError:
             FlameMessageWindow(
                 'Error', 'error',
-                f'Check permissions on {self.settings_xml_file}')
+                f'Check permissions on {self._settings_file}')
             return
-        self.btn_preset.populate_menu(
-            [preset.get('name') for preset in
-             self.settings_xml_presets.findall('preset')])
+        self.btn_preset.populate_menu(self._store.preset_names)
         self.btn_preset.setText(preset_name)
 
     def main_window(self):
         """The main GUI window."""
         def get_preset_names():
             """Return just the names of the presets."""
-            try:
-                preset_names = [
-                    preset.get('name') for preset in
-                    self.settings_xml_presets.findall('preset')]
-            except IndexError:  # if findall() returns empty list
-                preset_names = []
-
-            return preset_names
+            return self._store.preset_names
 
         def get_selected_preset():
             """Get preset that should be displayed or return empty string."""
-            try:
-                selected_preset = get_preset_names()[0]
-            except IndexError:  # if get_preset_names returns empty list
-                selected_preset = ''
-
-            return selected_preset
+            names = get_preset_names()
+            return names[0] if names else ''
 
         def update_folder():
             """Update folder when pattern is changed."""
@@ -444,33 +349,28 @@ class ContinueFolder:
         def update_pattern():
             """Update pattern when preset is changed."""
             preset_name = self.btn_preset.text()
-
-            if preset_name:  # might be empty str if all presets were deleted
-                for preset in self.settings_xml_presets.findall('preset'):
-                    if preset.get('name') == preset_name:
-                        self.line_edit_pattern.setText(preset.find('pattern').text)
-                        break  # should not be any duplicates
+            if preset_name:
+                preset = self._store.presets.get(preset_name)
+                if preset:
+                    self.line_edit_pattern.setText(
+                        getattr(preset, 'pattern', '') or '')
 
         def preset_delete_button():
             """Triggered when the Delete button on the Preset line is pressed."""
             preset_name = self.btn_preset.text()
-
-            if FlameMessageWindow(
+            if not FlameMessageWindow(
                     'Confirm Operation', 'confirm', 'Are you sure want to'
                     + ' permanently delete this preset?' + '<br/>' + 'This operation'
                     + ' cannot be undone.'):
-                for preset in self.settings_xml_presets.findall('preset'):
-                    if preset.get('name') == preset_name:
-                        self.settings_xml_presets.remove(preset)
-                self.settings_xml_tree.write(self.settings_xml_file)
-
+                return
+            try:
+                self._store.delete(name=preset_name)
+                self._store.save()
                 self.message(
-                    f'{preset_name} preset deleted from {self.settings_xml_file}')
-
-            # Reload presets button
-            self.load_settings_tree()
-            self.get_settings_root()
-            self.get_settings_presets()
+                    f'{preset_name} preset deleted from {self._settings_file}')
+            except ValueError:
+                pass
+            self._store.load()
             self.btn_preset.populate_menu(get_preset_names())
             self.btn_preset.setText(get_selected_preset())
             update_pattern()
