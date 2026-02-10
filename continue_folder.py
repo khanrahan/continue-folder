@@ -12,13 +12,14 @@ Update Date: 03.06.25
 
 Description:
 
-    Create a new reel on the Desktop and/or folder in the MediaHub Files tab using
-    tokens, including a token to continue a number sequence in a sequence of existing
-    folders.
+    Create a new reel on the Desktop and/or folder in the MediaHub Files tab
+    using tokens, including a token to continue a number sequence in a sequence
+    of existing folders.
 
 Menus:
 
-    Right-click selected folders in the Media Hub --> Create... --> Continue Folder
+    Right-click selected folders in the Media Hub --> Create... --> Continue
+    Folder
 
 To Install:
 
@@ -58,9 +59,9 @@ XML = 'continue_folder.xml'
 class ContinueFolder:
     """Creates a new folder on the Desktop or in the Media Hub using tokens.
 
-    Currently, the only special token is {version} which will look for a number sequence
-    and return the next number in the sequence. All of the other tokens are standard
-    things like: day, hour, minute.
+    Currently, the only special token is {version} which will look for a number
+    sequence and return the next number in the sequence. All of the other
+    tokens are standard things like: day, hour, minute.
     """
     def __init__(self, path):
 
@@ -208,15 +209,16 @@ class ContinueFolder:
     def generate_tokens(self):
         """Generate dictionary of tokens with a list for each.
 
-        Each item has a list with the shorthand token, a token regex, a pattern regex
-        and then the value.
+        Each item has a list with the shorthand token, a token regex, a pattern
+        regex and then the value.
 
         {name : [ token, token_regex, pattern_regex, value ], ...}
 
         name = full name of the token
         token = this is the shorthand used in the pattern. ie, {token}
-        token_regex = optional regex to assist in generating the pattern regex.  only
-            necessary on tokens that take optional modifiers, ie. {version###}
+        token_regex = optional regex to assist in generating the pattern regex.
+            only necessary on tokens that take optional modifiers, ie.
+            {version###}
         pattern_regex = regex to extract the token data from the folder name
         value = starting value
         """
@@ -236,7 +238,8 @@ class ContinueFolder:
             'Month':
                 ['{MM}', None, '[0-9]{2}', self.now.strftime('%m')],
             'Version':
-                # the regex for Version is a named capture group excluding zero padding
+                # the regex for Version is a named capture group excluding zero
+                # padding
                 ['{version}', '{version#*}', '0*(?P<version>[1-9][0-9]*)', '1'],
             'Year (##)':
                 ['{YY}', None, '[0-9]{2}', self.now.strftime('%y')],
@@ -256,7 +259,8 @@ class ContinueFolder:
         """
         try:
             result = re.match(regex, folder)
-        except re.error:  # for example, a situation where {version} is passed twice
+        except re.error:
+            # for example, a situation where {version} is passed twice
             result = None
 
         return result
@@ -275,8 +279,8 @@ class ContinueFolder:
     def generate_pattern_regex(self):
         """Generate a regex based on the token pattern.
 
-        This regex will be used to find matching folders.  Use the token regex if
-        available otherwise just token.
+        This regex will be used to find matching folders.  Use the token regex
+        if available otherwise just token.
 
         for example, {YYYY}_{MM}_{DD} would become [0-9]{4}_[0-9]{2}_[0-9]{2}
         """
@@ -292,7 +296,8 @@ class ContinueFolder:
     def find_folders(self):
         """Appends tuples to self.folders list.
 
-        The tuples contain the folder name, and then the version number if present.
+        The tuples contain the folder name, and then the version number if
+        present.
         """
         # Always clear the list before searching again with new regex
         self.folders = []
@@ -300,7 +305,8 @@ class ContinueFolder:
         for folder in next(os.walk(self.path))[1]:
             search = self.capture_tokens(self.pattern_regex, folder)
 
-            # append tuples containing matching folder name(str) and version(int)
+            # append tuples containing matching folder name(str) and
+            # version(int)
             match = []
 
             # folder name match
@@ -308,17 +314,19 @@ class ContinueFolder:
                 match.append(search.group(0))
 
                 # version token match
-                # version must be integer because strings would sort as 1, 10, 11, 9
+                # version must be integer because strings would sort as 1, 10,
+                # 11, 9
                 if len(search.groups()) == 1:  # groups only returns named groups
                     match.append(int(search.group(1)))
 
                 self.folders.append(tuple(match))
 
     def update_version_token(self):
-        """Scan folders that matched the pattern regex to find if a version is present.
+        """Scan for folder versions.
 
-        If so, find the highest version number and set value in self.tokens to be one
-        higher.
+        Scan folders that matched the pattern regex to find if a version is
+        present.  If so, find the highest version number and set value in
+        self.tokens to be one higher.
         """
 
         def find_version_padding():
@@ -360,7 +368,8 @@ class ContinueFolder:
     def create_desktop_reel(self):
         """Create reel on bottom of the current desktop.
 
-        This will start a folder sequence or continue an existing folder sequence.
+        This will start a folder sequence or continue an existing folder
+        sequence.
         """
         desktop = flame.project.current_project.current_workspace.desktop
         # create_real will not take utf-8, only ascii
@@ -370,7 +379,8 @@ class ContinueFolder:
     def create_media_hub_folder(self):
         """Create folder in Media Hub.
 
-        This will start a folder sequence or continue the existing folder sequence.
+        This will start a folder sequence or continue the existing folder
+        sequence.
         """
         os.mkdir(os.path.join(self.path, self.folder_new))
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
