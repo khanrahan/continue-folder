@@ -8,8 +8,8 @@ from typing import Callable
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
-from button_mixin import ButtonMixin
-from flame_colors import FlameColors
+from continue_folder_button_mixin import ButtonMixin
+from continue_folder_flame_colors import FlameColors
 
 
 class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):

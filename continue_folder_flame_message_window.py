@@ -8,10 +8,10 @@ from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtWidgets  # pylint: disable=import-error
 
-from flame_button import FlameButton
-from flame_colors import FlameColors
-from flame_label import FlameLabel
-from window_mixin import WindowMixin
+from continue_folder_flame_button import FlameButton
+from continue_folder_flame_colors import FlameColors
+from continue_folder_flame_label import FlameLabel
+from continue_folder_window_mixin import WindowMixin
 
 
 class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):

@@ -8,7 +8,7 @@ from typing import Optional
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
-from flame_colors import FlameColors
+from continue_folder_flame_colors import FlameColors
 
 
 class FlameLabel(QtWidgets.QLabel):
