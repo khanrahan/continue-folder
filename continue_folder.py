@@ -109,6 +109,7 @@ class ContinueFolder:
         self.folder_new = ''
         self.resolve_tokens()
 
+        # Windows
         self._windows = {
             'parent': self._get_flame_parent(),
             'main': None,
@@ -118,6 +119,7 @@ class ContinueFolder:
             TITLE_VERSION, parent=self._windows['parent'])
         self._windows['save'] = SavePresetWindow(self._windows['main'])
 
+        # Window starting values
         self._windows['main'].preset = (
             self._store.preset_names[0] if self._store.preset_names else '')
         self._windows['main'].presets = self._store.preset_names
@@ -126,6 +128,7 @@ class ContinueFolder:
         self._windows['main'].tokens = {
             key: values[0] for key, values in self.tokens.items()}
 
+        # Window signals
         self._windows['main'].signal_preset.connect(self._on_preset_change)
         self._windows['main'].signal_save.connect(self._on_preset_save)
         self._windows['main'].signal_delete.connect(self._on_preset_delete)
