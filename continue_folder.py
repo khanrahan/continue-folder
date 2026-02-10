@@ -108,23 +108,31 @@ class ContinueFolder:
         self.folder_new = ''
         self.resolve_tokens()
 
-        self._window = MainWindow(TITLE_VERSION, self._get_flame_parent())
-        self._window.preset = (
+        self._windows = {
+            'parent': self._get_flame_parent(),
+            'main': None,
+            'save': None,
+        }
+        self._windows['main'] = MainWindow(
+            TITLE_VERSION, parent=self._windows['parent'])
+        self._windows['save'] = SavePresetWindow(self._windows['main'])
+
+        self._windows['main'].preset = (
             self._store.preset_names[0] if self._store.preset_names else '')
-        self._window.presets = self._store.preset_names
-        self._window.pattern = self.pattern
-        self._window.folder_new = self.folder_new
-        self._window.tokens = {
+        self._windows['main'].presets = self._store.preset_names
+        self._windows['main'].pattern = self.pattern
+        self._windows['main'].folder_new = self.folder_new
+        self._windows['main'].tokens = {
             key: values[0] for key, values in self.tokens.items()}
 
-        self._window.signal_preset.connect(self._on_preset_change)
-        self._window.signal_save.connect(self.save_preset_window)
-        self._window.signal_delete.connect(self._on_preset_delete)
-        self._window.signal_pattern.connect(self._on_pattern_change)
-        self._window.signal_ok.connect(self._on_ok_clicked)
-        self._window.signal_cancel.connect(self._on_cancel_clicked)
+        self._windows['main'].signal_preset.connect(self._on_preset_change)
+        self._windows['main'].signal_save.connect(self._on_preset_save)
+        self._windows['main'].signal_delete.connect(self._on_preset_delete)
+        self._windows['main'].signal_pattern.connect(self._on_pattern_change)
+        self._windows['main'].signal_ok.connect(self._on_ok_clicked)
+        self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
 
-        self._window.show()
+        self._windows['main'].show()
 
     @staticmethod
     def message(string):
@@ -141,12 +149,12 @@ class ContinueFolder:
 
     def _on_preset_change(self):
         """Handle preset selection change; update pattern from store."""
-        preset_name = self._window.preset
+        preset_name = self._windows['main'].preset
         if preset_name:
             preset = self._store.presets.get(preset_name)
             if preset:
                 self.pattern = getattr(preset, 'pattern', '') or ''
-                self._window.pattern = self.pattern
+                self._windows['main'].pattern = self.pattern
         self._refresh_folder_display()
 
     def _on_pattern_change(self, text):
@@ -156,7 +164,7 @@ class ContinueFolder:
 
     def _on_preset_delete(self):
         """Handle preset delete button; confirm then delete and reload."""
-        preset_name = self._window.preset
+        preset_name = self._windows['main'].preset
         if not FlameMessageWindow(
                 'Confirm Operation', 'confirm', 'Are you sure want to'
                 + ' permanently delete this preset?' + '<br/>' + 'This operation'
@@ -170,24 +178,24 @@ class ContinueFolder:
         except ValueError:
             pass
         self._store.load()
-        self._window.presets = self._store.preset_names
-        self._window.preset = (
+        self._windows['main'].presets = self._store.preset_names
+        self._windows['main'].preset = (
             self._store.preset_names[0] if self._store.preset_names else '')
         self._on_preset_change()
 
     def _on_ok_clicked(self):
         """Handle OK button; create reel or folder then close."""
-        if self._window.destination_reel_checked:
+        if self._windows['main'].destination_reel_checked:
             self.create_desktop_reel()
-        if self._window.destination_folder_checked:
+        if self._windows['main'].destination_folder_checked:
             self.create_media_hub_folder()
         self.message('Done!')
-        self._window.close()
+        self._windows['main'].close()
 
     def _on_cancel_clicked(self):
         """Handle Cancel button."""
         self.message('Cancelled!')
-        self._window.close()
+        self._windows['main'].close()
 
     def _refresh_folder_display(self):
         """Recompute folder name from pattern and update window display."""
@@ -195,7 +203,7 @@ class ContinueFolder:
         self.find_folders()
         self.update_version_token()
         self.resolve_tokens()
-        self._window.folder_new = self.folder_new
+        self._windows['main'].folder_new = self.folder_new
 
     def generate_tokens(self):
         """Generate dictionary of tokens with a list for each.
@@ -368,13 +376,12 @@ class ContinueFolder:
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
         self.message('MediaHub folder created!')
 
-    def save_preset_window(self):
+    def _on_preset_save(self):
         """Show save preset dialog and save or overwrite preset on accept."""
-        save_window = SavePresetWindow(self._window)
-        save_window.name = self.pattern
-        if save_window.exec_() != QtWidgets.QDialog.Accepted:
+        self._windows['save'].name = self._windows['main'].preset
+        if self._windows['save'].exec_() != QtWidgets.QDialog.Accepted:
             return
-        preset_name = save_window.name
+        preset_name = self._windows['save'].name
         pattern = self.pattern
         duplicate = self._store.find_preset(preset_name) is not None
         if duplicate:
@@ -396,8 +403,8 @@ class ContinueFolder:
                 'Error', 'error',
                 f'Check permissions on {self._settings_file}')
             return
-        self._window.presets = self._store.preset_names
-        self._window.preset = preset_name
+        self._windows['main'].presets = self._store.preset_names
+        self._windows['main'].preset = preset_name
 
 
 def process_selection(selection):
