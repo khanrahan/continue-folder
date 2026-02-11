@@ -81,9 +81,8 @@ class MainWindow(QtWidgets.QWidget):
     def _init_line_edits(self) -> None:
         """Initialize all line edit and read-only folder display."""
         self._line_edits['pattern'] = FlameLineEdit('')
-        self._line_edits['pattern'].textChanged.connect(
-            lambda t: self.signal_pattern.emit(t))
-        self._line_edits['folder'] = FlameLabel('', 'background')
+        self._line_edits['pattern'].textChanged.connect(self.signal_pattern.emit)
+        self._line_edits['folder'] = FlameLineEdit('')
 
     def _init_buttons(self) -> None:
         """Initialize all button widgets used in the window."""
@@ -110,10 +109,8 @@ class MainWindow(QtWidgets.QWidget):
         self._buttons['cancel'] = FlameButton(
             'Cancel', self.signal_cancel.emit, button_width=110)
 
-        self._buttons['destination_reel'] = FlamePushButton(
-            'Desktop Reel', True)
-        self._buttons['destination_folder'] = FlamePushButton(
-            'MediaHub Folder', False)
+        self._buttons['destination_reel'] = FlamePushButton('Desktop Reel', True)
+        self._buttons['destination_folder'] = FlamePushButton('MediaHub Folder', False)
 
     def _init_layouts(self) -> None:
         """Initialize and configure all layout managers for the window."""
@@ -153,11 +150,19 @@ class MainWindow(QtWidgets.QWidget):
         self.setMinimumSize(self._WINDOW_X, self._WINDOW_Y)
         self.setStyleSheet('background-color: #272727')
         self.setWindowTitle(self.title_version)
+
+        # Mac needs this to close the window
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
+        # Keeps on top of Flame but not other windows
+        self.setWindowFlags(QtCore.Qt.Tool)
+
+        # Widgets
         self._init_labels()
         self._init_line_edits()
         self._init_buttons()
+
+        # layouts
         self._init_layouts()
         self.setLayout(self._layouts['vbox'])
         self._center_window()

@@ -63,12 +63,12 @@ class ContinueFolder:
     sequence and return the next number in the sequence. All of the other
     tokens are standard things like: day, hour, minute.
     """
-    def __init__(self, path):
+    def __init__(self, selection):
 
         self.message(TITLE_VERSION)
         self.message(f'Script called from {__file__}')
 
-        self.path = path
+        self.path = selection[0].path
 
         # New folder destinations
         self.destinations = [
@@ -116,7 +116,7 @@ class ContinueFolder:
             'save': None,
         }
         self._windows['main'] = MainWindow(
-            TITLE_VERSION, parent=self._windows['parent'])
+            TITLE_VERSION, self._windows['parent'])
         self._windows['save'] = SavePresetWindow(self._windows['main'])
 
         # Window starting values
@@ -420,22 +420,18 @@ class ContinueFolder:
         self._windows['main'].preset = preset_name
 
 
-def process_selection(selection):
-    """Execute script on all selected folders in MediaHub."""
-    for folder in selection:
-        ContinueFolder(folder.path)
-
-
-def scope_folders(selection):
-    """Determine if selection is a folder in the MediaHub > Files tab."""
-    return any(isinstance(item, flame.PyMediaHubFilesFolder) for item in selection)
+def scope_folder(selection):
+    """Determine if selection is a single folder in the MediaHub > Files tab."""
+    if len(selection) == 1 and isinstance(selection[0], flame.PyMediaHubFilesFolder):
+        return True
+    return False
 
 
 def get_mediahub_files_custom_ui_actions():
     """Add right click menu items."""
     return [{'name': 'Create...',
              'actions': [{'name': 'Continue Folder',
-                          'isVisible': scope_folders,
-                          'execute': process_selection,
+                          'isVisible': scope_folder,
+                          'execute': ContinueFolder,
                           'minimumVersion': '2025.0.0.0'}]
             }]
