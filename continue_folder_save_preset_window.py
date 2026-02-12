@@ -6,10 +6,11 @@ configurations with a name.
 
 from typing import Optional
 
+from PySide6 import QtGui, QtWidgets  # pylint: disable=import-error
+
 from continue_folder_flame_button import FlameButton
 from continue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
-from PySide6 import QtGui, QtWidgets  # pylint: disable=import-error
 
 
 class SavePresetWindow(QtWidgets.QDialog):
