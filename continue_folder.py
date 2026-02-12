@@ -308,8 +308,7 @@ class ContinueFolder:
         for folder in next(os.walk(self.path))[1]:
             search = self.capture_tokens(self.pattern_regex, folder)
 
-            # append tuples containing matching folder name(str) and
-            # version(int)
+            # append tuples containing matching folder name and version
             match = []
 
             # folder name match
@@ -421,7 +420,7 @@ class ContinueFolder:
 
 
 def scope_folder(selection):
-    """Determine if selection is a single folder in the MediaHub > Files tab."""
+    """Determine if selection is a one folder in the MediaHub > Files tab."""
     if len(selection) == 1 and isinstance(selection[0], flame.PyMediaHubFilesFolder):
         return True
     return False
@@ -429,9 +428,12 @@ def scope_folder(selection):
 
 def get_mediahub_files_custom_ui_actions():
     """Add right click menu items."""
-    return [{'name': 'Create...',
-             'actions': [{'name': 'Continue Folder',
-                          'isVisible': scope_folder,
-                          'execute': ContinueFolder,
-                          'minimumVersion': '2025.0.0.0'}]
-            }]
+    menu_name = 'Create...'
+    action = {
+        'name': 'Continue Folder',
+        'isVisible': scope_folder,
+        'execute': ContinueFolder,
+        'minimumVersion': '2025.0.0.0'
+    }
+    menu = {'name': menu_name, 'actions': [action]}
+    return [menu]
