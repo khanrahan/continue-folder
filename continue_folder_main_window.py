@@ -14,9 +14,10 @@ from continue_folder_flame_line_edit import FlameLineEdit
 from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 from continue_folder_flame_token_push_button import FlameTokenPushButton
+from continue_folder_window_mixin import WindowMixin
 
 
-class MainWindow(QtWidgets.QWidget):
+class MainWindow(WindowMixin, QtWidgets.QWidget):
     """Main application window for Continue Folder.
 
     This class provides the primary interface for the application, including:
@@ -166,13 +167,6 @@ class MainWindow(QtWidgets.QWidget):
         self._init_layouts()
         self.setLayout(self._layouts['vbox'])
         self._center_window()
-
-    def _center_window(self) -> None:
-        """Center the window on the primary screen."""
-        resolution = QtGui.QGuiApplication.primaryScreen().availableGeometry()
-        self.move(
-            (resolution.width() / 2) - (self._WINDOW_X / 2),
-            (resolution.height() / 2) - (self._WINDOW_Y / 2 + 44))
 
     @property
     def preset(self) -> str:
