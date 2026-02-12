@@ -64,7 +64,12 @@ class ContinueFolder:
     tokens are standard things like: day, hour, minute.
     """
     def __init__(self, selection):
+        """Initialize ContinueFolder and set up the GUI.
 
+        Args:
+            selection: Tuple of selected Flame objects provided by the Flame
+            API.
+        """
         self.message(TITLE_VERSION)
         self.message(f'Script called from {__file__}')
 
