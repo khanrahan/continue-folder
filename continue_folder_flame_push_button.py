@@ -4,8 +4,6 @@ This module provides the FlamePushButton widget class for creating Flame-themed
 push buttons with toggle functionality.
 """
 
-from typing import Callable
-
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
 from continue_folder_button_mixin import ButtonMixin
