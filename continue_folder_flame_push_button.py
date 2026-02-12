@@ -16,8 +16,7 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
     """Custom Flame Push Button Widget.
 
     A custom push button widget with Flame-style theming that can be toggled
-    between checked and unchecked states. When clicked, the button executes a
-    callback function.
+    between checked and unchecked states.
 
     Examples:
         Basic usage:
@@ -42,7 +41,6 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
             self,
             name: str,
             checked: bool,
-            callback: Callable[[], None],
             button_width: int = 150,
             button_max_width: int = 150
     ) -> None:
@@ -55,16 +53,13 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
             name: Text displayed on the button.
             checked: Initial checked state of the button. If True, the button
                 will appear in its checked state (highlighted).
-            callback: Function to call when the button is clicked. Must be
-                callable and not None.
             button_width: Minimum width of the button in pixels. Defaults to
                 150.
             button_max_width: Maximum width of the button in pixels. Defaults
                 to 150. Must be >= button_width.
 
         Raises:
-            TypeError: If name is not a string, checked is not a bool, or
-                callback is None or not callable.
+            TypeError: If name is not a string, checked is not a bool.
             ValueError: If name is empty, or button_width or button_max_width
                 are non-positive, or button_max_width < button_width.
         """
@@ -73,7 +68,6 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         # Validate parameters
         self._check_name(name)
         self._check_checked(checked)
-        self._check_callback(callback)
         self._check_button_dimensions(button_width, button_max_width)
 
         # Store instance variables
@@ -81,7 +75,7 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         self.button_max_width = button_max_width
 
         # Initialize UI components
-        self._init_button(name, checked, callback, button_width, button_max_width)
+        self._init_button(name, checked, button_width, button_max_width)
 
     def _check_name(self, name: str) -> None:
         """Validate name parameter.
@@ -112,26 +106,10 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
             raise TypeError(
                 f'checked must be a bool, got {type(checked).__name__}')
 
-    def _check_callback(self, callback: Callable[[], None]) -> None:
-        """Validate callback parameter.
-
-        Args:
-            callback: Callback function to validate.
-
-        Raises:
-            TypeError: If callback is None or not callable.
-        """
-        if callback is None:
-            raise TypeError('callback cannot be None')
-        if not callable(callback):
-            raise TypeError(
-                f'callback must be callable, got {type(callback).__name__}')
-
     def _init_button(
             self,
             name: str,
             checked: bool,
-            callback: Callable[[], None],
             button_width: int,
             button_max_width: int
     ) -> None:
@@ -143,7 +121,6 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         Args:
             name: Text to display on the button.
             checked: Initial checked state of the button.
-            callback: Function to call when button is clicked.
             button_width: Minimum width of the button in pixels.
             button_max_width: Maximum width of the button in pixels.
         """
@@ -152,9 +129,6 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         self.setCheckable(True)
         self.setChecked(checked)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
-
-        # Connect signals
-        self.clicked.connect(callback)
 
         # Set button dimensions
         self.setMinimumSize(QtCore.QSize(button_width, 28))
