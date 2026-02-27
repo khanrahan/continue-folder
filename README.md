@@ -7,17 +7,29 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 ![screenshot](screenshot.png)
 
 ## Tokens
-- `AM/PM`
-- `am/pm`
-- `Day`
-- `Hour (12hr)`
-- `Hour (24hr)`
-- `Minute`
-- `Month`
-- `Version`
-	- Scan the other folders present and if found, will increment to the new version number.  *Similar* to the version token for pattern browsing.
-    - Use optional hashes for padding.  `{version###}`
-- `Year`
+
+**Input Pattern** uses curly braces to interpret existing destination folders.
+**Output Pattern** uses square brackets to form the new folder name.
+
+**Input** (match / continue):
+- `{PP}` / `{pp}` — AM/PM
+- `{DD}` — Day
+- `{hh}` / `{HH}` — Hour (12hr / 24hr)
+- `{mm}` — Minute
+- `{MM}` — Month
+- `{YY}` / `{YYYY}` — Year
+- `{version}` — Scan matching folders and continue the number sequence (*similar* to the version token for pattern browsing). Optional hashes set zero-padding: `{version###}`.
+
+**Output** (new folder name):
+- `[PP]` / `[pp]` — AM/PM
+- `[DD]` — Day
+- `[hh]` / `[HH]` — Hour (12hr / 24hr)
+- `[mm]` — Minute
+- `[MM]` — Month
+- `[YY]` / `[YYYY]` — Year
+- `[version]` — Next version from the input pattern scan. Optional hashes set zero-padding: `[version###]`.
+
+Example: Input `{YYYY}_{MM}_v{version###}` + Output `[YYYY]_[MM]_v[version]` → `2026_08_v004`
 
 ## Example Workflow
 You want to have a Library that will mirror a folder of exports on the server:

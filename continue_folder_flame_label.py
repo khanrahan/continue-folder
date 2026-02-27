@@ -134,13 +134,10 @@ class FlameLabel(QtWidgets.QLabel):
 
         Raises:
             TypeError: If label_name is not a string.
-            ValueError: If label_name is empty.
         """
         if not isinstance(label_name, str):
             raise TypeError(
                 f'label_name must be a string, got {type(label_name).__name__}')
-        if not label_name:
-            raise ValueError('label_name cannot be empty')
 
     def _check_label_type(self, label_type: str) -> None:
         """Validate label_type parameter.

@@ -36,7 +36,6 @@ To Install:
 
 import datetime as dt
 import os
-import re
 
 import flame
 from PySide6 import QtWidgets
@@ -45,6 +44,8 @@ from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_main_window import MainWindow
 from continue_folder_save_preset_window import SavePresetWindow
 from continue_folder_settings_store import SettingsStore
+from continue_folder_token_store_input import InputTokenStore
+from continue_folder_token_store_output import OutputTokenStore
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
@@ -59,10 +60,13 @@ XML = 'continue_folder.xml'
 class ContinueFolder:
     """Creates a new folder on the Desktop or in the Media Hub using tokens.
 
-    Currently, the only special token is {version} which will look for a number
-    sequence and return the next number in the sequence. All of the other
-    tokens are standard things like: day, hour, minute.
+    Input Pattern uses curly-brace tokens (``{version}``, ``{YYYY}``, …) to
+    interpret existing destination folders. Output Pattern uses square-bracket
+    tokens (``[version]``, ``[YYYY]``, …) to form the new folder name.
+    ``{version}`` continues a number sequence; optional hashes set padding
+    on input (``{version###}``) or output (``[version###]``).
     """
+
     def __init__(self, selection):
         """Initialize ContinueFolder and set up the GUI.
 
@@ -75,44 +79,38 @@ class ContinueFolder:
 
         self.path = selection[0].path
 
-        # New folder destinations
-        self.destinations = [
-            'Desktop Reel',
-            'Desktop Reel && Media Hub',  # double & to cancel QShortcut
-            'Media Hub']
-
         # Settings store (presets XML)
         self._settings_file = os.path.join(
             os.path.expanduser(CONFIG_FOLDER), XML)
         self._store = SettingsStore(
             self._settings_file, TITLE, VERSION,
-            preset_attributes=('name', 'pattern'))
+            preset_attributes=(
+                'name', 'input_pattern', 'output_pattern', 'destinations')
+            )
         self.message(f'Settings loaded from {self._settings_file}')
 
-        # Generate dict containing token names, shorthand, and values
+        # Token stores
         self.now = dt.datetime.now()
-        self.tokens = {}
-        self.generate_tokens()
+        self.input_token_store = InputTokenStore(self.path)
+        self.output_token_store = OutputTokenStore(
+            epoch=self.now,
+            input_token_store=self.input_token_store,
+        )
 
-        # Translate the token pattern to a regex
-        self.pattern = ''
-        self.load_pattern()
+        # Patterns
+        self.input_pattern = ''
+        self.output_pattern = ''
+        self.load_patterns()
 
-        # Translate the token pattern to a regex
-        self.pattern_regex = ''
-        self.generate_pattern_regex()
-
-        # Find folders that match the regex
+        # Folders
         self.folders = []
-        self.find_folders()
-
-        # Extract version token from the found folders
-        self.version_padding = 0
-        self.update_version_token()
-
-        # Replace tokens to generate new folder name
+        self.pattern_regex = ''
         self.folder_new = ''
-        self.resolve_tokens()
+        self._apply_patterns()
+
+        # New folder destinations
+        self.destinations = {'Desktop Reel': False, 'Media Hub': False}
+        self._load_destinations_by_index(0)
 
         # Windows
         self._windows = {
@@ -128,16 +126,24 @@ class ContinueFolder:
         self._windows['main'].preset = (
             self._store.preset_names[0] if self._store.preset_names else '')
         self._windows['main'].presets = self._store.preset_names
-        self._windows['main'].pattern = self.pattern
+        self._windows['main'].input_pattern = self.input_pattern
+        self._windows['main'].output_pattern = self.output_pattern
         self._windows['main'].folder_new = self.folder_new
-        self._windows['main'].tokens = {
-            key: values[0] for key, values in self.tokens.items()}
+        self._windows['main'].input_tokens = (
+            self.input_token_store.name_token_pairs)
+        self._windows['main'].output_tokens = (
+            self.output_token_store.name_token_pairs)
 
         # Window signals
         self._windows['main'].signal_preset.connect(self._on_preset_change)
         self._windows['main'].signal_save.connect(self._on_preset_save)
         self._windows['main'].signal_delete.connect(self._on_preset_delete)
-        self._windows['main'].signal_pattern.connect(self._on_pattern_change)
+        self._windows['main'].signal_input_pattern.connect(
+            self._on_input_pattern_change)
+        self._windows['main'].signal_output_pattern.connect(
+            self._on_output_pattern_change)
+        self._windows['main'].signal_destination.connect(
+            self._on_destinatination_change)
         self._windows['main'].signal_ok.connect(self._on_ok_clicked)
         self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
 
@@ -156,19 +162,64 @@ class ContinueFolder:
                 return widget
         return None
 
+    @staticmethod
+    def _patterns_from_preset(preset) -> tuple[str, str]:
+        """Read input/output patterns from a preset, with legacy fallback."""
+        input_pattern = (
+            getattr(preset, 'input_pattern', None)
+            or getattr(preset, 'pattern', None)
+            or '{version}')
+        output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
+        return input_pattern, output_pattern
+
+    def _apply_patterns(self) -> None:
+        """Scan with input pattern and resolve the output pattern."""
+        self.input_token_store.apply(self.input_pattern)
+        self.folders = self.input_token_store.folders
+        self.pattern_regex = self.input_token_store.pattern_regex
+        self.folder_new = self.output_token_store.resolve(self.output_pattern)
+
+    def _refresh_folder_display(self):
+        """Recompute folder name from patterns and update window display."""
+        self._apply_patterns()
+        self._windows['main'].folder_new = self.folder_new
+
+    def _on_destinatination_change(self):
+        """Update destinations dictionary from window checkboxes."""
+        self.destinations['Desktop Reel'] = (
+            self._windows['main'].destination_reel_checked
+        )
+        self.destinations['Media Hub'] = (
+            self._windows['main'].destination_folder_checked
+        )
+
     def _on_preset_change(self):
-        """Handle preset selection change; update pattern from store."""
+        """Handle preset selection change; update patterns from store."""
         preset_name = self._windows['main'].preset
         if preset_name:
             preset = self._store.presets.get(preset_name)
             if preset:
-                self.pattern = getattr(preset, 'pattern', '') or ''
-                self._windows['main'].pattern = self.pattern
+                self.input_pattern, self.output_pattern = (
+                    self._patterns_from_preset(preset))
+                self._windows['main'].input_pattern = self.input_pattern
+                self._windows['main'].output_pattern = self.output_pattern
+                self._load_destinations(preset)
+                self._windows['main'].destination_reel_checked = (
+                    self.destinations.get('Desktop Reel', False)
+                )
+                self._windows['main'].destination_folder_checked = (
+                    self.destinations.get('Media Hub', False)
+                )
         self._refresh_folder_display()
 
-    def _on_pattern_change(self, text):
-        """Handle pattern text change; recompute folder and update display."""
-        self.pattern = text
+    def _on_input_pattern_change(self, text):
+        """Handle input pattern change; update folder and update display."""
+        self.input_pattern = text
+        self._refresh_folder_display()
+
+    def _on_output_pattern_change(self, text):
+        """Handle output pattern change; update folder and update display."""
+        self.output_pattern = text
         self._refresh_folder_display()
 
     def _on_preset_delete(self):
@@ -192,6 +243,51 @@ class ContinueFolder:
             self._store.preset_names[0] if self._store.preset_names else '')
         self._on_preset_change()
 
+    def _encode_destinations(self):
+        """Encode destinations dict as a comma separated string."""
+        return ', '.join(
+            key for key, value in self.destinations.items() if value is True
+        )
+
+    def _on_preset_save(self):
+        """Show save preset dialog and save or overwrite preset on accept."""
+        self._windows['save'].name = self._windows['main'].preset
+        if self._windows['save'].exec_() != QtWidgets.QDialog.Accepted:
+            return
+        preset_name = self._windows['save'].name
+        duplicate = self._store.find_preset(preset_name) is not None
+        if duplicate:
+            if not FlameMessageWindow(
+                    'Overwrite Existing Preset', 'confirm', 'Are you '
+                    + 'sure want to permanently overwrite this preset?'
+                    + '<br/>' + 'This operation cannot be undone.'):
+                return
+            self._store.overwrite_preset(
+                name=preset_name,
+                input_pattern=self.input_pattern,
+                output_pattern=self.output_pattern,
+                destinations=self._encode_destinations()
+            )
+        else:
+            self._store.add_preset(
+                name=preset_name,
+                input_pattern=self.input_pattern,
+                output_pattern=self.output_pattern,
+                destinations=self._encode_destinations()
+            )
+            self._store.sort()
+        try:
+            self._store.save()
+            self.message(
+                f'{preset_name} preset saved to {self._settings_file}')
+        except OSError:
+            FlameMessageWindow(
+                'Error', 'error',
+                f'Check permissions on {self._settings_file}')
+            return
+        self._windows['main'].presets = self._store.preset_names
+        self._windows['main'].preset = preset_name
+
     def _on_ok_clicked(self):
         """Handle OK button; create reel or folder then close."""
         if self._windows['main'].destination_reel_checked:
@@ -206,171 +302,41 @@ class ContinueFolder:
         self.message('Cancelled!')
         self._windows['main'].close()
 
-    def _refresh_folder_display(self):
-        """Recompute folder name from pattern and update window display."""
-        self.generate_pattern_regex()
-        self.find_folders()
-        self.update_version_token()
-        self.resolve_tokens()
-        self._windows['main'].folder_new = self.folder_new
-
-    def generate_tokens(self):
-        """Generate dictionary of tokens with a list for each.
-
-        Each item has a list with the shorthand token, a token regex, a pattern
-        regex and then the value.
-
-        {name : [ token, token_regex, pattern_regex, value ], ...}
-
-        name = full name of the token
-        token = this is the shorthand used in the pattern. ie, {token}
-        token_regex = optional regex to assist in generating the pattern regex.
-            only necessary on tokens that take optional modifiers, ie.
-            {version###}
-        pattern_regex = regex to extract the token data from the folder name
-        value = starting value
-        """
-        self.tokens = {
-            'am/pm':
-                ['{pp}', None, '[a-z]{2}', self.now.strftime('%p').lower()],
-            'AM/PM':
-                ['{PP}', None, '[A-Z]{2}', self.now.strftime('%p').upper()],
-            'Day':
-                ['{DD}', None, '[0-9]{2}', self.now.strftime('%d')],
-            'Hour (12hr)':
-                ['{hh}', None, '[0-9]{2}', self.now.strftime('%I')],
-            'Hour (24hr)':
-                ['{HH}', None, '[0-9]{2}', self.now.strftime('%H')],
-            'Minute':
-                ['{mm}', None, '[0-9]{2}', self.now.strftime('%M')],
-            'Month':
-                ['{MM}', None, '[0-9]{2}', self.now.strftime('%m')],
-            'Version':
-                # the regex for Version is a named capture group excluding zero
-                # padding
-                ['{version}', '{version#*}', '0*(?P<version>[1-9][0-9]*)', '1'],
-            'Year (##)':
-                ['{YY}', None, '[0-9]{2}', self.now.strftime('%y')],
-            'Year (####)':
-                ['{YYYY}', None, '[0-9]{4}', self.now.strftime('%Y')]}
-
-    @staticmethod
-    def capture_tokens(regex, folder):
-        """Capture tokens using regex.
-
-        Args:
-            regex (str): regex that match tokens wrapped in curly braces
-            folder (str): folder name to be tested
-
-        Returns:
-            Regex match object
-        """
-        try:
-            result = re.match(regex, folder)
-        except re.error:
-            # for example, a situation where {version} is passed twice
-            result = None
-
-        return result
-
-    def load_pattern(self):
-        """Load the first preset's pattern or use the default pattern."""
+    def load_patterns(self):
+        """Load the first preset's patterns or use defaults."""
         if self._store.preset_names:
             first_name = self._store.preset_names[0]
             preset = self._store.presets.get(first_name)
-            self.pattern = (
-                getattr(preset, 'pattern', '') or '{version}'
-                if preset else '{version}')
+            if preset:
+                self.input_pattern, self.output_pattern = (
+                    self._patterns_from_preset(preset))
+            else:
+                self.input_pattern = '{version}'
+                self.output_pattern = '[version]'
         else:
-            self.pattern = '{version}'
+            self.input_pattern = '{version}'
+            self.output_pattern = '[version]'
 
-    def generate_pattern_regex(self):
-        """Generate a regex based on the token pattern.
+    def _load_destinations_by_index(self, index):
+        """Load destinations by index, instead of name.
 
-        This regex will be used to find matching folders.  Use the token regex
-        if available otherwise just token.
-
-        for example, {YYYY}_{MM}_{DD} would become [0-9]{4}_[0-9]{2}_[0-9]{2}
+        Used to load the first preset found on startup.
         """
-        self.pattern_regex = self.pattern
+        preset = self._store.presets.get(self._store.preset_names[index])
+        self._load_destinations(preset)
 
-        for token, values in self.tokens.items():
-            del token
-            if values[1]:  # token regex available
-                self.pattern_regex = re.sub(values[1], values[2], self.pattern_regex)
-            else:
-                self.pattern_regex = re.sub(values[0], values[2], self.pattern_regex)
-
-    def find_folders(self):
-        """Appends tuples to self.folders list.
-
-        The tuples contain the folder name, and then the version number if
-        present.
-        """
-        # Always clear the list before searching again with new regex
-        self.folders = []
-
-        for folder in next(os.walk(self.path))[1]:
-            search = self.capture_tokens(self.pattern_regex, folder)
-
-            # append tuples containing matching folder name and version
-            match = []
-
-            # folder name match
-            if search:  # re returns match object or None
-                match.append(search.group(0))
-
-                # version token match
-                # version must be integer because strings would sort as 1, 10,
-                # 11, 9
-                if len(search.groups()) == 1:  # groups only returns named groups
-                    match.append(int(search.group(1)))
-
-                self.folders.append(tuple(match))
-
-    def update_version_token(self):
-        """Scan for folder versions.
-
-        Scan folders that matched the pattern regex to find if a version is
-        present.  If so, find the highest version number and set value in
-        self.tokens to be one higher.
-        """
-
-        def find_version_padding():
-            """Find if the version number is padded with zeroes."""
-            # find hashes preceeded by {version and trailed by }
-            # using re.match starts searching from beginning of a string so
-            # ?:.* is a non-capturing group for anything preceeding {version
-            search = '(?:.*{version)(?P<padding>#*)}'
-
-            result = self.capture_tokens(search, self.pattern)
-
-            if result:
-                self.version_padding = len(result.group(1))
-            else:
-                self.version_padding = 0
-
-        find_version_padding()
-
-        try:
-            # sort self.folders by the second value in each set
-            self.folders.sort(key=lambda item: item[1])
-            version = self.folders[-1][1] + 1
-        except IndexError:  # if there no folders with version matches
-            version = 1
-
-        self.tokens['Version'][3] = str(version).zfill(self.version_padding)
-
-    def resolve_tokens(self):
-        """Replace tokens with values."""
-        self.folder_new = self.pattern
-
-        for token, values in self.tokens.items():
-            del token
-            if values[1]:  # token regex available
-                self.folder_new = re.sub(values[1], values[3], self.folder_new)
-            else:
-                self.folder_new = re.sub(values[0], values[3], self.folder_new)
+    def _load_destinations(self, preset):
+        """Load destinations from preset."""
+        destinations = getattr(preset, 'destinations', None)
+        if destinations:
+            loaded_destinations = destinations.split(', ')
+            for destination in self.destinations:
+                if destination in loaded_destinations:
+                    self.destinations[destination] = True
+                else:
+                    self.destinations[destination] = False
+        else:
+            self.destinations = {'Desktop Reel': True, 'Media Hub': False}
 
     def create_desktop_reel(self):
         """Create reel on bottom of the current desktop.
@@ -392,36 +358,6 @@ class ContinueFolder:
         os.mkdir(os.path.join(self.path, self.folder_new))
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
         self.message('MediaHub folder created!')
-
-    def _on_preset_save(self):
-        """Show save preset dialog and save or overwrite preset on accept."""
-        self._windows['save'].name = self._windows['main'].preset
-        if self._windows['save'].exec_() != QtWidgets.QDialog.Accepted:
-            return
-        preset_name = self._windows['save'].name
-        pattern = self.pattern
-        duplicate = self._store.find_preset(preset_name) is not None
-        if duplicate:
-            if not FlameMessageWindow(
-                    'Overwrite Existing Preset', 'confirm', 'Are you '
-                    + 'sure want to permanently overwrite this preset?'
-                    + '<br/>' + 'This operation cannot be undone.'):
-                return
-            self._store.overwrite_preset(name=preset_name, pattern=pattern)
-        else:
-            self._store.add_preset(name=preset_name, pattern=pattern)
-            self._store.sort()
-        try:
-            self._store.save()
-            self.message(
-                f'{preset_name} preset saved to {self._settings_file}')
-        except OSError:
-            FlameMessageWindow(
-                'Error', 'error',
-                f'Check permissions on {self._settings_file}')
-            return
-        self._windows['main'].presets = self._store.preset_names
-        self._windows['main'].preset = preset_name
 
 
 def scope_folder(selection):

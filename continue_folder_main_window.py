@@ -22,7 +22,8 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
 
     This class provides the primary interface for the application, including:
     - Preset selection and management (save/delete)
-    - Pattern input field with token insertion
+    - Input pattern field (curly-brace tokens) with token insertion
+    - Output pattern field (square-bracket tokens) with token insertion
     - New folder name display
     - Destination selection (Desktop Reel / MediaHub Folder)
     - OK/Cancel action buttons
@@ -34,19 +35,22 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         signal_preset: Emitted when preset selection changes.
         signal_save: Emitted when Save preset button is clicked.
         signal_delete: Emitted when Delete preset button is clicked.
-        signal_pattern: Emitted when pattern line edit text changes.
+        signal_input_pattern: Emitted when input pattern text changes.
+        signal_output_pattern: Emitted when output pattern text changes.
         signal_ok: Emitted when OK button is clicked.
         signal_cancel: Emitted when Cancel button is clicked.
     """
     signal_preset = QtCore.Signal()
     signal_save = QtCore.Signal()
     signal_delete = QtCore.Signal()
-    signal_pattern = QtCore.Signal(str)
+    signal_input_pattern = QtCore.Signal(str)
+    signal_output_pattern = QtCore.Signal(str)
+    signal_destination = QtCore.Signal()
     signal_ok = QtCore.Signal()
     signal_cancel = QtCore.Signal()
 
     _WINDOW_X = 900
-    _WINDOW_Y = 130
+    _WINDOW_Y = 180
 
     def __init__(
             self,
@@ -75,15 +79,20 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     def _init_labels(self) -> None:
         """Initialize all label widgets used in the window."""
         self._labels['preset'] = FlameLabel('Preset', 'normal')
-        self._labels['pattern'] = FlameLabel('Pattern', 'normal')
+        self._labels['input_pattern'] = FlameLabel('Input Pattern', 'normal')
+        self._labels['output_pattern'] = FlameLabel('Output Pattern', 'normal')
         self._labels['folder'] = FlameLabel('New Folder', 'normal')
+        self._labels['folder_name'] = FlameLabel('', 'background')
         self._labels['destination'] = FlameLabel('Destination', 'normal')
 
     def _init_line_edits(self) -> None:
-        """Initialize all line edit and read-only folder display."""
-        self._line_edits['pattern'] = FlameLineEdit('')
-        self._line_edits['pattern'].textChanged.connect(self.signal_pattern.emit)
-        self._line_edits['folder'] = FlameLineEdit('')
+        """Initialize pattern line edits and read-only folder display."""
+        self._line_edits['input_pattern'] = FlameLineEdit('')
+        self._line_edits['input_pattern'].textChanged.connect(
+            self.signal_input_pattern.emit)
+        self._line_edits['output_pattern'] = FlameLineEdit('')
+        self._line_edits['output_pattern'].textChanged.connect(
+            self.signal_output_pattern.emit)
 
     def _init_buttons(self) -> None:
         """Initialize all button widgets used in the window."""
@@ -99,10 +108,15 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['preset_delete'] = FlameButton(
             'Delete', self.signal_delete.emit, button_width=110)
 
-        self._buttons['tokens'] = FlameTokenPushButton(
+        self._buttons['input_tokens'] = FlameTokenPushButton(
             'Add Token',
             {},
-            self._line_edits['pattern'],
+            self._line_edits['input_pattern'],
+        )
+        self._buttons['output_tokens'] = FlameTokenPushButton(
+            'Add Token',
+            {},
+            self._line_edits['output_pattern'],
         )
 
         self._buttons['ok'] = FlameButton(
@@ -111,7 +125,9 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
             'Cancel', self.signal_cancel.emit, button_width=110)
 
         self._buttons['destination_reel'] = FlamePushButton('Desktop Reel', True)
+        self._buttons['destination_reel'].clicked.connect(self.signal_destination.emit)
         self._buttons['destination_folder'] = FlamePushButton('MediaHub Folder', False)
+        self._buttons['destination_folder'].clicked.connect(self.signal_destination.emit)
 
     def _init_layouts(self) -> None:
         """Initialize and configure all layout managers for the window."""
@@ -127,13 +143,16 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._layouts['grid'].addWidget(self._buttons['preset'], 0, 1)
         self._layouts['grid'].addWidget(self._buttons['preset_save'], 0, 2)
         self._layouts['grid'].addWidget(self._buttons['preset_delete'], 0, 3)
-        self._layouts['grid'].addWidget(self._labels['pattern'], 1, 0)
-        self._layouts['grid'].addWidget(self._line_edits['pattern'], 1, 1)
-        self._layouts['grid'].addWidget(self._buttons['tokens'], 1, 2)
-        self._layouts['grid'].addWidget(self._labels['folder'], 2, 0)
-        self._layouts['grid'].addWidget(self._line_edits['folder'], 2, 1)
-        self._layouts['grid'].addWidget(self._labels['destination'], 3, 0)
-        self._layouts['grid'].addLayout(self._layouts['hbox1'], 3, 1)
+        self._layouts['grid'].addWidget(self._labels['input_pattern'], 1, 0)
+        self._layouts['grid'].addWidget(self._line_edits['input_pattern'], 1, 1)
+        self._layouts['grid'].addWidget(self._buttons['input_tokens'], 1, 2)
+        self._layouts['grid'].addWidget(self._labels['output_pattern'], 2, 0)
+        self._layouts['grid'].addWidget(self._line_edits['output_pattern'], 2, 1)
+        self._layouts['grid'].addWidget(self._buttons['output_tokens'], 2, 2)
+        self._layouts['grid'].addWidget(self._labels['folder'], 3, 0)
+        self._layouts['grid'].addWidget(self._labels['folder_name'], 3, 1)
+        self._layouts['grid'].addWidget(self._labels['destination'], 4, 0)
+        self._layouts['grid'].addLayout(self._layouts['hbox1'], 4, 1)
 
         self._layouts['hbox2'] = QtWidgets.QHBoxLayout()
         self._layouts['hbox2'].addStretch(1)
@@ -189,38 +208,66 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['preset'].populate_menu(preset_list)
 
     @property
-    def pattern(self) -> str:
-        """Get or set the current pattern value."""
-        return self._line_edits['pattern'].text()
+    def input_pattern(self) -> str:
+        """Get or set the input pattern (curly-brace tokens)."""
+        return self._line_edits['input_pattern'].text()
 
-    @pattern.setter
-    def pattern(self, string: str) -> None:
-        self._line_edits['pattern'].setText(string)
+    @input_pattern.setter
+    def input_pattern(self, string: str) -> None:
+        self._line_edits['input_pattern'].setText(string)
+
+    @property
+    def output_pattern(self) -> str:
+        """Get or set the output pattern (square-bracket tokens)."""
+        return self._line_edits['output_pattern'].text()
+
+    @output_pattern.setter
+    def output_pattern(self, string: str) -> None:
+        self._line_edits['output_pattern'].setText(string)
 
     @property
     def folder_new(self) -> str:
         """Get or set the new folder name display."""
-        return self._line_edits['folder'].text()
+        return self._labels['folder_name'].text()
 
     @folder_new.setter
     def folder_new(self, string: str) -> None:
-        self._line_edits['folder'].setText(string)
+        self._labels['folder_name'].setText(string)
 
     @property
-    def tokens(self) -> dict:
-        """Get or set the token dict for the Add Token button."""
-        return getattr(self._buttons['tokens'], 'token_dict', {})
+    def input_tokens(self) -> dict:
+        """Get or set the token dict for the input Add Token button."""
+        return getattr(self._buttons['input_tokens'], 'token_dict', {})
 
-    @tokens.setter
-    def tokens(self, token_dict: dict) -> None:
-        self._buttons['tokens'].populate_menu(token_dict)
+    @input_tokens.setter
+    def input_tokens(self, token_dict: dict) -> None:
+        self._buttons['input_tokens'].populate_menu(token_dict)
+
+    @property
+    def output_tokens(self) -> dict:
+        """Get or set the token dict for the output Add Token button."""
+        return getattr(self._buttons['output_tokens'], 'token_dict', {})
+
+    @output_tokens.setter
+    def output_tokens(self, token_dict: dict) -> None:
+        self._buttons['output_tokens'].populate_menu(token_dict)
 
     @property
     def destination_reel_checked(self) -> bool:
         """Return True if Desktop Reel is selected."""
         return self._buttons['destination_reel'].isChecked()
 
+    @destination_reel_checked.setter
+    def destination_reel_checked(self, value: bool) -> None:
+        """Set the Desktop Reel button checked state."""
+        self._buttons['destination_reel'].setChecked(value)
+
     @property
     def destination_folder_checked(self) -> bool:
         """Return True if MediaHub Folder is selected."""
         return self._buttons['destination_folder'].isChecked()
+
+    @destination_folder_checked.setter
+    def destination_folder_checked(self, value: bool) -> None:
+        """Set the MediaHub Folder button checked state."""
+        self._buttons['destination_folder'].setChecked(value)

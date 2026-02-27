@@ -6,7 +6,8 @@ stored as XML.
 
 import os
 import xml.etree.ElementTree as Etree
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any, Optional
 
 from continue_folder_preset import Preset
 
@@ -349,13 +350,24 @@ class SettingsStore:
             if preset_name:
                 preset = Preset(name=preset_name)
                 preset.element = preset_element
-                # Legacy XML may use child <pattern> instead of attribute
-                if not getattr(preset, 'pattern', None) and 'pattern' in self._preset_attributes:
+                # Legacy XML may use pattern attribute/child instead of
+                # input_pattern
+                if (
+                        not getattr(preset, 'input_pattern', None)
+                        and 'input_pattern' in self._preset_attributes
+                ):
                     pattern_el = preset_element.find('pattern')
-                    preset.pattern = (
+                    legacy_pattern = (
                         pattern_el.text if pattern_el is not None
                         and pattern_el.text is not None
                         else preset_element.get('pattern', '')
                     )
+                    if legacy_pattern:
+                        preset.input_pattern = legacy_pattern
+                if (
+                        not getattr(preset, 'output_pattern', None)
+                        and 'output_pattern' in self._preset_attributes
+                ):
+                    preset.output_pattern = '[version]'
                 results[preset.name] = preset
         return results
