@@ -213,8 +213,9 @@ class ContinueFolder:
             self._store.save()
             self.message(
                 f'{preset_name} preset deleted from {self._settings_file}')
-        except ValueError:
-            pass
+        except ValueError as error:
+            FlameMessageWindow('Error', 'error', str(error))
+            return
         self._store.load()
         self._windows['main'].presets = self._store.preset_names
         next_preset = (
