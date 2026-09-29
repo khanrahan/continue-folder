@@ -2,7 +2,6 @@
 
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -60,7 +59,7 @@ class InputToken:
     name: str
     pattern: str
     regex: str
-    value: Optional[str] = None  # filled after scan
+    value: str | None = None  # filled after scan
 
     @property
     def token(self) -> str:

@@ -51,7 +51,7 @@ class OutputTokenStore:
             TokenPadded(
                 'Version',
                 'version',
-                self.input_token_store.captured_token_values['version'] or 1,
+                self.input_token_store.captured_token_values['version'] or '1',
             ),
             Token('Year (YY)', 'YY', self.now.strftime('%y')),
             Token('Year (YYYY)', 'YYYY', self.now.strftime('%Y')),

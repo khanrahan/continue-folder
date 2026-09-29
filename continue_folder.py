@@ -42,6 +42,7 @@ from PySide6 import QtWidgets
 
 from continue_folder_flame_message_window import FlameMessageWindow
 from continue_folder_main_window import MainWindow
+from continue_folder_preset import Preset
 from continue_folder_save_preset_window import SavePresetWindow
 from continue_folder_settings_store import SettingsStore
 from continue_folder_token_store_input import InputTokenStore
@@ -67,7 +68,7 @@ class ContinueFolder:
     on input (``{version###}``) or output (``[version###]``).
     """
 
-    def __init__(self, selection):
+    def __init__(self, selection: tuple) -> None:
         """Initialize ContinueFolder and set up the GUI.
 
         Args:
@@ -132,12 +133,12 @@ class ContinueFolder:
         self._windows['main'].show()
 
     @staticmethod
-    def message(string):
+    def message(string: str) -> None:
         """Print message to shell window and append global MESSAGE_PREFIX."""
         print(' '.join([MESSAGE_PREFIX, string]))
 
     @staticmethod
-    def _get_flame_parent():
+    def _get_flame_parent() -> QtWidgets.QWidget | None:
         """Return Flame main window as parent for dialogs, or None."""
         for widget in QtWidgets.QApplication.topLevelWidgets():
             if widget.objectName() == 'CF Main Window':
@@ -145,7 +146,7 @@ class ContinueFolder:
         return None
 
     @staticmethod
-    def _patterns_from_preset(preset) -> tuple[str, str]:
+    def _patterns_from_preset(preset: Preset) -> tuple[str, str]:
         """Read input/output patterns from a preset, with legacy fallback."""
         input_pattern = (
             getattr(preset, 'input_pattern', None)
@@ -160,7 +161,7 @@ class ContinueFolder:
         self.input_token_store.apply(main.input_pattern)
         self.folder_new = self.output_token_store.resolve(main.output_pattern)
 
-    def _refresh_folder_display(self):
+    def _refresh_folder_display(self) -> None:
         """Recompute folder name from patterns and update window display."""
         self._apply_patterns()
         self._windows['main'].folder_new = self.folder_new
@@ -186,19 +187,19 @@ class ContinueFolder:
         main.preset = name or ''
         self._refresh_folder_display()
 
-    def _on_preset_change(self):
+    def _on_preset_change(self) -> None:
         """Handle preset selection change; reload from the store."""
         self.apply_preset(self._windows['main'].preset)
 
-    def _on_input_pattern_change(self, _text):
+    def _on_input_pattern_change(self, _text: str) -> None:
         """Input pattern change; recompute folder and update display."""
         self._refresh_folder_display()
 
-    def _on_output_pattern_change(self, _text):
+    def _on_output_pattern_change(self, _text: str) -> None:
         """Output pattern change; recompute folder and update display."""
         self._refresh_folder_display()
 
-    def _on_preset_delete(self):
+    def _on_preset_delete(self) -> None:
         """Handle preset delete button; confirm then delete and reload."""
         preset_name = self._windows['main'].preset
         if not FlameMessageWindow(
@@ -227,7 +228,7 @@ class ContinueFolder:
             if value
         )
 
-    def _on_preset_save(self):
+    def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
         self._windows['save'].name = self._windows['main'].preset
         if self._windows['save'].exec_() != QtWidgets.QDialog.Accepted:
@@ -266,7 +267,7 @@ class ContinueFolder:
         self._windows['main'].presets = self._store.preset_names
         self.apply_preset(preset_name)
 
-    def _on_ok_clicked(self):
+    def _on_ok_clicked(self) -> None:
         """Handle OK button; create reel or folder then close."""
         if self._windows['main'].destination_reel_checked:
             self.create_desktop_reel()
@@ -275,12 +276,12 @@ class ContinueFolder:
         self.message('Done!')
         self._windows['main'].close()
 
-    def _on_cancel_clicked(self):
+    def _on_cancel_clicked(self) -> None:
         """Handle Cancel button."""
         self.message('Cancelled!')
         self._windows['main'].close()
 
-    def _destinations_from_preset(self, preset) -> dict[str, bool]:
+    def _destinations_from_preset(self, preset: Preset) -> dict[str, bool]:
         """Read destination checks from a preset, with reel-only default."""
         destinations = getattr(preset, 'destinations', None)
         result = {'Desktop Reel': False, 'Media Hub': False}
@@ -291,7 +292,7 @@ class ContinueFolder:
             return result
         return {'Desktop Reel': True, 'Media Hub': False}
 
-    def create_desktop_reel(self):
+    def create_desktop_reel(self) -> None:
         """Create reel on bottom of the current desktop.
 
         This will start a folder sequence or continue an existing folder
@@ -302,7 +303,7 @@ class ContinueFolder:
         desktop.reel_groups[0].create_reel(self.folder_new.encode('ascii', 'ignore'))
         self.message('Reel created!')
 
-    def create_media_hub_folder(self):
+    def create_media_hub_folder(self) -> None:
         """Create folder in Media Hub.
 
         This will start a folder sequence or continue the existing folder
@@ -313,12 +314,12 @@ class ContinueFolder:
         self.message('MediaHub folder created!')
 
 
-def scope_folder(selection):
+def scope_folder(selection: tuple) -> bool:
     """Determine if selection is a one folder in the MediaHub > Files tab."""
     return len(selection) == 1 and isinstance(selection[0], flame.PyMediaHubFilesFolder)
 
 
-def get_mediahub_files_custom_ui_actions():
+def get_mediahub_files_custom_ui_actions() -> list[dict]:
     """Add right click menu items."""
     menu_name = 'Create...'
     action = {

@@ -4,8 +4,6 @@ This module provides the MainWindow widget class for the main application
 interface.
 """
 
-from typing import Optional
-
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
 from continue_folder_flame_button import FlameButton
@@ -55,7 +53,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     def __init__(
             self,
             title_version: str,
-            parent_widget: Optional[QtWidgets.QWidget] = None
+            parent_widget: QtWidgets.QWidget | None = None
     ) -> None:
         """Initialize the main window instance.
 
@@ -197,14 +195,14 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['preset'].setText(string)
 
     @property
-    def presets(self) -> list:
+    def presets(self) -> list[str]:
         """Get or set the list of available preset names."""
         return getattr(
             self._buttons['preset'], 'menu_options',
             [])
 
     @presets.setter
-    def presets(self, preset_list: list) -> None:
+    def presets(self, preset_list: list[str]) -> None:
         self._buttons['preset'].populate_menu(preset_list)
 
     @property
@@ -235,21 +233,21 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._labels['folder_name'].setText(string)
 
     @property
-    def input_tokens(self) -> dict:
+    def input_tokens(self) -> dict[str, str]:
         """Get or set the token dict for the input Add Token button."""
         return getattr(self._buttons['input_tokens'], 'token_dict', {})
 
     @input_tokens.setter
-    def input_tokens(self, token_dict: dict) -> None:
+    def input_tokens(self, token_dict: dict[str, str]) -> None:
         self._buttons['input_tokens'].populate_menu(token_dict)
 
     @property
-    def output_tokens(self) -> dict:
+    def output_tokens(self) -> dict[str, str]:
         """Get or set the token dict for the output Add Token button."""
         return getattr(self._buttons['output_tokens'], 'token_dict', {})
 
     @output_tokens.setter
-    def output_tokens(self, token_dict: dict) -> None:
+    def output_tokens(self, token_dict: dict[str, str]) -> None:
         self._buttons['output_tokens'].populate_menu(token_dict)
 
     @property

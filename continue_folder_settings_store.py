@@ -7,7 +7,7 @@ stored as XML.
 import os
 import xml.etree.ElementTree as Etree
 from collections.abc import Iterable
-from typing import Any, Optional
+from typing import Any
 
 from continue_folder_preset import Preset
 
@@ -150,7 +150,7 @@ class SettingsStore:
             f'{self.ELEMENT_PRESETS}'
         )
 
-    def _get_presets_element(self) -> Optional[Etree.Element]:
+    def _get_presets_element(self) -> Etree.Element | None:
         """Get the presets container element from the XML tree.
 
         Returns:
@@ -185,7 +185,7 @@ class SettingsStore:
         """
         return self._presets.findall(self.ELEMENT_PRESET)
 
-    def find_preset(self, name: str) -> Optional[Etree.Element]:
+    def find_preset(self, name: str) -> Etree.Element | None:
         """Find a preset element by name.
 
         Args:

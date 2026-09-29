@@ -4,8 +4,6 @@ This module provides the SavePresetWindow dialog class for saving preset
 configurations with a name.
 """
 
-from typing import Optional
-
 from PySide6 import QtGui, QtWidgets  # pylint: disable=import-error
 
 from continue_folder_flame_button import FlameButton
@@ -39,7 +37,7 @@ class SavePresetWindow(QtWidgets.QDialog):
         ...     # Save the preset with this name
     """
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget]) -> None:
+    def __init__(self, parent: QtWidgets.QWidget | None) -> None:
         """Initialize the save preset dialog window.
 
         Args:

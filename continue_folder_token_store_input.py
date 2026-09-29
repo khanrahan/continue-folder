@@ -15,8 +15,8 @@ class InputTokenStore:
         """Initialize input tokens for destination ``path``."""
         self.path = path
         self.tokens: dict[str, InputToken] = {}
-        self.folders: list[dict] = []
-        self.pattern_regex = ''
+        self.folders: list[tuple[str, dict[str, str]]] = []
+        self.pattern_regex: str = ''
         self._build_tokens()
 
     def _build_tokens(self) -> None:
@@ -53,9 +53,11 @@ class InputTokenStore:
             )
         return pattern_regex
 
-    def find_folders(self, pattern_regex: str) -> list[tuple]:
+    def find_folders(
+            self, pattern_regex: str
+    ) -> list[tuple[str, dict[str, str]]]:
         """Return folders under self.path that match pattern_regex."""
-        self.folders = []  # reset
+        folders: list[tuple[str, dict[str, str]]] = []
 
         try:
             dirnames = next(os.walk(self.path))[1]
@@ -66,9 +68,9 @@ class InputTokenStore:
             search = self.capture_tokens(pattern_regex, folder)
             if not search:
                 continue
-            result = (search.group(0), search.groupdict())
-            self.folders.append(result)
-        self.folders.sort(key=lambda x: x[0])
+            folders.append((search.group(0), search.groupdict()))
+        folders.sort(key=lambda x: x[0])
+        return folders
 
     def fill_values(self) -> None:
         """Copy named groups from the last matching folder onto tokens."""
@@ -82,7 +84,7 @@ class InputTokenStore:
     def apply(self, pattern: str) -> None:
         """Scan destination with pattern and derive input token values."""
         self.pattern_regex = self.build_pattern_regex(pattern)
-        self.find_folders(self.pattern_regex)
+        self.folders = self.find_folders(self.pattern_regex)
         self.fill_values()
 
     @property
@@ -91,6 +93,6 @@ class InputTokenStore:
         return {token.name: token.token for token in self.tokens.values()}
 
     @property
-    def captured_token_values(self) -> dict[str, str]:
+    def captured_token_values(self) -> dict[str, str | None]:
         """Map token patterns to captured values from destination folders."""
         return {pattern: token.value for pattern, token in self.tokens.items()}
