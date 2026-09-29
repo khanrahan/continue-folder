@@ -36,6 +36,7 @@ To Install:
 
 import datetime as dt
 import os
+from pathlib import Path
 
 import flame
 from PySide6 import QtWidgets
@@ -309,7 +310,7 @@ class ContinueFolder:
         This will start a folder sequence or continue the existing folder
         sequence.
         """
-        os.mkdir(os.path.join(self.path, self.folder_new))
+        Path(self.path, self.folder_new).mkdir()
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
         self.message('MediaHub folder created!')
 
