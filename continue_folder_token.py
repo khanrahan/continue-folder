@@ -10,10 +10,12 @@ class Token:
     """Output token: square brackets form the new folder name.
 
     Attributes:
-        pattern: token excluding the square bracket delimiters
+        name: Display name for the Add Token menu.
+        pattern: Token excluding the square bracket delimiters.
         value: Resolved value to emit into the new folder name.
     """
 
+    name: str
     pattern: str
     value: str
 
@@ -49,10 +51,13 @@ class InputToken:
     """Input token: curly braces interpret destination folder names.
 
     Attributes:
-        pattern: Curly-brace token (e.g. {version}).
+        name: Display name for the Add Token menu.
+        pattern: Token excluding the curly-brace delimiters (e.g. version).
+        regex: Capture regex used when scanning folder names.
         value: Result value after scanning (e.g. next version number).
     """
 
+    name: str
     pattern: str
     regex: str
     value: Optional[str] = None  # filled after scan

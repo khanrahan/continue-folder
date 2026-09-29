@@ -39,28 +39,31 @@ class OutputTokenStore:
         self._build_tokens()
 
     def _build_tokens(self) -> None:
-        """Populate square-bracket output tokens."""
-        self.tokens['am/pm'] = Token('pp', self.now.strftime('%p').lower())
-        self.tokens['AM/PM'] = Token('PP', self.now.strftime('%p').upper())
-        self.tokens['Day'] = Token('DD', self.now.strftime('%d'))
-        self.tokens['Hour (12hr)'] = Token('hh', self.now.strftime('%I'))
-        self.tokens['Hour (24hr)'] = Token('HH', self.now.strftime('%H'))
-        self.tokens['Minute'] = Token('mm', self.now.strftime('%M'))
-        self.tokens['Month'] = Token('MM', self.now.strftime('%m'))
-        self.tokens['Version'] = Token('version', '1')
-        self.tokens['Year (YY)'] = Token('YY', self.now.strftime('%y'))
-        self.tokens['Year (YYYY)'] = Token('YYYY', self.now.strftime('%Y'))
-        self.tokens['Version'] = TokenPadded(
-            'version',
-            self.input_token_store.captured_token_values['Version'] or 1,
-        )
+        """Populate square-bracket output tokens keyed by pattern."""
+        tokens = [
+            Token('am/pm', 'pp', self.now.strftime('%p').lower()),
+            Token('AM/PM', 'PP', self.now.strftime('%p').upper()),
+            Token('Day', 'DD', self.now.strftime('%d')),
+            Token('Hour (12hr)', 'hh', self.now.strftime('%I')),
+            Token('Hour (24hr)', 'HH', self.now.strftime('%H')),
+            Token('Minute', 'mm', self.now.strftime('%M')),
+            Token('Month', 'MM', self.now.strftime('%m')),
+            TokenPadded(
+                'Version',
+                'version',
+                self.input_token_store.captured_token_values['version'] or 1,
+            ),
+            Token('Year (YY)', 'YY', self.now.strftime('%y')),
+            Token('Year (YYYY)', 'YYYY', self.now.strftime('%Y')),
+        ]
+        self.tokens = {token.pattern: token for token in tokens}
 
     def resolve(self, pattern: str) -> str:
         """Replace square-bracket tokens in pattern with values."""
         self._build_tokens()  # rebuild
         folder_new = pattern
 
-        for _, token in self.tokens.items():
+        for token in self.tokens.values():
             if isinstance(token, TokenPadded):
                 folder_new = re.sub(
                     token.regex,
@@ -76,4 +79,4 @@ class OutputTokenStore:
     @property
     def name_token_pairs(self) -> dict[str, str]:
         """Map display names to insertable square-bracket patterns."""
-        return {name: f'{token.token}' for name, token in self.tokens.items()}
+        return {token.name: token.token for token in self.tokens.values()}

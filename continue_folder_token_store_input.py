@@ -20,17 +20,20 @@ class InputTokenStore:
         self._build_tokens()
 
     def _build_tokens(self) -> None:
-        """Populate curly-brace input tokens for matching and capture."""
-        self.tokens['am/pm'] = InputToken('pp', '[a-z]{2}')
-        self.tokens['AM/PM'] = InputToken('PP', '[A-Z]{2}')
-        self.tokens['Day'] = InputToken('DD', '[0-9]{2}')
-        self.tokens['Hour (12hr)'] = InputToken('hh', '[0-9]{2}')
-        self.tokens['Hour (24hr)'] = InputToken('HH', '[0-9]{2}')
-        self.tokens['Minute'] = InputToken('mm', '[0-9]{2}')
-        self.tokens['Month'] = InputToken('MM', '[0-9]{2}')
-        self.tokens['Version'] = InputToken('version', '[0-9]*')
-        self.tokens['Year (##)'] = InputToken('YY', '[0-9]{2}')
-        self.tokens['Year (####)'] = InputToken('YYYY', '[0-9]{4}')
+        """Populate curly-brace input tokens keyed by pattern."""
+        tokens = [
+            InputToken('am/pm', 'pp', '[a-z]{2}'),
+            InputToken('AM/PM', 'PP', '[A-Z]{2}'),
+            InputToken('Day', 'DD', '[0-9]{2}'),
+            InputToken('Hour (12hr)', 'hh', '[0-9]{2}'),
+            InputToken('Hour (24hr)', 'HH', '[0-9]{2}'),
+            InputToken('Minute', 'mm', '[0-9]{2}'),
+            InputToken('Month', 'MM', '[0-9]{2}'),
+            InputToken('Version', 'version', '[0-9]*'),
+            InputToken('Year (##)', 'YY', '[0-9]{2}'),
+            InputToken('Year (####)', 'YYYY', '[0-9]{4}'),
+        ]
+        self.tokens = {token.pattern: token for token in tokens}
 
     @staticmethod
     def capture_tokens(regex: str, folder: str) -> re.Match | None:
@@ -68,13 +71,13 @@ class InputTokenStore:
         self.folders.sort(key=lambda x: x[0])
 
     def fill_values(self) -> None:
-        """Fill the token values."""
-        if self.folders:
-            match = self.folders[-1][1]  # last folder's captured values
-            for key, value in match.items():
-                for token in self.tokens.values():
-                    if key == token.pattern:
-                        token.value = value
+        """Copy named groups from the last matching folder onto tokens."""
+        if not self.folders:
+            return
+        match = self.folders[-1][1]
+        for key, value in match.items():
+            if key in self.tokens:
+                self.tokens[key].value = value
 
     def apply(self, pattern: str) -> None:
         """Scan destination with pattern and derive input token values."""
@@ -85,9 +88,9 @@ class InputTokenStore:
     @property
     def name_token_pairs(self) -> dict[str, str]:
         """Map display names to insertable curly-brace patterns."""
-        return {name: token.pattern for name, token in self.tokens.items()}
+        return {token.name: token.token for token in self.tokens.values()}
 
     @property
     def captured_token_values(self) -> dict[str, str]:
-        """Map display names to captured values from destination folders."""
-        return {name: token.value for name, token in self.tokens.items()}
+        """Map token patterns to captured values from destination folders."""
+        return {pattern: token.value for pattern, token in self.tokens.items()}
