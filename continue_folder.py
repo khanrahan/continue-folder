@@ -97,20 +97,13 @@ class ContinueFolder:
             input_token_store=self.input_token_store,
         )
 
-        # Patterns
-        self.input_pattern = ''
-        self.output_pattern = ''
-        self.load_patterns()
-
-        # Folders
+        # Patterns, folders, destinations — filled by apply_preset
+        self.input_pattern = '{version}'
+        self.output_pattern = '[version]'
         self.folders = []
         self.pattern_regex = ''
         self.folder_new = ''
-        self._apply_patterns()
-
-        # New folder destinations
-        self.destinations = {'Desktop Reel': False, 'Media Hub': False}
-        self._load_destinations_by_index(0)
+        self.destinations = {'Desktop Reel': True, 'Media Hub': False}
 
         # Windows
         self._windows = {
@@ -122,13 +115,7 @@ class ContinueFolder:
             TITLE_VERSION, self._windows['parent'])
         self._windows['save'] = SavePresetWindow(self._windows['main'])
 
-        # Window starting values
-        self._windows['main'].preset = (
-            self._store.preset_names[0] if self._store.preset_names else '')
         self._windows['main'].presets = self._store.preset_names
-        self._windows['main'].input_pattern = self.input_pattern
-        self._windows['main'].output_pattern = self.output_pattern
-        self._windows['main'].folder_new = self.folder_new
         self._windows['main'].input_tokens = (
             self.input_token_store.name_token_pairs)
         self._windows['main'].output_tokens = (
@@ -146,6 +133,10 @@ class ContinueFolder:
             self._on_destinatination_change)
         self._windows['main'].signal_ok.connect(self._on_ok_clicked)
         self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
+
+        preset_zero = (
+            self._store.preset_names[0] if self._store.preset_names else None)
+        self.apply_preset(preset_zero)
 
         self._windows['main'].show()
 
@@ -193,24 +184,36 @@ class ContinueFolder:
             self._windows['main'].destination_folder_checked
         )
 
-    def _on_preset_change(self):
-        """Handle preset selection change; update patterns from store."""
-        preset_name = self._windows['main'].preset
-        if preset_name:
-            preset = self._store.presets.get(preset_name)
-            if preset:
-                self.input_pattern, self.output_pattern = (
-                    self._patterns_from_preset(preset))
-                self._windows['main'].input_pattern = self.input_pattern
-                self._windows['main'].output_pattern = self.output_pattern
-                self._load_destinations(preset)
-                self._windows['main'].destination_reel_checked = (
-                    self.destinations.get('Desktop Reel', False)
-                )
-                self._windows['main'].destination_folder_checked = (
-                    self.destinations.get('Media Hub', False)
-                )
+    def apply_preset(self, name: str | None) -> None:
+        """Load a preset into the model and push it to the main window.
+
+        Missing or unknown names fall back to default patterns and
+        destinations. Call this after the window exists, including on
+        startup (setText does not emit ``signal_preset``).
+        """
+        preset = self._store.presets.get(name) if name else None
+        if preset:
+            self.input_pattern, self.output_pattern = (
+                self._patterns_from_preset(preset))
+            self._load_destinations(preset)
+        else:
+            self.input_pattern = '{version}'
+            self.output_pattern = '[version]'
+            self.destinations = {'Desktop Reel': True, 'Media Hub': False}
+
+        main = self._windows['main']
+        main.preset = name or ''
+        main.input_pattern = self.input_pattern
+        main.output_pattern = self.output_pattern
+        main.destination_reel_checked = self.destinations.get(
+            'Desktop Reel', False)
+        main.destination_folder_checked = self.destinations.get(
+            'Media Hub', False)
         self._refresh_folder_display()
+
+    def _on_preset_change(self):
+        """Handle preset selection change; reload from the store."""
+        self.apply_preset(self._windows['main'].preset)
 
     def _on_input_pattern_change(self, text):
         """Handle input pattern change; update folder and update display."""
@@ -239,9 +242,9 @@ class ContinueFolder:
             pass
         self._store.load()
         self._windows['main'].presets = self._store.preset_names
-        self._windows['main'].preset = (
-            self._store.preset_names[0] if self._store.preset_names else '')
-        self._on_preset_change()
+        next_preset = (
+            self._store.preset_names[0] if self._store.preset_names else None)
+        self.apply_preset(next_preset)
 
     def _encode_destinations(self):
         """Encode destinations dict as a comma separated string."""
@@ -286,7 +289,7 @@ class ContinueFolder:
                 f'Check permissions on {self._settings_file}')
             return
         self._windows['main'].presets = self._store.preset_names
-        self._windows['main'].preset = preset_name
+        self.apply_preset(preset_name)
 
     def _on_ok_clicked(self):
         """Handle OK button; create reel or folder then close."""
@@ -301,29 +304,6 @@ class ContinueFolder:
         """Handle Cancel button."""
         self.message('Cancelled!')
         self._windows['main'].close()
-
-    def load_patterns(self):
-        """Load the first preset's patterns or use defaults."""
-        if self._store.preset_names:
-            first_name = self._store.preset_names[0]
-            preset = self._store.presets.get(first_name)
-            if preset:
-                self.input_pattern, self.output_pattern = (
-                    self._patterns_from_preset(preset))
-            else:
-                self.input_pattern = '{version}'
-                self.output_pattern = '[version]'
-        else:
-            self.input_pattern = '{version}'
-            self.output_pattern = '[version]'
-
-    def _load_destinations_by_index(self, index):
-        """Load destinations by index, instead of name.
-
-        Used to load the first preset found on startup.
-        """
-        preset = self._store.presets.get(self._store.preset_names[index])
-        self._load_destinations(preset)
 
     def _load_destinations(self, preset):
         """Load destinations from preset."""
