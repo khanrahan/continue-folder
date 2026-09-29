@@ -31,12 +31,21 @@ class Token:
 
 @dataclass
 class TokenPadded(Token):
-    """Output token with optional padding modifier."""
+    """Output token with optional padding modifier.
+
+    ``value`` is the stored capture (e.g. highest existing version).
+    Emission uses ``next_value`` so the new folder continues the sequence.
+    """
+
+    @property
+    def next_value(self) -> str:
+        """Return stored value plus one, or ``1`` when value is not a number."""
+        n = int(self.value) if str(self.value).isdigit() else 0
+        return str(n + 1)
 
     def process_match(self, match: re.Match) -> str:
-        """Process a regex match and return the padded value."""
-        padding = len(match.group(1))
-        return str(self.value).zfill(padding)
+        """Process a regex match and return the padded next value."""
+        return self.next_value.zfill(len(match.group(1)))
 
     @property
     def regex(self) -> str:
