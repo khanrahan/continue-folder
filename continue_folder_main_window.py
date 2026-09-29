@@ -253,6 +253,21 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['output_tokens'].populate_menu(token_dict)
 
     @property
+    def destinations(self) -> dict[str, bool]:
+        """Get or set Desktop Reel / Media Hub destination checks."""
+        return {
+            'Desktop Reel': self._buttons['destination_reel'].isChecked(),
+            'Media Hub': self._buttons['destination_folder'].isChecked(),
+        }
+
+    @destinations.setter
+    def destinations(self, values: dict[str, bool]) -> None:
+        self._buttons['destination_reel'].setChecked(
+            values.get('Desktop Reel', False))
+        self._buttons['destination_folder'].setChecked(
+            values.get('Media Hub', False))
+
+    @property
     def destination_reel_checked(self) -> bool:
         """Return True if Desktop Reel is selected."""
         return self._buttons['destination_reel'].isChecked()

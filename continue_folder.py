@@ -96,14 +96,7 @@ class ContinueFolder:
             epoch=self.now,
             input_token_store=self.input_token_store,
         )
-
-        # Patterns, folders, destinations — filled by apply_preset
-        self.input_pattern = '{version}'
-        self.output_pattern = '[version]'
-        self.folders = []
-        self.pattern_regex = ''
         self.folder_new = ''
-        self.destinations = {'Desktop Reel': True, 'Media Hub': False}
 
         # Windows
         self._windows = {
@@ -129,8 +122,6 @@ class ContinueFolder:
             self._on_input_pattern_change)
         self._windows['main'].signal_output_pattern.connect(
             self._on_output_pattern_change)
-        self._windows['main'].signal_destination.connect(
-            self._on_destinatination_change)
         self._windows['main'].signal_ok.connect(self._on_ok_clicked)
         self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
 
@@ -165,24 +156,14 @@ class ContinueFolder:
 
     def _apply_patterns(self) -> None:
         """Scan with input pattern and resolve the output pattern."""
-        self.input_token_store.apply(self.input_pattern)
-        self.folders = self.input_token_store.folders
-        self.pattern_regex = self.input_token_store.pattern_regex
-        self.folder_new = self.output_token_store.resolve(self.output_pattern)
+        main = self._windows['main']
+        self.input_token_store.apply(main.input_pattern)
+        self.folder_new = self.output_token_store.resolve(main.output_pattern)
 
     def _refresh_folder_display(self):
         """Recompute folder name from patterns and update window display."""
         self._apply_patterns()
         self._windows['main'].folder_new = self.folder_new
-
-    def _on_destinatination_change(self):
-        """Update destinations dictionary from window checkboxes."""
-        self.destinations['Desktop Reel'] = (
-            self._windows['main'].destination_reel_checked
-        )
-        self.destinations['Media Hub'] = (
-            self._windows['main'].destination_folder_checked
-        )
 
     def apply_preset(self, name: str | None) -> None:
         """Load a preset into the model and push it to the main window.
@@ -192,37 +173,29 @@ class ContinueFolder:
         startup (setText does not emit ``signal_preset``).
         """
         preset = self._store.presets.get(name) if name else None
-        if preset:
-            self.input_pattern, self.output_pattern = (
-                self._patterns_from_preset(preset))
-            self._load_destinations(preset)
-        else:
-            self.input_pattern = '{version}'
-            self.output_pattern = '[version]'
-            self.destinations = {'Desktop Reel': True, 'Media Hub': False}
-
         main = self._windows['main']
+        if preset:
+            main.input_pattern, main.output_pattern = (
+                self._patterns_from_preset(preset))
+            main.destinations = self._destinations_from_preset(preset)
+        else:
+            main.input_pattern = '{version}'
+            main.output_pattern = '[version]'
+            main.destinations = {'Desktop Reel': True, 'Media Hub': False}
+
         main.preset = name or ''
-        main.input_pattern = self.input_pattern
-        main.output_pattern = self.output_pattern
-        main.destination_reel_checked = self.destinations.get(
-            'Desktop Reel', False)
-        main.destination_folder_checked = self.destinations.get(
-            'Media Hub', False)
         self._refresh_folder_display()
 
     def _on_preset_change(self):
         """Handle preset selection change; reload from the store."""
         self.apply_preset(self._windows['main'].preset)
 
-    def _on_input_pattern_change(self, text):
-        """Handle input pattern change; update folder and update display."""
-        self.input_pattern = text
+    def _on_input_pattern_change(self, _text):
+        """Input pattern change; recompute folder and update display."""
         self._refresh_folder_display()
 
-    def _on_output_pattern_change(self, text):
-        """Handle output pattern change; update folder and update display."""
-        self.output_pattern = text
+    def _on_output_pattern_change(self, _text):
+        """Output pattern change; recompute folder and update display."""
         self._refresh_folder_display()
 
     def _on_preset_delete(self):
@@ -246,10 +219,12 @@ class ContinueFolder:
             self._store.preset_names[0] if self._store.preset_names else None)
         self.apply_preset(next_preset)
 
-    def _encode_destinations(self):
-        """Encode destinations dict as a comma separated string."""
+    def _encode_destinations(self) -> str:
+        """Encode window destination checks as a comma-separated string."""
         return ', '.join(
-            key for key, value in self.destinations.items() if value is True
+            key
+            for key, value in self._windows['main'].destinations.items()
+            if value
         )
 
     def _on_preset_save(self):
@@ -267,15 +242,15 @@ class ContinueFolder:
                 return
             self._store.overwrite_preset(
                 name=preset_name,
-                input_pattern=self.input_pattern,
-                output_pattern=self.output_pattern,
+                input_pattern=self._windows['main'].input_pattern,
+                output_pattern=self._windows['main'].output_pattern,
                 destinations=self._encode_destinations()
             )
         else:
             self._store.add_preset(
                 name=preset_name,
-                input_pattern=self.input_pattern,
-                output_pattern=self.output_pattern,
+                input_pattern=self._windows['main'].input_pattern,
+                output_pattern=self._windows['main'].output_pattern,
                 destinations=self._encode_destinations()
             )
             self._store.sort()
@@ -305,18 +280,16 @@ class ContinueFolder:
         self.message('Cancelled!')
         self._windows['main'].close()
 
-    def _load_destinations(self, preset):
-        """Load destinations from preset."""
+    def _destinations_from_preset(self, preset) -> dict[str, bool]:
+        """Read destination checks from a preset, with reel-only default."""
         destinations = getattr(preset, 'destinations', None)
+        result = {'Desktop Reel': False, 'Media Hub': False}
         if destinations:
-            loaded_destinations = destinations.split(', ')
-            for destination in self.destinations:
-                if destination in loaded_destinations:
-                    self.destinations[destination] = True
-                else:
-                    self.destinations[destination] = False
-        else:
-            self.destinations = {'Desktop Reel': True, 'Media Hub': False}
+            loaded = destinations.split(', ')
+            for key in result:
+                result[key] = key in loaded
+            return result
+        return {'Desktop Reel': True, 'Media Hub': False}
 
     def create_desktop_reel(self):
         """Create reel on bottom of the current desktop.
