@@ -290,18 +290,16 @@ class SettingsStore:
                 all other preset_attributes.
 
         Raises:
-            ValueError: If kwargs fail _check_attributes validation.
-
-        Note:
-            If a preset with the given name doesn't exist, this method
-            silently does nothing (no error is raised).
+            ValueError: If kwargs fail _check_attributes validation, or if a
+                preset with the given name does not exist.
         """
         self._check_attributes(kwargs)
         name_value = kwargs['name']
         preset = self.find_preset(name_value)
-        if preset is not None:
-            for key, value in kwargs.items():
-                preset.set(key, value)
+        if preset is None:
+            raise ValueError(f'Preset "{name_value}" does not exist.')
+        for key, value in kwargs.items():
+            preset.set(key, value)
 
     def save(self) -> None:
         """Write the XML tree to the settings file.

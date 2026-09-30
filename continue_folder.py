@@ -235,12 +235,16 @@ class ContinueFolder:
                     + 'sure want to permanently overwrite this preset?'
                     + '<br/>' + 'This operation cannot be undone.'):
                 return
-            self._store.overwrite_preset(
-                name=preset_name,
-                input_pattern=self._windows['main'].input_pattern,
-                output_pattern=self._windows['main'].output_pattern,
-                destinations=self._encode_destinations()
-            )
+            try:
+                self._store.overwrite_preset(
+                    name=preset_name,
+                    input_pattern=self._windows['main'].input_pattern,
+                    output_pattern=self._windows['main'].output_pattern,
+                    destinations=self._encode_destinations()
+                )
+            except ValueError as error:
+                FlameMessageWindow('Error', 'error', str(error))
+                return
         else:
             self._store.add_preset(
                 name=preset_name,
