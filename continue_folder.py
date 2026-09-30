@@ -35,7 +35,6 @@ To Install:
 
 
 import datetime as dt
-import os
 from pathlib import Path
 
 import flame
@@ -82,8 +81,7 @@ class ContinueFolder:
         self.path = selection[0].path
 
         # Settings store (presets XML)
-        self._settings_file = os.path.join(
-            os.path.expanduser(CONFIG_FOLDER), XML)
+        self._settings_file = str(Path(CONFIG_FOLDER).expanduser() / XML)
         self._store = SettingsStore(
             self._settings_file, TITLE, VERSION,
             preset_attributes=(
