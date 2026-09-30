@@ -6,17 +6,17 @@ from dataclasses import dataclass
 
 @dataclass
 class Token:
-    """Output token: square brackets form the new folder name.
+    """Output token delimited with square brackets form the new result name.
 
     Attributes:
         name: Display name for the Add Token menu.
         pattern: Token excluding the square bracket delimiters.
-        value: Resolved value to emit into the new folder name.
+        value: Stored capture, or the resolved value to emit for date tokens.
     """
 
     name: str
     pattern: str
-    value: str
+    value: str | None
 
     @property
     def token(self) -> str:
@@ -31,15 +31,11 @@ class Token:
 
 @dataclass
 class TokenPadded(Token):
-    """Output token with optional padding modifier.
-
-    ``value`` is the stored capture (e.g. highest existing version).
-    Emission uses ``next_value`` so the new folder continues the sequence.
-    """
+    """Output token with optional padding modifier."""
 
     @property
     def next_value(self) -> str:
-        """Return stored value plus one, or ``1`` when value is not a number."""
+        """Return stored value plus one, or 1 when value is not a number."""
         n = int(self.value) if str(self.value).isdigit() else 0
         return str(n + 1)
 
@@ -56,19 +52,25 @@ class TokenPadded(Token):
 
 @dataclass
 class InputToken:
-    """Input token: curly braces interpret destination folder names.
+    """Input token delimited with curly braces.
+
+    Used with a InputTokenStore to store sections of a common string pattern.
 
     Attributes:
         name: Display name for the Add Token menu.
         pattern: Token excluding the curly-brace delimiters (e.g. version).
         regex: Capture regex used when scanning folder names.
-        value: Result value after scanning (e.g. next version number).
+        value: Result after considering
     """
 
     name: str
     pattern: str
     regex: str
     value: str | None = None  # filled after scan
+
+    def consider(self, captured: str) -> None:
+        """Consider a capture; last write wins."""
+        self.value = captured
 
     @property
     def token(self) -> str:
@@ -79,3 +81,16 @@ class InputToken:
     def named_regex(self) -> str:
         """Get pattern named group regex."""
         return rf'(?P<{self.pattern}>{self.regex})'
+
+
+@dataclass
+class InputTokenMax(InputToken):
+    """Input token that keeps the numeric max of all captures."""
+
+    def consider(self, captured: str) -> None:
+        """Keep the highest integer capture; ignore non-digits."""
+        if not captured.isdigit():
+            return
+        number = int(captured)
+        if self.value is None or number > int(self.value):
+            self.value = str(number)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import re
 
-from continue_folder_token import InputToken
+from continue_folder_token import InputToken, InputTokenMax
 
 
 class InputTokenStore:
@@ -29,7 +29,7 @@ class InputTokenStore:
             InputToken('Hour (24hr)', 'HH', '[0-9]{2}'),
             InputToken('Minute', 'mm', '[0-9]{2}'),
             InputToken('Month', 'MM', '[0-9]{2}'),
-            InputToken('Version', 'version', '[0-9]*'),
+            InputTokenMax('Version', 'version', '[0-9]*'),
             InputToken('Year (##)', 'YY', '[0-9]{2}'),
             InputToken('Year (####)', 'YYYY', '[0-9]{4}'),
         ]
@@ -73,13 +73,13 @@ class InputTokenStore:
         return folders
 
     def fill_values(self) -> None:
-        """Copy named groups from the last matching folder onto tokens."""
-        if not self.folders:
-            return
-        match = self.folders[-1][1]
-        for key, value in match.items():
-            if key in self.tokens:
-                self.tokens[key].value = value
+        """Copy named groups from matching folders onto tokens."""
+        for token in self.tokens.values():
+            token.value = None
+        for _, groups in self.folders:
+            for key, captured in groups.items():
+                if key in self.tokens:
+                    self.tokens[key].consider(captured)
 
     def apply(self, pattern: str) -> None:
         """Scan destination with pattern and derive input token values."""
