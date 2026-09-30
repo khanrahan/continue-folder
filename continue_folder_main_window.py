@@ -43,7 +43,6 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     signal_delete = QtCore.Signal()
     signal_input_pattern = QtCore.Signal(str)
     signal_output_pattern = QtCore.Signal(str)
-    signal_destination = QtCore.Signal()
     signal_ok = QtCore.Signal()
     signal_cancel = QtCore.Signal()
 
@@ -123,9 +122,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
             'Cancel', self.signal_cancel.emit, button_width=110)
 
         self._buttons['destination_reel'] = FlamePushButton('Desktop Reel', True)
-        self._buttons['destination_reel'].clicked.connect(self.signal_destination.emit)
         self._buttons['destination_folder'] = FlamePushButton('MediaHub Folder', False)
-        self._buttons['destination_folder'].clicked.connect(self.signal_destination.emit)
 
     def _init_layouts(self) -> None:
         """Initialize and configure all layout managers for the window."""
