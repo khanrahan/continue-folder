@@ -66,7 +66,7 @@ class ContinueFolder:
     interpret existing destination folders. Output Pattern uses square-bracket
     tokens (``[version]``, ``[YYYY]``, …) to form the new folder name.
     ``{version}`` continues a number sequence; optional hashes set padding
-    on input (``{version###}``) or output (``[version###]``).
+    on output (``[version###]``).
     """
 
     def __init__(self, selection: tuple) -> None:
