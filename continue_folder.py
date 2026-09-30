@@ -98,7 +98,6 @@ class ContinueFolder:
             epoch=self.now,
             input_token_store=self.input_token_store,
         )
-        self.folder_new = ''
 
         # Windows
         self._windows = {
@@ -156,16 +155,11 @@ class ContinueFolder:
         output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
         return input_pattern, output_pattern
 
-    def _apply_patterns(self) -> None:
-        """Scan with input pattern and resolve the output pattern."""
-        main = self._windows['main']
-        self.input_token_store.apply(main.input_pattern)
-        self.folder_new = self.output_token_store.resolve(main.output_pattern)
-
     def _refresh_folder_display(self) -> None:
         """Recompute folder name from patterns and update window display."""
-        self._apply_patterns()
-        self._windows['main'].folder_new = self.folder_new
+        main = self._windows['main']
+        self.input_token_store.apply(main.input_pattern)
+        main.folder_new = self.output_token_store.resolve(main.output_pattern)
 
     def apply_preset(self, name: str | None) -> None:
         """Load a preset into the model and push it to the main window.
@@ -301,8 +295,9 @@ class ContinueFolder:
         sequence.
         """
         desktop = flame.project.current_project.current_workspace.desktop
-        # create_real will not take utf-8, only ascii
-        desktop.reel_groups[0].create_reel(self.folder_new.encode('ascii', 'ignore'))
+        # create_reel will not take utf-8, only ascii
+        desktop.reel_groups[0].create_reel(
+            self._windows['main'].folder_new.encode('ascii', 'ignore'))
         self.message('Reel created!')
 
     def create_media_hub_folder(self) -> None:
@@ -311,7 +306,7 @@ class ContinueFolder:
         This will start a folder sequence or continue the existing folder
         sequence.
         """
-        Path(self.path, self.folder_new).mkdir()
+        Path(self.path, self._windows['main'].folder_new).mkdir()
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
         self.message('MediaHub folder created!')
 
