@@ -69,14 +69,17 @@ class InputTokenStore:
             if not search:
                 continue
             folders.append((search.group(0), search.groupdict()))
-        folders.sort(key=lambda x: x[0])
         return folders
 
     def fill_values(self) -> None:
-        """Copy named groups from matching folders onto tokens."""
+        """Copy named groups from matching folders onto tokens.
+
+        Last-wins tokens see captures in folder-name order. Max tokens
+        consider every capture regardless of order.
+        """
         for token in self.tokens.values():
             token.value = None
-        for _, groups in self.folders:
+        for _, groups in sorted(self.folders, key=lambda folder: folder[0]):
             for key, captured in groups.items():
                 if key in self.tokens:
                     self.tokens[key].consider(captured)
