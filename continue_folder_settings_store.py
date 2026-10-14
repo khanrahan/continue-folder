@@ -199,23 +199,18 @@ class SettingsStore:
                 return preset
         return None
 
-    def delete(self, *ignore: Any, name: str) -> None:
+    def delete(self, *, name: str) -> None:
         """Delete a preset element from the XML tree by name.
 
         Args:
-            *ignore: Additional positional arguments are not allowed.
             name: The name of the preset to delete.
 
         Raises:
-            ValueError: If additional positional arguments are provided, or if
-                a preset with the given name does not exist.
+            ValueError: If a preset with the given name does not exist.
 
         Note:
             Changes are not persisted to disk until save() is called.
         """
-        if ignore:
-            raise ValueError(
-                'SettingsStore.delete() only accepts "name" keyword argument.')
         preset = self.find_preset(name)
         if preset is None:
             raise ValueError(f'Preset "{name}" does not exist.')
