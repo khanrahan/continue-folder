@@ -209,12 +209,21 @@ class ContinueFolder:
             return
         try:
             self._store.delete(name=preset_name)
-            self._store.save()
-            self.message(
-                f'{preset_name} preset deleted from {self._settings_file}')
         except ValueError as error:
             FlameMessageWindow('Error', 'error', str(error))
             return
+        try:
+            self._store.save()
+        except OSError:
+            FlameMessageWindow(
+                'Error', 'error',
+                f'Check permissions on {self._settings_file}')
+            # delete() already removed the preset from memory; reload the
+            # file that failed to update.
+            self._store.load()
+            return
+        self.message(
+            f'{preset_name} preset deleted from {self._settings_file}')
         self._store.load()
         self._windows['main'].presets = self._store.preset_names
         next_preset = (
