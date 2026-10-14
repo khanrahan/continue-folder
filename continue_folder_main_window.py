@@ -14,6 +14,9 @@ from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 from continue_folder_flame_token_push_button import FlameTokenPushButton
 from continue_folder_window_mixin import WindowMixin
 
+DESTINATION_REEL = 'Desktop Reel'
+DESTINATION_FOLDER = 'MediaHub Folder'
+
 
 class MainWindow(WindowMixin, QtWidgets.QWidget):
     """Main application window for Continue Folder.
@@ -121,8 +124,9 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['cancel'] = FlameButton(
             'Cancel', self.signal_cancel.emit, button_width=110)
 
-        self._buttons['destination_reel'] = FlamePushButton('Desktop Reel', True)
-        self._buttons['destination_folder'] = FlamePushButton('MediaHub Folder', False)
+        self._buttons['destination_reel'] = FlamePushButton(DESTINATION_REEL, True)
+        self._buttons['destination_folder'] = FlamePushButton(
+            DESTINATION_FOLDER, False)
 
     def _init_layouts(self) -> None:
         """Initialize and configure all layout managers for the window."""
@@ -251,16 +255,16 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     def destinations(self) -> dict[str, bool]:
         """Get or set Desktop Reel / MediaHub Folder destination checks."""
         return {
-            'Desktop Reel': self._buttons['destination_reel'].isChecked(),
-            'MediaHub Folder': self._buttons['destination_folder'].isChecked(),
+            DESTINATION_REEL: self._buttons['destination_reel'].isChecked(),
+            DESTINATION_FOLDER: self._buttons['destination_folder'].isChecked(),
         }
 
     @destinations.setter
     def destinations(self, values: dict[str, bool]) -> None:
         self._buttons['destination_reel'].setChecked(
-            values.get('Desktop Reel', False))
+            values.get(DESTINATION_REEL, False))
         self._buttons['destination_folder'].setChecked(
-            values.get('MediaHub Folder', False))
+            values.get(DESTINATION_FOLDER, False))
 
     @property
     def destination_reel_checked(self) -> bool:

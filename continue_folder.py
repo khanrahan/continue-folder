@@ -41,7 +41,11 @@ import flame
 from PySide6 import QtWidgets
 
 from continue_folder_flame_message_window import FlameMessageWindow
-from continue_folder_main_window import MainWindow
+from continue_folder_main_window import (
+    DESTINATION_FOLDER,
+    DESTINATION_REEL,
+    MainWindow,
+)
 from continue_folder_preset import Preset
 from continue_folder_save_preset_window import SavePresetWindow
 from continue_folder_settings_store import SettingsStore
@@ -56,6 +60,11 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
+
+
+def _get_default_destinations() -> dict[str, bool]:
+    """Return a new destination map with the reel on and the folder off."""
+    return {DESTINATION_REEL: True, DESTINATION_FOLDER: False}
 
 
 class ContinueFolder:
@@ -180,7 +189,7 @@ class ContinueFolder:
         else:
             main.input_pattern = '{version}'
             main.output_pattern = '[version]'
-            main.destinations = {'Desktop Reel': True, 'MediaHub Folder': False}
+            main.destinations = _get_default_destinations()
 
         main.preset = name or ''
         self._refresh_folder_display()
@@ -294,13 +303,13 @@ class ContinueFolder:
     def _destinations_from_preset(self, preset: Preset) -> dict[str, bool]:
         """Read destination checks from a preset, with reel-only default."""
         destinations = getattr(preset, 'destinations', None)
-        result = {'Desktop Reel': False, 'MediaHub Folder': False}
+        result = dict.fromkeys(_get_default_destinations(), False)
         if destinations:
             loaded = destinations.split(', ')
             for key in result:
                 result[key] = key in loaded
             return result
-        return {'Desktop Reel': True, 'MediaHub Folder': False}
+        return _get_default_destinations()
 
     def create_desktop_reel(self) -> None:
         """Create reel on bottom of the current desktop.
