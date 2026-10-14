@@ -254,7 +254,7 @@ class ContinueFolder:
         if duplicate:
             if not FlameMessageWindow(
                     'Overwrite Existing Preset', 'confirm', 'Are you '
-                    + 'sure want to permanently overwrite this preset?'
+                    + 'sure you want to permanently overwrite this preset?'
                     + '<br/>' + 'This operation cannot be undone.'):
                 return
             try:
