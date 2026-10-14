@@ -265,23 +265,3 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
             values.get(DESTINATION_REEL, False))
         self._buttons['destination_folder'].setChecked(
             values.get(DESTINATION_FOLDER, False))
-
-    @property
-    def destination_reel_checked(self) -> bool:
-        """Return True if Desktop Reel is selected."""
-        return self._buttons['destination_reel'].isChecked()
-
-    @destination_reel_checked.setter
-    def destination_reel_checked(self, value: bool) -> None:
-        """Set the Desktop Reel button checked state."""
-        self._buttons['destination_reel'].setChecked(value)
-
-    @property
-    def destination_folder_checked(self) -> bool:
-        """Return True if MediaHub Folder is selected."""
-        return self._buttons['destination_folder'].isChecked()
-
-    @destination_folder_checked.setter
-    def destination_folder_checked(self, value: bool) -> None:
-        """Set the MediaHub Folder button checked state."""
-        self._buttons['destination_folder'].setChecked(value)

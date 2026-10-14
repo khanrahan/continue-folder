@@ -288,9 +288,10 @@ class ContinueFolder:
 
     def _on_ok_clicked(self) -> None:
         """Handle OK button; create reel or folder then close."""
-        if self._windows['main'].destination_reel_checked:
+        destinations = self._windows['main'].destinations
+        if destinations[DESTINATION_REEL]:
             self.create_desktop_reel()
-        if self._windows['main'].destination_folder_checked:
+        if destinations[DESTINATION_FOLDER]:
             self.create_media_hub_folder()
         self.message('Done!')
         self._windows['main'].close()
