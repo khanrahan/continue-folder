@@ -81,7 +81,7 @@ class ContinueFolder:
         self.path = selection[0].path
 
         # Settings store (presets XML)
-        self._settings_file = str(Path(CONFIG_FOLDER).expanduser() / XML)
+        self._settings_file = Path(CONFIG_FOLDER).expanduser() / XML
         self._store = SettingsStore(
             self._settings_file, TITLE, VERSION,
             preset_attributes=(

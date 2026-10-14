@@ -4,9 +4,9 @@ This module provides the SettingsStore class for managing application settings
 stored as XML.
 """
 
-import os
 import xml.etree.ElementTree as Etree
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any
 
 from continue_folder_preset import Preset
@@ -41,7 +41,7 @@ class SettingsStore:
 
     Example:
         >>> attrs = ('name', 'path', 'pattern', 'find')
-        >>> store = SettingsStore('/path/to/settings.xml', 'Script Title', '1.0.0', attrs)
+        >>> store = SettingsStore(Path('/path/to/settings.xml'), 'Script Title', '1.0.0', attrs)
         >>> store.add_preset(name='My Preset', path='/some/path', pattern='<DD>')
         >>> store.save()
         >>> presets = store.preset_names
@@ -57,7 +57,7 @@ class SettingsStore:
 
     def __init__(
         self,
-        file: str,
+        file: Path,
         title: str,
         version: str,
         preset_attributes: Iterable[str],
@@ -65,7 +65,7 @@ class SettingsStore:
         """Initialize the instance.
 
         Args:
-            file: Filepath of existing or to be created XML file of settings.
+            file: Path of an existing or to-be-created XML settings file.
             title: Script title for the XML structure.
             version: Script version for the XML structure.
             preset_attributes: Iterable of preset XML attribute names. Must
@@ -106,7 +106,7 @@ class SettingsStore:
         After loading or creating the tree, initializes the root element and
         presets container element.
         """
-        if os.path.isfile(self.file):
+        if self.file.is_file():
             try:
                 self.tree = Etree.parse(self.file)
             except (Etree.ParseError, OSError) as error:
@@ -312,9 +312,7 @@ class SettingsStore:
                 disk full, or invalid path).
         """
         try:
-            dirpath = os.path.dirname(self.file)
-            if not os.path.exists(dirpath):
-                os.makedirs(dirpath)
+            self.file.parent.mkdir(parents=True, exist_ok=True)
             self.tree.write(self.file)
         except OSError as error:
             raise OSError(f'Failed to save settings to {self.file}: {error}') from error
