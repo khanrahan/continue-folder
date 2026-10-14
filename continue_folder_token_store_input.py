@@ -29,7 +29,7 @@ class InputTokenStore:
             InputToken('Hour (24hr)', 'HH', '[0-9]{2}'),
             InputToken('Minute', 'mm', '[0-9]{2}'),
             InputToken('Month', 'MM', '[0-9]{2}'),
-            InputTokenMax('Version', 'version', '[0-9]*'),
+            InputTokenMax('Version', 'version', '[0-9]+'),
             InputToken('Year (##)', 'YY', '[0-9]{2}'),
             InputToken('Year (####)', 'YYYY', '[0-9]{4}'),
         ]
@@ -37,9 +37,11 @@ class InputTokenStore:
 
     @staticmethod
     def capture_tokens(regex: str, folder: str) -> re.Match | None:
-        """Match folder against regex, returning None on error."""
+        """Match the folder name against regex, returning None on error."""
         try:
-            return re.match(regex, folder)
+            # Use fullmatch to ensure the entire folder name matches the regex
+            # as opposed to just a substring match.
+            return re.fullmatch(regex, folder)
         except re.error:
             # e.g. duplicate named groups when {version} appears twice
             return None
