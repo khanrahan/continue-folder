@@ -23,44 +23,42 @@ class OutputTokenStore:
 
     def __init__(
             self,
-            epoch: dt.datetime | None = None,
             input_token_store: InputTokenStore | None = None,
     ) -> None:
-        """Initialize output tokens for ``epoch`` (default: now).
+        """Initialize output tokens.
 
         Args:
-            epoch: Datetime used for date/time output tokens.
             input_token_store: Optional store used to supply derived values
                 (e.g. version) when resolving the output pattern.
         """
-        self.now = epoch if epoch is not None else dt.datetime.now()
         self.input_token_store = input_token_store
         self.tokens: dict[str, Token] = {}
         self._build_tokens()
 
     def _build_tokens(self) -> None:
         """Populate square-bracket output tokens keyed by pattern."""
+        now = dt.datetime.now()
         tokens = [
-            Token('am/pm', 'pp', self.now.strftime('%p').lower()),
-            Token('AM/PM', 'PP', self.now.strftime('%p').upper()),
-            Token('Day', 'DD', self.now.strftime('%d')),
-            Token('Hour (12hr)', 'hh', self.now.strftime('%I')),
-            Token('Hour (24hr)', 'HH', self.now.strftime('%H')),
-            Token('Minute', 'mm', self.now.strftime('%M')),
-            Token('Month', 'MM', self.now.strftime('%m')),
+            Token('am/pm', 'pp', now.strftime('%p').lower()),
+            Token('AM/PM', 'PP', now.strftime('%p').upper()),
+            Token('Day', 'DD', now.strftime('%d')),
+            Token('Hour (12hr)', 'hh', now.strftime('%I')),
+            Token('Hour (24hr)', 'HH', now.strftime('%H')),
+            Token('Minute', 'mm', now.strftime('%M')),
+            Token('Month', 'MM', now.strftime('%m')),
             TokenPadded(
                 'Version',
                 'version',
                 self.input_token_store.captured_token_values['version'],
             ),
-            Token('Year (YY)', 'YY', self.now.strftime('%y')),
-            Token('Year (YYYY)', 'YYYY', self.now.strftime('%Y')),
+            Token('Year (YY)', 'YY', now.strftime('%y')),
+            Token('Year (YYYY)', 'YYYY', now.strftime('%Y')),
         ]
         self.tokens = {token.pattern: token for token in tokens}
 
     def resolve(self, pattern: str) -> str:
         """Replace square-bracket tokens in pattern with values."""
-        self._build_tokens()  # rebuild
+        self._build_tokens()
         folder_new = pattern
 
         for token in self.tokens.values():
