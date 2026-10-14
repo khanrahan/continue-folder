@@ -249,10 +249,10 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
 
     @property
     def destinations(self) -> dict[str, bool]:
-        """Get or set Desktop Reel / Media Hub destination checks."""
+        """Get or set Desktop Reel / MediaHub Folder destination checks."""
         return {
             'Desktop Reel': self._buttons['destination_reel'].isChecked(),
-            'Media Hub': self._buttons['destination_folder'].isChecked(),
+            'MediaHub Folder': self._buttons['destination_folder'].isChecked(),
         }
 
     @destinations.setter
@@ -260,7 +260,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['destination_reel'].setChecked(
             values.get('Desktop Reel', False))
         self._buttons['destination_folder'].setChecked(
-            values.get('Media Hub', False))
+            values.get('MediaHub Folder', False))
 
     @property
     def destination_reel_checked(self) -> bool:

@@ -18,8 +18,8 @@ Description:
 
 Menus:
 
-    Right-click selected folders in the Media Hub --> Create... --> Continue
-    Folder
+    Right-click selected folders in the MediaHub Folder --> Create... -->
+    Continue Folder
 
 To Install:
 
@@ -59,7 +59,7 @@ XML = 'continue_folder.xml'
 
 
 class ContinueFolder:
-    """Creates a new folder on the Desktop or in the Media Hub using tokens.
+    """Creates a new Desktop reel or MediaHub Folder using tokens.
 
     Input Pattern uses curly-brace tokens (``{version}``, ``{YYYY}``, …) to
     interpret existing destination folders. Output Pattern uses square-bracket
@@ -180,7 +180,7 @@ class ContinueFolder:
         else:
             main.input_pattern = '{version}'
             main.output_pattern = '[version]'
-            main.destinations = {'Desktop Reel': True, 'Media Hub': False}
+            main.destinations = {'Desktop Reel': True, 'MediaHub Folder': False}
 
         main.preset = name or ''
         self._refresh_folder_display()
@@ -294,13 +294,13 @@ class ContinueFolder:
     def _destinations_from_preset(self, preset: Preset) -> dict[str, bool]:
         """Read destination checks from a preset, with reel-only default."""
         destinations = getattr(preset, 'destinations', None)
-        result = {'Desktop Reel': False, 'Media Hub': False}
+        result = {'Desktop Reel': False, 'MediaHub Folder': False}
         if destinations:
             loaded = destinations.split(', ')
             for key in result:
                 result[key] = key in loaded
             return result
-        return {'Desktop Reel': True, 'Media Hub': False}
+        return {'Desktop Reel': True, 'MediaHub Folder': False}
 
     def create_desktop_reel(self) -> None:
         """Create reel on bottom of the current desktop.
@@ -315,7 +315,7 @@ class ContinueFolder:
         self.message('Reel created!')
 
     def create_media_hub_folder(self) -> None:
-        """Create folder in Media Hub.
+        """Create folder in MediaHub Folder.
 
         This will start a folder sequence or continue the existing folder
         sequence.
