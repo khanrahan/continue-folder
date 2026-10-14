@@ -136,7 +136,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         self.show()
         self.raise_()
         self.activateWindow()
-        self.exec_()
+        self.exec()
 
     def _init_widgets(
             self,

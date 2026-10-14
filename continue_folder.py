@@ -241,7 +241,7 @@ class ContinueFolder:
     def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
         self._windows['save'].name = self._windows['main'].preset
-        if self._windows['save'].exec_() != QtWidgets.QDialog.Accepted:
+        if self._windows['save'].exec() != QtWidgets.QDialog.Accepted:
             return
         preset_name = self._windows['save'].name
         duplicate = self._store.find_preset(preset_name) is not None

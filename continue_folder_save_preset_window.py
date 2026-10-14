@@ -22,7 +22,7 @@ class SavePresetWindow(QtWidgets.QDialog):
     until the user either accepts (Save) or rejects (Cancel) the dialog.
 
     Usage:
-        The dialog should be shown using exec() or exec_(). After the dialog
+        The dialog should be shown using exec(). After the dialog
         closes, check the return value:
         - QDialog.Accepted: User clicked Save
         - QDialog.Rejected: User clicked Cancel
