@@ -119,9 +119,9 @@ class ContinueFolder:
         self._windows['main'].signal_save.connect(self._on_preset_save)
         self._windows['main'].signal_delete.connect(self._on_preset_delete)
         self._windows['main'].signal_input_pattern.connect(
-            self._on_input_pattern_change)
+            self._on_pattern_change)
         self._windows['main'].signal_output_pattern.connect(
-            self._on_output_pattern_change)
+            self._on_pattern_change)
         self._windows['main'].signal_ok.connect(self._on_ok_clicked)
         self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
 
@@ -190,13 +190,12 @@ class ContinueFolder:
         self._set_now()
         self.apply_preset(self._windows['main'].preset)
 
-    def _on_input_pattern_change(self, _text: str) -> None:
-        """Input pattern change; recompute folder and update display."""
-        self._set_now()
-        self._refresh_folder_display()
+    def _on_pattern_change(self, _text: str) -> None:
+        """Input or Output pattern change.
 
-    def _on_output_pattern_change(self, _text: str) -> None:
-        """Output pattern change; recompute folder and update display."""
+        Recompute folder and update display.  Ignore the string emitted by
+        FlameLineEdit.
+        """
         self._set_now()
         self._refresh_folder_display()
 
