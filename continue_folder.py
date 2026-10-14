@@ -90,7 +90,8 @@ class ContinueFolder:
         self.message(f'Settings loaded from {self._settings_file}')
 
         # Token stores
-        self.now = dt.datetime.now()
+        self.now = None
+        self._set_now()
         self.input_token_store = InputTokenStore(self.path)
         self.output_token_store = OutputTokenStore(
             epoch=self.now,
@@ -153,6 +154,10 @@ class ContinueFolder:
         output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
         return input_pattern, output_pattern
 
+    def _set_now(self) -> None:
+        """Set self.now to the current date and time."""
+        self.now = dt.datetime.now()
+
     def _refresh_folder_display(self) -> None:
         """Recompute folder name from patterns and update window display."""
         main = self._windows['main']
@@ -182,14 +187,17 @@ class ContinueFolder:
 
     def _on_preset_change(self) -> None:
         """Handle preset selection change; reload from the store."""
+        self._set_now()
         self.apply_preset(self._windows['main'].preset)
 
     def _on_input_pattern_change(self, _text: str) -> None:
         """Input pattern change; recompute folder and update display."""
+        self._set_now()
         self._refresh_folder_display()
 
     def _on_output_pattern_change(self, _text: str) -> None:
         """Output pattern change; recompute folder and update display."""
+        self._set_now()
         self._refresh_folder_display()
 
     def _on_preset_delete(self) -> None:
