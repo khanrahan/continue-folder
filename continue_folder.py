@@ -149,8 +149,8 @@ class ContinueFolder:
         """Read input/output patterns from a preset, with legacy fallback."""
         input_pattern = (
             getattr(preset, 'input_pattern', None)
-            or getattr(preset, 'pattern', None)
-            or '{version}')
+            or '{version}'
+        )
         output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
         return input_pattern, output_pattern
 
