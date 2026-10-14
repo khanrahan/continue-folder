@@ -236,6 +236,12 @@ class ContinueFolder:
             return
         preset_name = self._windows['save'].name
         duplicate = self._store.find_preset(preset_name) is not None
+        preset_details = {
+            'name': preset_name,
+            'input_pattern': self._windows['main'].input_pattern,
+            'output_pattern': self._windows['main'].output_pattern,
+            'destinations': self._encode_destinations(),
+        }
         if duplicate:
             if not FlameMessageWindow(
                     'Overwrite Existing Preset', 'confirm', 'Are you '
@@ -243,22 +249,12 @@ class ContinueFolder:
                     + '<br/>' + 'This operation cannot be undone.'):
                 return
             try:
-                self._store.overwrite_preset(
-                    name=preset_name,
-                    input_pattern=self._windows['main'].input_pattern,
-                    output_pattern=self._windows['main'].output_pattern,
-                    destinations=self._encode_destinations()
-                )
+                self._store.overwrite_preset(**preset_details)
             except ValueError as error:
                 FlameMessageWindow('Error', 'error', str(error))
                 return
         else:
-            self._store.add_preset(
-                name=preset_name,
-                input_pattern=self._windows['main'].input_pattern,
-                output_pattern=self._windows['main'].output_pattern,
-                destinations=self._encode_destinations()
-            )
+            self._store.add_preset(**preset_details)
             self._store.sort()
         try:
             self._store.save()
