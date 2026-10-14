@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import os
 import re
+from pathlib import Path
 
 from continue_folder_token import InputToken, InputTokenMax
 
@@ -60,12 +60,14 @@ class InputTokenStore:
         folders: list[tuple[str, dict[str, str]]] = []
 
         try:
-            dirnames = next(os.walk(self.path))[1]
-        except StopIteration:
-            dirnames = []
+            entries = Path(self.path).iterdir()
+        except OSError:
+            return folders
 
-        for folder in dirnames:
-            search = self.capture_tokens(pattern_regex, folder)
+        for entry in entries:
+            if not entry.is_dir():
+                continue
+            search = self.capture_tokens(pattern_regex, entry.name)
             if not search:
                 continue
             folders.append((search.group(0), search.groupdict()))
