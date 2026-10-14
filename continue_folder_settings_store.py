@@ -232,32 +232,22 @@ class SettingsStore:
             key=lambda preset: preset.get('name', '')
         )
 
-    def _check_attributes(self, kwargs: dict[str, Any]) -> dict[str, Any]:
+    def _check_attributes(self, kwargs: dict[str, Any]) -> None:
         """Validate preset kwargs.
 
         Args:
             kwargs: Preset attribute names and values.
 
         Raises:
-            ValueError: If 'name' is missing or empty, if any preset attribute
-                is missing from kwargs, or if kwargs contains keys not in
-                preset_attributes.
+            ValueError: If 'name' is missing or empty, or if kwargs keys do
+                not exactly match preset_attributes.
         """
-        if 'name' not in kwargs or not kwargs['name']:
+        if not kwargs.get('name'):
+            raise ValueError("Preset must have a non-empty 'name' attribute")
+        if kwargs.keys() != set(self._preset_attributes):
             raise ValueError(
-                "Preset must have a non-empty 'name' attribute"
-            )
-        required = set(self._preset_attributes)
-        kwargs_keys = set(kwargs.keys())
-        if kwargs_keys < required:
-            missing = required - kwargs_keys
-            raise ValueError(
-                f'Preset is missing required attributes: {sorted(missing)}'
-            )
-        if kwargs_keys > required:
-            extra = kwargs_keys - required
-            raise ValueError(
-                f'Preset has unexpected attributes: {sorted(extra)}'
+                f'Preset attributes must be exactly '
+                f'{sorted(self._preset_attributes)}, got {sorted(kwargs)}'
             )
 
     def add_preset(self, **kwargs: Any) -> None:
