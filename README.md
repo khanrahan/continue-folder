@@ -18,7 +18,7 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `{mm}` — Minute
 - `{MM}` — Month
 - `{YY}` / `{YYYY}` — Year
-- `{version}` — Scan matching folders and continue the number sequence (*similar* to the version token for pattern browsing). Optional hashes set zero-padding: `{version###}`.
+- `{version}` — Scan matching folders and continue the number sequence (*similar* to the version token for pattern browsing).
 
 **Output** (new folder name):
 - `[PP]` / `[pp]` — AM/PM
@@ -29,7 +29,7 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `[YY]` / `[YYYY]` — Year
 - `[version]` — Next version from the input pattern scan. Optional hashes set zero-padding: `[version###]`.
 
-Example: Input `{YYYY}_{MM}_v{version###}` + Output `[YYYY]_[MM]_v[version]` → `2026_08_v004`
+Example: Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version]` → `2026_08_v004`
 
 ## Example Workflow
 You want to have a Library that will mirror a folder of exports on the server:
