@@ -4,8 +4,8 @@ This module provides the FlamePushButtonMenu widget class for creating
 Flame-themed push buttons with dropdown menus.
 """
 
-from functools import partial
 from collections.abc import Callable
+from functools import partial
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
