@@ -21,10 +21,7 @@ class OutputTokenStore:
     set zero-padding: ``[version###]``.
     """
 
-    def __init__(
-            self,
-            input_token_store: InputTokenStore | None = None,
-    ) -> None:
+    def __init__(self, input_token_store: InputTokenStore,) -> None:
         """Initialize output tokens.
 
         Args:
