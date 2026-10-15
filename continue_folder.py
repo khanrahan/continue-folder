@@ -302,6 +302,11 @@ class ContinueFolder:
 
     def _on_ok_clicked(self) -> None:
         """Handle OK button; create reel or folder then close."""
+        if not self._windows['main'].folder_new:
+            FlameMessageWindow(
+                'Error', 'error',
+                'New Folder field is empty.  Check your input and output patterns.')
+            return
         destinations = self._windows['main'].destinations
         if destinations[DESTINATION_REEL]:
             self.create_desktop_reel()
