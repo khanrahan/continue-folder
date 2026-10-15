@@ -70,7 +70,7 @@ class SavePresetWindow(QtWidgets.QDialog):
         self._buttons['cancel'] = FlameButton(
             'Cancel', self.reject, button_width=110)
 
-    def _init_layouts(self):
+    def _init_layouts(self) -> None:
         """Initialize all layouts used in the window."""
         self._layouts['grid'] = QtWidgets.QGridLayout()
         self._layouts['grid'].setVerticalSpacing(10)

@@ -52,12 +52,12 @@ class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
 
     def __init__(
             self,
-            button_name,
-            token_dict,
-            token_dest,
-            button_width=110,
-            button_max_width=300,
-            sort=False
+            button_name: str,
+            token_dict: dict[str, str],
+            token_dest: QtWidgets.QLineEdit,
+            button_width: int = 110,
+            button_max_width: int = 300,
+            sort: bool = False
     ) -> None:
         """Initialize the FlameTokenPushButton instance.
 
