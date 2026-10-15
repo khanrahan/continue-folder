@@ -4,14 +4,15 @@ This module provides the SavePresetWindow dialog class for saving preset
 configurations with a name.
 """
 
-from PySide6 import QtGui, QtWidgets  # pylint: disable=import-error
+from PySide6 import QtWidgets  # pylint: disable=import-error
 
 from continue_folder_flame_button import FlameButton
 from continue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
+from continue_folder_window_mixin import WindowMixin
 
 
-class SavePresetWindow(QtWidgets.QDialog):
+class SavePresetWindow(WindowMixin, QtWidgets.QDialog):
     """Dialog window for saving presets with a name.
 
     This dialog provides a simple interface for users to enter a name when
@@ -37,6 +38,9 @@ class SavePresetWindow(QtWidgets.QDialog):
         ...     # Save the preset with this name
     """
 
+    _WINDOW_X = 500
+    _WINDOW_Y = 100
+
     def __init__(self, parent: QtWidgets.QWidget | None) -> None:
         """Initialize the save preset dialog window.
 
@@ -49,7 +53,6 @@ class SavePresetWindow(QtWidgets.QDialog):
             Flame app window.
         """
         super().__init__(parent)
-        self.dimensions = {'x': 500, 'y': 100}
         self._labels = {}
         self._line_edits = {}
         self._buttons = {}
@@ -91,21 +94,14 @@ class SavePresetWindow(QtWidgets.QDialog):
 
     def _init_window(self) -> None:
         """Initialize the window."""
-        self.setMinimumSize(
-                self.dimensions['x'], self.dimensions['y'])
-
+        self.setMinimumSize(self._WINDOW_X, self._WINDOW_Y)
         self.setStyleSheet('background-color: #272727')
         self.setWindowTitle('Save Preset As...')
-
-        # Center Window
-        resolution = QtGui.QGuiApplication.primaryScreen().screenGeometry()
-        self.move(
-            (resolution.width() / 2) - (self.dimensions['x'] / 2),
-            (resolution.height() / 2) - (self.dimensions['y'] / 2 + 44))
 
         self._init_widgets()
         self._init_layouts()
         self.setLayout(self._layouts['vbox'])
+        self._center_window()
 
     @property
     def name(self) -> str:
