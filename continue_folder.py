@@ -34,6 +34,7 @@ To Install:
 """
 
 
+import unicodedata
 from pathlib import Path
 
 import flame
@@ -159,11 +160,34 @@ class ContinueFolder:
         output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
         return input_pattern, output_pattern
 
+    @staticmethod
+    def _convert_to_ascii(text: str) -> str:
+        """Convert a unicode string to ASCII, ignoring non-ASCII characters.
+
+        All strings in Python3 are unicode, but Flame only accepts ASCII.
+        """
+        if text.isascii():
+            return text
+        # NFKD normalization splits accented letters into a letter and
+        # separate accent
+        normalized = unicodedata.normalize('NFKD', text)
+        # ASCII bytes will ignore the accents, emoji, and other non-ASCII
+        # characters
+        ascii_bytes = normalized.encode('ascii', 'ignore')
+        # finally decode to ASCII string
+        ascii_string = ascii_bytes.decode('ascii')
+        return ascii_string
+
     def _refresh_folder_display(self) -> None:
-        """Recompute folder name from patterns and update window display."""
+        """Recompute folder name from patterns and update window display.
+
+        Because Flame only accepts ASCII, convert before showing, which may
+        differ from output pattern.
+        """
         main = self._windows['main']
         self.input_token_store.apply(main.input_pattern)
-        main.folder_new = self.output_token_store.resolve(main.output_pattern)
+        result = self.output_token_store.resolve(main.output_pattern)
+        main.folder_new = self._convert_to_ascii(result)
 
     def apply_preset(self, name: str | None) -> None:
         """Load a preset into the model and push it to the main window.
@@ -309,9 +333,7 @@ class ContinueFolder:
         sequence.
         """
         desktop = flame.project.current_project.current_workspace.desktop
-        # create_reel will not take utf-8, only ascii
-        desktop.reel_groups[0].create_reel(
-            self._windows['main'].folder_new.encode('ascii', 'ignore'))
+        desktop.reel_groups[0].create_reel(self._windows['main'].folder_new)
         self.message('Reel created!')
 
     def create_media_hub_folder(self) -> None:
