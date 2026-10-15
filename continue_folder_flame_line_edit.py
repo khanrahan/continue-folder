@@ -4,7 +4,6 @@ This module provides the FlameLineEdit widget class for creating Flame-themed
 line edit widgets with customizable width constraints.
 """
 
-from typing import Optional
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
@@ -120,8 +119,8 @@ class FlameLineEdit(QtWidgets.QLineEdit):
     def __init__(
             self,
             text: str,
-            width: Optional[int] = None,
-            max_width: Optional[int] = None
+            width: int | None = None,
+            max_width: int | None = None
     ) -> None:
         """Initialize the FlameLineEdit instance.
 

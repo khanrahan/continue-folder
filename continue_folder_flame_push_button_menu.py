@@ -5,7 +5,7 @@ Flame-themed push buttons with dropdown menus.
 """
 
 from functools import partial
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
@@ -52,7 +52,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
             menu_options: list[str],
             menu_width: int = 240,
             menu_max_width: int = 2000,
-            menu_action: Optional[Callable[[], None]] = None
+            menu_action: Callable[[], None] | None = None
     ) -> None:
         """Initialize the FlamePushButtonMenu instance.
 
@@ -158,7 +158,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
     def _menu_change(
             self,
             option: str,
-            menu_action: Optional[Callable[[], None]]
+            menu_action: Callable[[], None] | None
     ) -> None:
         """Handle menu item selection.
 

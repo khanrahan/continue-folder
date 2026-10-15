@@ -4,7 +4,6 @@ This module provides the FlameMessageWindow widget class for creating
 Flame-themed message dialog windows.
 """
 
-from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtWidgets  # pylint: disable=import-error
 
@@ -59,21 +58,21 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
     # Type hints for instance attributes
     _start_position: QtCore.QPoint
-    cancel_button: Optional[FlameButton]
-    confirm_button: Optional[FlameButton]
+    cancel_button: FlameButton | None
+    confirm_button: FlameButton | None
     confirmed: bool
     grid: QtWidgets.QGridLayout
     main_label: FlameLabel
     message_text_edit: QtWidgets.QTextEdit
     message_type: str
-    ok_button: Optional[FlameButton]
+    ok_button: FlameButton | None
 
     def __init__(
             self,
             message_title: str,
             message_type: str,
             message: str,
-            parent: Optional[QtWidgets.QWidget] = None
+            parent: QtWidgets.QWidget | None = None
     ) -> None:
         """Initialize the FlameMessageWindow instance.
 
@@ -176,7 +175,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
             self.cancel_button = None
 
     def _init_window_properties(
-            self, parent: Optional[QtWidgets.QWidget]) -> None:
+            self, parent: QtWidgets.QWidget | None) -> None:
         """Initialize window properties.
 
         Sets window attributes, flags, size, stylesheet, and parent widget.

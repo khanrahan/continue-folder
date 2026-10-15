@@ -4,7 +4,7 @@ This module provides the FlameButton widget class for creating Flame-themed
 push buttons with callback functionality.
 """
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
@@ -91,8 +91,8 @@ class FlameButton(QtWidgets.QPushButton):
             button_name: str,
             connect: Callable[[], None],
             button_color: str = 'normal',
-            button_width: Optional[int] = None,
-            button_max_width: Optional[int] = None
+            button_width: int | None = None,
+            button_max_width: int | None = None
     ) -> None:
         """Initialize the FlameButton instance.
 

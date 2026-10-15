@@ -4,7 +4,6 @@ This module provides the FlameLabel widget class for creating Flame-themed
 label widgets with customizable styling.
 """
 
-from typing import Optional
 
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
@@ -66,7 +65,7 @@ class FlameLabel(QtWidgets.QLabel):
             self,
             label_name: str,
             label_type: str = 'normal',
-            label_width: Optional[int] = None
+            label_width: int | None = None
     ) -> None:
         """Initialize the FlameLabel instance.
 
