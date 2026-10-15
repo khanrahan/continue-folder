@@ -7,6 +7,8 @@ from pathlib import Path
 
 from continue_folder_token import InputToken, InputTokenMax
 
+TOKEN_REGEX = re.compile(r'\{(?P<pattern>\w+)\}')
+
 
 class InputTokenStore:
     """Store tokens that interpret destination folder names."""
@@ -16,7 +18,7 @@ class InputTokenStore:
         self.path = path
         self.tokens: dict[str, InputToken] = {}
         self.folders: list[tuple[str, dict[str, str]]] = []
-        self.pattern_regex: str = ''
+        self.pattern_regex: re.Pattern[str] | None = None
         self._build_tokens()
 
     def _build_tokens(self) -> None:
@@ -35,44 +37,46 @@ class InputTokenStore:
         ]
         self.tokens = {token.pattern: token for token in tokens}
 
-    @staticmethod
-    def capture_tokens(regex: str, folder: str) -> re.Match | None:
-        """Match the folder name against regex, returning None on error."""
-        try:
-            # Use fullmatch to ensure the entire folder name matches the regex
-            # as opposed to just a substring match.
-            return re.fullmatch(regex, folder)
-        except re.error:
-            # e.g. duplicate named groups when {version} appears twice
-            return None
+    def build_pattern_regex(self, pattern: str) -> re.Pattern[str]:
+        """Translate an input pattern into a folder-matching regex.
 
-    def build_pattern_regex(self, pattern: str) -> str:
-        """Translate an input pattern into a folder-matching regex."""
-        pattern_regex = pattern
-        for token in self.tokens.values():
-            pattern_regex = re.sub(
-                re.escape(token.token), token.named_regex, pattern_regex
-            )
-        return pattern_regex
+        Text outside of recognized tokens is matched literally. A token
+        repeated in the pattern must capture the same value each time.
+        """
+        regex_parts: list[str] = []
+        found_patterns: set[str] = set()
+        end_index = 0
+        for token_match in TOKEN_REGEX.finditer(pattern):
+            token = self.tokens.get(token_match['pattern'])
+            if token is None:
+                continue
+            regex_parts.append(
+                re.escape(pattern[end_index:token_match.start()]))
+            if token.pattern in found_patterns:
+                regex_parts.append(f'(?P={token.pattern})')
+            else:
+                regex_parts.append(token.named_regex)
+                found_patterns.add(token.pattern)
+            end_index = token_match.end()
+        regex_parts.append(re.escape(pattern[end_index:]))
+        return re.compile(''.join(regex_parts))
 
     def find_folders(
-            self, pattern_regex: str
+            self, pattern_regex: re.Pattern[str]
     ) -> list[tuple[str, dict[str, str]]]:
-        """Return folders under self.path that match pattern_regex."""
-        folders: list[tuple[str, dict[str, str]]] = []
-
+        """Return folders under self.path that fully match pattern_regex."""
         try:
-            entries = Path(self.path).iterdir()
+            entries = list(Path(self.path).iterdir())
         except OSError:
-            return folders
+            return []
 
+        folders: list[tuple[str, dict[str, str]]] = []
         for entry in entries:
             if not entry.is_dir():
                 continue
-            search = self.capture_tokens(pattern_regex, entry.name)
-            if not search:
-                continue
-            folders.append((search.group(0), search.groupdict()))
+            match = pattern_regex.fullmatch(entry.name)
+            if match:
+                folders.append((match.group(0), match.groupdict()))
         return folders
 
     def fill_values(self) -> None:
