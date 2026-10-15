@@ -1,7 +1,5 @@
 """Input token store for Continue Folder (curly-brace tokens)."""
 
-from __future__ import annotations
-
 import re
 from pathlib import Path
 

@@ -1,15 +1,10 @@
 """Output token store for Continue Folder (square-bracket tokens)."""
 
-from __future__ import annotations
-
 import datetime as dt
 import re
-from typing import TYPE_CHECKING
 
 from continue_folder_token import Token, TokenPadded
-
-if TYPE_CHECKING:
-    from continue_folder_token_store_input import InputTokenStore
+from continue_folder_token_store_input import InputTokenStore
 
 
 class OutputTokenStore:
