@@ -39,7 +39,7 @@ class TokenPadded(Token):
         n = int(self.value) if str(self.value).isdigit() else 0
         return str(n + 1)
 
-    def process_match(self, match: re.Match) -> str:
+    def process_match(self, match: re.Match[str]) -> str:
         """Process a regex match and return the padded next value."""
         return self.next_value.zfill(len(match.group(1)))
 
