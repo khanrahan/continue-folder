@@ -267,7 +267,7 @@ class ContinueFolder:
         if self._windows['save'].exec() != QtWidgets.QDialog.Accepted:
             return
         preset_name = self._windows['save'].name
-        duplicate = self._store.find_preset(preset_name) is not None
+        duplicate = preset_name in self._store.preset_names
         preset_details = {
             'name': preset_name,
             'input_pattern': self._windows['main'].input_pattern,

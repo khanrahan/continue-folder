@@ -159,7 +159,7 @@ class SettingsStore:
         """
         return self._presets.findall(self.ELEMENT_PRESET)
 
-    def find_preset(self, name: str) -> Etree.Element | None:
+    def _find_preset(self, name: str) -> Etree.Element | None:
         """Find a preset element by name.
 
         Args:
@@ -185,7 +185,7 @@ class SettingsStore:
         Note:
             Changes are not persisted to disk until save() is called.
         """
-        preset = self.find_preset(name)
+        preset = self._find_preset(name)
         if preset is None:
             raise ValueError(f'Preset "{name}" does not exist.')
         self._presets.remove(preset)
@@ -254,7 +254,7 @@ class SettingsStore:
         """
         self._check_attributes(kwargs)
         name_value = kwargs['name']
-        preset = self.find_preset(name_value)
+        preset = self._find_preset(name_value)
         if preset is None:
             raise ValueError(f'Preset "{name_value}" does not exist.')
         for key, value in kwargs.items():
