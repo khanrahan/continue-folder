@@ -266,7 +266,11 @@ class ContinueFolder:
         self._windows['save'].name = self._windows['main'].preset
         if self._windows['save'].exec() != QtWidgets.QDialog.Accepted:
             return
-        preset_name = self._windows['save'].name
+        # Strip leading/trailing whitespace to avoid names of only spaces.
+        preset_name = self._windows['save'].name.strip()
+        if not preset_name:
+            FlameMessageWindow('Error', 'error', 'Name field cannot be empty.')
+            return
         duplicate = preset_name in self._store.preset_names
         preset_details = {
             'name': preset_name,
@@ -286,7 +290,11 @@ class ContinueFolder:
                 FlameMessageWindow('Error', 'error', str(error))
                 return
         else:
-            self._store.add_preset(**preset_details)
+            try:
+                self._store.add_preset(**preset_details)
+            except ValueError as error:
+                FlameMessageWindow('Error', 'error', str(error))
+                return
             self._store.sort_presets()
         try:
             self._store.save()
