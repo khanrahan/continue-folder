@@ -18,18 +18,20 @@ Description:
 
 Menus:
 
-    Right-click selected folders in the MediaHub Folder --> Create... -->
+    Right-click a selected folder in MediaHub Files --> Create... -->
     Continue Folder
 
 To Install:
 
-    For all users, copy this file to:
+    Copy all of the continue_folder*.py files together into the same folder.
+
+    For all users, copy the files to:
     /opt/Autodesk/shared/python/
 
-    For a specific user on Linux, copy this file to:
+    For a specific user on Linux, copy the files to:
     /home/<user_name>/flame/python/
 
-    For a specific user on Mac, copy this file to:
+    For a specific user on Mac, copy the files to:
     /Users/<user_name>/Library/Preferences/Autodesk/flame/python/
 """
 

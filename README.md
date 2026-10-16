@@ -29,7 +29,7 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `[YY]` / `[YYYY]` — Year
 - `[version]` — Next version from the input pattern scan. Optional hashes set zero-padding: `[version###]`.
 
-Example: Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version]` → `2026_08_v004`
+Example: Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version###]` → `2026_08_v004`
 
 ## Example Workflow
 You want to have a Library that will mirror a folder of exports on the server:
@@ -50,9 +50,11 @@ You want to have a Library that will mirror a folder of exports on the server:
 ## Installation
 
 ### Flame 2025 and newer
-To make available to all users on the workstation, copy `continue_folder.py` to `/opt/Autodesk/shared/python/`
+The script is split across several modules, so copy all of the `continue_folder*.py` files together into the same folder.
 
-For specific users, copy `continue_folder.py` to the appropriate path below...
+To make available to all users on the workstation, copy the files to `/opt/Autodesk/shared/python/`
+
+For specific users, copy the files to the appropriate path below...
 |Platform|Path|
 |---|---|
 |Linux|`/home/<user_name>/flame/python/`|
@@ -67,7 +69,7 @@ For specific users, copy `continue_folder.py` to `/opt/Autodesk/user/<user name>
 Finally, inside of Flame, go to Flame (fish) menu `->` Python `->` Rescan Python Hooks
 
 ## Menus
-- Right-click selected folders in a MediaHub Files `->` Create... `->` Continue Folder
+- Right-click a single selected folder in MediaHub Files `->` Create... `->` Continue Folder
 
 ## Acknowledgements
 UI Templates courtesy of [pyflame.com](http://www.pyflame.com)
