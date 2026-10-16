@@ -54,6 +54,7 @@ class SettingsStore:
     ELEMENT_VERSION = 'version'
     ELEMENT_PRESETS = 'presets'
     ELEMENT_PRESET = 'preset'
+    PRESETS_PATH = f'{ELEMENT_SCRIPT_NAME}/{ELEMENT_VERSION}/{ELEMENT_PRESETS}'
 
     def __init__(
         self,
@@ -114,7 +115,7 @@ class SettingsStore:
         else:
             self._init_tree()
 
-        self._get_settings_presets()
+        self._load_presets_element()
 
     def _init_tree(self) -> None:
         """Create a new empty XML tree with the required structure.
@@ -132,34 +133,18 @@ class SettingsStore:
         _presets = Etree.SubElement(version, self.ELEMENT_PRESETS)
         self.tree = Etree.ElementTree(settings)
 
-    def _get_presets_path(self) -> str:
-        """Get the XPath to the presets element."""
-        return (
-            f'{self.ELEMENT_SCRIPT_NAME}/'
-            f'{self.ELEMENT_VERSION}/'
-            f'{self.ELEMENT_PRESETS}'
-        )
-
-    def _get_presets_element(self) -> Etree.Element | None:
-        """Get the presets container element from the XML tree.
-
-        Returns:
-            The presets element, or None if the XML structure is invalid.
-        """
-        return self.tree.find(self._get_presets_path())
-
-    def _get_settings_presets(self) -> None:
+    def _load_presets_element(self) -> None:
         """Store the presets container element from the XML tree.
 
         Locates and stores the presets container element. If the element cannot
         be found (invalid XML structure), rebuilds the entire tree structure
         and then locates the presets element again.
         """
-        self._presets = self._get_presets_element()
+        self._presets = self.tree.find(self.PRESETS_PATH)
         if self._presets is None:
             # Rebuild tree if structure is invalid
             self._init_tree()
-            self._presets = self._get_presets_element()
+            self._presets = self.tree.find(self.PRESETS_PATH)
 
     def get_presets(self) -> list[Etree.Element]:
         """Return a list of preset Element objects.
