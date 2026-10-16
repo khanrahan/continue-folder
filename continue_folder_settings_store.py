@@ -80,7 +80,6 @@ class SettingsStore:
         self.file = file
         self.title = title
         self.version = version
-        self.root = None
         self.tree = None
         self._presets = None
         self.load()
@@ -103,8 +102,8 @@ class SettingsStore:
         or malformed XML), creates a new empty XML tree structure. If the file
         doesn't exist, creates a new empty XML tree structure.
 
-        After loading or creating the tree, initializes the root element and
-        presets container element.
+        After loading or creating the tree, initializes the presets container
+        element.
         """
         if self.file.is_file():
             try:
@@ -115,7 +114,6 @@ class SettingsStore:
         else:
             self._init_tree()
 
-        self._get_settings_root()
         self._get_settings_presets()
 
     def _init_tree(self) -> None:
@@ -134,14 +132,6 @@ class SettingsStore:
         _presets = Etree.SubElement(version, self.ELEMENT_PRESETS)
         self.tree = Etree.ElementTree(settings)
 
-    def _get_settings_root(self) -> None:
-        """Store the root element of the XML tree.
-
-        Retrieves and stores the root element ('settings') from the
-        ElementTree.
-        """
-        self.root = self.tree.getroot()
-
     def _get_presets_path(self) -> str:
         """Get the XPath to the presets element."""
         return (
@@ -156,7 +146,7 @@ class SettingsStore:
         Returns:
             The presets element, or None if the XML structure is invalid.
         """
-        return self.root.find(self._get_presets_path())
+        return self.tree.find(self._get_presets_path())
 
     def _get_settings_presets(self) -> None:
         """Store the presets container element from the XML tree.
@@ -169,7 +159,6 @@ class SettingsStore:
         if self._presets is None:
             # Rebuild tree if structure is invalid
             self._init_tree()
-            self._get_settings_root()
             self._presets = self._get_presets_element()
 
     def get_presets(self) -> list[Etree.Element]:
