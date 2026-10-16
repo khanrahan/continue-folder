@@ -252,6 +252,11 @@ class ContinueFolder:
 
     def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
+        if not self._windows['main'].destinations:
+            FlameMessageWindow.error(
+                'Select at least one destination before saving a preset.',
+                self._windows['main'])
+            return
         self._windows['save'].name = self._windows['main'].preset
         if self._windows['save'].exec() != QtWidgets.QDialog.Accepted:
             return
@@ -307,6 +312,10 @@ class ContinueFolder:
                 self._windows['main'])
             return
         destinations = self._windows['main'].destinations
+        if not destinations:
+            FlameMessageWindow.error(
+                'Select at least one destination.', self._windows['main'])
+            return
         if Destination.REEL in destinations:
             self.create_desktop_reel()
         if Destination.FOLDER in destinations:
