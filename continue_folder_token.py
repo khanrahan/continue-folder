@@ -11,12 +11,12 @@ class Token:
     Attributes:
         name: Display name for the Add Token menu.
         pattern: Token excluding the square bracket delimiters.
-        value: Stored capture, or the resolved value to emit for date tokens.
+        input_value: Value the token is built from.
     """
 
     name: str
     pattern: str
-    value: str | None
+    input_value: str | None
 
     @property
     def token(self) -> str:
@@ -24,30 +24,36 @@ class Token:
         return f'[{self.pattern}]'
 
     @property
-    def regex(self) -> str:
-        """Get regex string."""
-        return rf'\[{self.pattern}\]'
+    def value(self) -> str:
+        """Value to emit in the new folder name."""
+        return self.input_value or ''
+
+    def resolve(self, text: str) -> str:
+        """Return text with every occurrence of this token replaced."""
+        return text.replace(self.token, self.value)
 
 
 @dataclass
 class TokenPadded(Token):
-    """Output token with optional padding modifier."""
+    """Output token with optional zero-padding, e.g. ``[frame####]``."""
+
+    def resolve(self, text: str) -> str:
+        """Return text with this token replaced and zero-padded per hash."""
+        return re.sub(
+            rf'\[{self.pattern}(?P<padding>#*)\]',
+            lambda match: self.value.zfill(len(match['padding'])),
+            text,
+        )
+
+
+@dataclass
+class TokenIncrement(TokenPadded):
+    """Padded output token whose value is one more than its input value."""
 
     @property
-    def next_value(self) -> str:
-        """Return stored value plus one, or 1 when value is not a number."""
-        n = int(self.value) if str(self.value).isdigit() else 0
-        return str(n + 1)
-
-    def process_match(self, match: re.Match[str]) -> str:
-        """Process a regex match and return the padded next value."""
-        return self.next_value.zfill(len(match.group(1)))
-
-    @property
-    def regex(self) -> str:
-        """Get regex string."""
-        # capture the padding as a match group
-        return rf'\[{self.pattern}(#*)\]'
+    def value(self) -> str:
+        """Input value plus one, or 1 when there is no input value."""
+        return str(int(self.input_value) + 1) if self.input_value else '1'
 
 
 @dataclass

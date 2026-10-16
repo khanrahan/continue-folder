@@ -1,9 +1,8 @@
 """Output token store for Continue Folder (square-bracket tokens)."""
 
 import datetime as dt
-import re
 
-from continue_folder_token import Token, TokenPadded
+from continue_folder_token import Token, TokenIncrement
 from continue_folder_token_store_input import InputTokenStore
 
 
@@ -38,7 +37,7 @@ class OutputTokenStore:
             Token('Hour (24hr)', 'HH', now.strftime('%H')),
             Token('Minute', 'mm', now.strftime('%M')),
             Token('Month', 'MM', now.strftime('%m')),
-            TokenPadded(
+            TokenIncrement(
                 'Version',
                 'version',
                 self.input_token_store.captured_token_values['version'],
@@ -52,18 +51,8 @@ class OutputTokenStore:
         """Replace square-bracket tokens in pattern with values."""
         self._build_tokens()
         folder_new = pattern
-
         for token in self.tokens.values():
-            if isinstance(token, TokenPadded):
-                folder_new = re.sub(
-                    token.regex,
-                    token.process_match,
-                    folder_new
-                )
-            else:
-                folder_new = re.sub(
-                    token.regex, token.value, folder_new
-                )
+            folder_new = token.resolve(folder_new)
         return folder_new
 
     @property
