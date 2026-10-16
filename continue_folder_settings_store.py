@@ -146,7 +146,7 @@ class SettingsStore:
             self._init_tree()
             self._presets = self.tree.find(self.PRESETS_PATH)
 
-    def get_presets(self) -> list[Etree.Element]:
+    def _get_preset_elements(self) -> list[Etree.Element]:
         """Return a list of preset Element objects.
 
         Returns:
@@ -168,7 +168,7 @@ class SettingsStore:
         Returns:
             The preset element if found, None otherwise.
         """
-        for preset in self.get_presets():
+        for preset in self._get_preset_elements():
             if preset.get('name') == name:
                 return preset
         return None
@@ -286,7 +286,7 @@ class SettingsStore:
         """
         return [
             preset.get('name', '')
-            for preset in self.get_presets()
+            for preset in self._get_preset_elements()
             if preset.get('name')
         ]
 
@@ -300,7 +300,7 @@ class SettingsStore:
             attribute access.
         """
         results = {}
-        for preset_element in self._presets:
+        for preset_element in self._get_preset_elements():
             preset_name = preset_element.get('name', '')
             if preset_name:
                 preset = Preset(name=preset_name)
