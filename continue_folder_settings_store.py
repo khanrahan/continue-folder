@@ -45,7 +45,7 @@ class SettingsStore:
         >>> store.add_preset(name='My Preset', path='/some/path', pattern='<DD>')
         >>> store.save()
         >>> presets = store.preset_names
-        >>> store.delete(name='My Preset')
+        >>> store.delete_preset(name='My Preset')
     """  # noqa: W505
 
     # XML tree element names
@@ -173,7 +173,7 @@ class SettingsStore:
                 return preset
         return None
 
-    def delete(self, *, name: str) -> None:
+    def delete_preset(self, *, name: str) -> None:
         """Delete a preset element from the XML tree by name.
 
         Args:
@@ -190,7 +190,7 @@ class SettingsStore:
             raise ValueError(f'Preset "{name}" does not exist.')
         self._presets.remove(preset)
 
-    def sort(self) -> None:
+    def sort_presets(self) -> None:
         """Alphabetically sort presets by name attribute.
 
         Sorts all preset elements in-place based on their 'name' attribute.

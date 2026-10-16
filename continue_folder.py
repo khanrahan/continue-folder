@@ -231,7 +231,7 @@ class ContinueFolder:
                 + ' cannot be undone.'):
             return
         try:
-            self._store.delete(name=preset_name)
+            self._store.delete_preset(name=preset_name)
         except ValueError as error:
             FlameMessageWindow('Error', 'error', str(error))
             return
@@ -241,8 +241,8 @@ class ContinueFolder:
             FlameMessageWindow(
                 'Error', 'error',
                 f'Check permissions on {self._settings_file}')
-            # delete() already removed the preset from memory; reload the
-            # file that failed to update.
+            # delete_preset() already removed the preset from memory; reload
+            # the file that failed to update.
             self._store.load()
             return
         self.message(
@@ -287,7 +287,7 @@ class ContinueFolder:
                 return
         else:
             self._store.add_preset(**preset_details)
-            self._store.sort()
+            self._store.sort_presets()
         try:
             self._store.save()
             self.message(
