@@ -24,30 +24,29 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
     Examples:
         Error message:
-            >>> FlameMessageWindow('Error', 'error', 'An error occurred')
+            >>> FlameMessageWindow.error('An error occurred', parent)
 
         Confirmation dialog:
-            >>> if FlameMessageWindow(
-            ...     'Confirm Operation', 'confirm',
-            ...     'Are you sure you want to proceed?'):
+            >>> if FlameMessageWindow.confirm(
+            ...     'Confirm Operation',
+            ...     'Are you sure you want to proceed?', parent):
             ...     print('User confirmed')
 
         Warning dialog:
-            >>> if FlameMessageWindow(
-            ...     'Warning', 'warning',
-            ...     'This operation cannot be undone'):
+            >>> if FlameMessageWindow.warning(
+            ...     'Warning', 'This operation cannot be undone', parent):
             ...     proceed_with_operation()
 
         Informational message:
             >>> FlameMessageWindow(
             ...     'Information', 'message',
-            ...     'Operation completed successfully')
+            ...     'Operation completed successfully', parent).exec()
 
     Note:
         The window is modal and blocks interaction with other windows until
-        closed. When used in a boolean context, 'confirm' and 'warning' types
-        return True if the user clicked Confirm, False if Cancel. 'message'
-        and 'error' types always return True.
+        closed. exec() returns QDialog.Accepted when the user clicks Confirm
+        or Ok, and QDialog.Rejected when the user clicks Cancel or presses
+        Escape.
     """
 
     # Side bar color constants
@@ -60,7 +59,6 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
     _start_position: QtCore.QPoint
     cancel_button: FlameButton | None
     confirm_button: FlameButton | None
-    confirmed: bool
     grid: QtWidgets.QGridLayout
     main_label: FlameLabel
     message_text_edit: QtWidgets.QTextEdit
@@ -77,9 +75,9 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         """Initialize the FlameMessageWindow instance.
 
         Validates all parameters, stores instance variables, and initializes
-        the window properties, UI widgets, and layout. The window is
-        automatically centered on the primary screen, shown, and executed as
-        a modal dialog.
+        the window properties, UI widgets, and layout. The window is centered
+        on the primary screen but not shown; call exec() to run it, or use
+        one of the confirm(), warning(), or error() class methods.
 
         Args:
             message_title: Text displayed in the top left of the window. Must
@@ -87,9 +85,8 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
             message_type: Type of message window. Must be one of: 'confirm',
                 'message', 'error', or 'warning'. Determines which buttons
                 are shown and the color of the side bar. 'confirm' and
-                'warning' types show Confirm/Cancel buttons and return True
-                or False when used in a boolean context. 'message' and 'error'
-                types show an Ok button.
+                'warning' types show Confirm/Cancel buttons. 'message' and
+                'error' types show an Ok button.
             message: Text to display in the message body of the window. Can
                 be an empty string. HTML tags like '<br>', '<center>', and
                 '<dd>' are automatically stripped.
@@ -102,7 +99,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
             ValueError: If message_title is empty, or message_type is not
                 one of the allowed values.
         """
-        super().__init__()
+        super().__init__(parent)
 
         # Validate parameters
         self._check_message_title(message_title)
@@ -119,10 +116,9 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
         # Store instance variables
         self.message_type = message_type
-        self.confirmed = False
 
         # Initialize window properties
-        self._init_window_properties(parent)
+        self._init_window_properties()
 
         # Initialize widgets
         self._init_widgets(message_title, message_type, message)
@@ -130,12 +126,39 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         # Initialize layout
         self._init_layout(message_type)
 
-        # Show window
         self._center_window()
-        self.show()
-        self.raise_()
-        self.activateWindow()
-        self.exec()
+
+    @classmethod
+    def confirm(
+            cls,
+            title: str,
+            message: str,
+            parent: QtWidgets.QWidget | None = None,
+    ) -> bool:
+        """Show a Confirm/Cancel dialog and return True if confirmed."""
+        dialog = cls(title, 'confirm', message, parent)
+        return dialog.exec() == QtWidgets.QDialog.Accepted
+
+    @classmethod
+    def warning(
+            cls,
+            title: str,
+            message: str,
+            parent: QtWidgets.QWidget | None = None,
+    ) -> bool:
+        """Show a red Confirm/Cancel dialog and return True if confirmed."""
+        dialog = cls(title, 'warning', message, parent)
+        return dialog.exec() == QtWidgets.QDialog.Accepted
+
+    @classmethod
+    def error(
+            cls,
+            message: str,
+            parent: QtWidgets.QWidget | None = None,
+            title: str = 'Error',
+    ) -> None:
+        """Show an error dialog with an Ok button."""
+        cls(title, 'error', message, parent).exec()
 
     def _init_widgets(
             self,
@@ -165,35 +188,27 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         # Create buttons based on message type
         if message_type in ('confirm', 'warning'):
             self.confirm_button = FlameButton(
-                'Confirm', self.confirm, button_color='blue', button_width=110)
-            self.cancel_button = FlameButton('Cancel', self.cancel, button_width=110)
+                'Confirm', self.accept, button_color='blue', button_width=110)
+            self.cancel_button = FlameButton('Cancel', self.reject, button_width=110)
             self.ok_button = None
         else:
             self.ok_button = FlameButton(
-                'Ok', self.confirm, button_color='blue', button_width=110)
+                'Ok', self.accept, button_color='blue', button_width=110)
             self.confirm_button = None
             self.cancel_button = None
 
-    def _init_window_properties(
-            self, parent: QtWidgets.QWidget | None) -> None:
+    def _init_window_properties(self) -> None:
         """Initialize window properties.
 
-        Sets window attributes, flags, size, stylesheet, and parent widget.
-
-        Args:
-            parent: Optional parent widget.
+        Sets window flags, size, stylesheet, and modality.
 
         Notes:
             Setting WindowModality to ApplicationModal blocks all interaction
             with Flame until the dialog is closed.
         """
-        self.setMinimumSize(QtCore.QSize(500, 330))
-        self.setMaximumSize(QtCore.QSize(500, 330))
+        self.setFixedSize(500, 330)
         self.setStyleSheet(f"""
             background-color: {FlameColors.BG_DARKER}""")
-        if parent:
-            self.setParent(parent)
-        # Set window flags after parent to ensure proper stacking
         self.setWindowFlags(
             QtCore.Qt.Dialog | QtCore.Qt.FramelessWindowHint)
         # Set window modality to application
@@ -270,31 +285,6 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         if not isinstance(message, str):
             raise TypeError(
                 f'message must be a string, got {type(message).__name__}')
-
-    def __bool__(self) -> bool:
-        """Return the confirmation state of the dialog.
-
-        Returns:
-            Returns True if the user confirmed the dialog (clicked Confirm or
-            Ok), False if cancelled (clicked Cancel or closed the dialog).
-        """
-        return self.confirmed
-
-    def cancel(self) -> None:
-        """Cancel the dialog.
-
-        Closes the dialog window and sets the confirmed flag to False.
-        """
-        self.close()
-        self.confirmed = False
-
-    def confirm(self) -> None:
-        """Confirm the dialog.
-
-        Closes the dialog window and sets the confirmed flag to True.
-        """
-        self.close()
-        self.confirmed = True
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:  # noqa: N802 pylint: disable=invalid-name,unused-argument
         """Handle paint events for custom window drawing.

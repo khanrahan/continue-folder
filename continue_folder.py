@@ -224,23 +224,24 @@ class ContinueFolder:
 
     def _on_preset_delete(self) -> None:
         """Handle preset delete button; confirm then delete and reload."""
-        preset_name = self._windows['main'].preset
-        if not FlameMessageWindow(
-                'Confirm Operation', 'confirm', 'Are you sure want to'
-                + ' permanently delete this preset?' + '<br/>' + 'This operation'
-                + ' cannot be undone.'):
+        main = self._windows['main']
+        preset_name = main.preset
+        if not FlameMessageWindow.confirm(
+                'Confirm Operation',
+                'Are you sure want to permanently delete this preset?<br/>'
+                'This operation cannot be undone.',
+                main):
             return
         try:
             self._store.delete_preset(name=preset_name)
         except ValueError as error:
-            FlameMessageWindow('Error', 'error', str(error))
+            FlameMessageWindow.error(str(error), main)
             return
         try:
             self._store.save()
         except OSError:
-            FlameMessageWindow(
-                'Error', 'error',
-                f'Check permissions on {self._settings_file}')
+            FlameMessageWindow.error(
+                f'Check permissions on {self._settings_file}', main)
             # delete_preset() already removed the preset from memory; reload
             # the file that failed to update.
             self._store.load()
@@ -269,7 +270,8 @@ class ContinueFolder:
         # Strip leading/trailing whitespace to avoid names of only spaces.
         preset_name = self._windows['save'].name.strip()
         if not preset_name:
-            FlameMessageWindow('Error', 'error', 'Name field cannot be empty.')
+            FlameMessageWindow.error(
+                'Name field cannot be empty.', self._windows['main'])
             return
         duplicate = preset_name in self._store.preset_names
         preset_details = {
@@ -279,21 +281,22 @@ class ContinueFolder:
             'destinations': self._encode_destinations(),
         }
         if duplicate:
-            if not FlameMessageWindow(
-                    'Overwrite Existing Preset', 'confirm', 'Are you '
-                    + 'sure you want to permanently overwrite this preset?'
-                    + '<br/>' + 'This operation cannot be undone.'):
+            if not FlameMessageWindow.confirm(
+                    'Overwrite Existing Preset',
+                    'Are you sure you want to permanently overwrite this '
+                    'preset?<br/>This operation cannot be undone.',
+                    self._windows['main']):
                 return
             try:
                 self._store.overwrite_preset(**preset_details)
             except ValueError as error:
-                FlameMessageWindow('Error', 'error', str(error))
+                FlameMessageWindow.error(str(error), self._windows['main'])
                 return
         else:
             try:
                 self._store.add_preset(**preset_details)
             except ValueError as error:
-                FlameMessageWindow('Error', 'error', str(error))
+                FlameMessageWindow.error(str(error), self._windows['main'])
                 return
             self._store.sort_presets()
         try:
@@ -301,9 +304,9 @@ class ContinueFolder:
             self.message(
                 f'{preset_name} preset saved to {self._settings_file}')
         except OSError:
-            FlameMessageWindow(
-                'Error', 'error',
-                f'Check permissions on {self._settings_file}')
+            FlameMessageWindow.error(
+                f'Check permissions on {self._settings_file}',
+                self._windows['main'])
             return
         self._windows['main'].presets = self._store.preset_names
         self.apply_preset(preset_name)
@@ -311,9 +314,9 @@ class ContinueFolder:
     def _on_ok_clicked(self) -> None:
         """Handle OK button; create reel or folder then close."""
         if not self._windows['main'].folder_new:
-            FlameMessageWindow(
-                'Error', 'error',
-                'New Folder field is empty.  Check your input and output patterns.')
+            FlameMessageWindow.error(
+                'New Folder field is empty.  Check your input and output patterns.',
+                self._windows['main'])
             return
         destinations = self._windows['main'].destinations
         if destinations[DESTINATION_REEL]:
