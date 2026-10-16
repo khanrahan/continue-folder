@@ -42,12 +42,9 @@ from pathlib import Path
 import flame
 from PySide6 import QtWidgets
 
+from continue_folder_destination import Destination
 from continue_folder_flame_message_window import FlameMessageWindow
-from continue_folder_main_window import (
-    DESTINATION_FOLDER,
-    DESTINATION_REEL,
-    MainWindow,
-)
+from continue_folder_main_window import MainWindow
 from continue_folder_preset import Preset
 from continue_folder_save_preset_window import SavePresetWindow
 from continue_folder_settings_store import SettingsStore
@@ -62,11 +59,6 @@ MESSAGE_PREFIX = '[PYTHON]'
 
 CONFIG_FOLDER = '~/.config/continue-folder'
 XML = 'continue_folder.xml'
-
-
-def _get_default_destinations() -> dict[str, bool]:
-    """Return a new destination map with the reel on and the folder off."""
-    return {DESTINATION_REEL: True, DESTINATION_FOLDER: False}
 
 
 class ContinueFolder:
@@ -203,11 +195,13 @@ class ContinueFolder:
         if preset:
             main.input_pattern, main.output_pattern = (
                 self._patterns_from_preset(preset))
-            main.destinations = self._destinations_from_preset(preset)
+            main.destinations = (
+                Destination.decode(getattr(preset, 'destinations', ''))
+                or Destination.default())
         else:
             main.input_pattern = '{version}'
             main.output_pattern = '[version]'
-            main.destinations = _get_default_destinations()
+            main.destinations = Destination.default()
 
         main.preset = name or ''
         self._refresh_folder_display()
@@ -256,14 +250,6 @@ class ContinueFolder:
             self._store.preset_names[0] if self._store.preset_names else None)
         self.apply_preset(next_preset)
 
-    def _encode_destinations(self) -> str:
-        """Encode window destination checks as a comma-separated string."""
-        return ', '.join(
-            key
-            for key, value in self._windows['main'].destinations.items()
-            if value
-        )
-
     def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
         self._windows['save'].name = self._windows['main'].preset
@@ -280,7 +266,7 @@ class ContinueFolder:
             'name': preset_name,
             'input_pattern': self._windows['main'].input_pattern,
             'output_pattern': self._windows['main'].output_pattern,
-            'destinations': self._encode_destinations(),
+            'destinations': Destination.encode(self._windows['main'].destinations),
         }
         if duplicate:
             if not FlameMessageWindow.confirm(
@@ -321,9 +307,9 @@ class ContinueFolder:
                 self._windows['main'])
             return
         destinations = self._windows['main'].destinations
-        if destinations[DESTINATION_REEL]:
+        if Destination.REEL in destinations:
             self.create_desktop_reel()
-        if destinations[DESTINATION_FOLDER]:
+        if Destination.FOLDER in destinations:
             self.create_media_hub_folder()
         self.message('Done!')
         self._windows['main'].close()
@@ -332,17 +318,6 @@ class ContinueFolder:
         """Handle Cancel button."""
         self.message('Cancelled!')
         self._windows['main'].close()
-
-    def _destinations_from_preset(self, preset: Preset) -> dict[str, bool]:
-        """Read destination checks from a preset, with reel-only default."""
-        destinations = getattr(preset, 'destinations', None)
-        result = dict.fromkeys(_get_default_destinations(), False)
-        if destinations:
-            loaded = destinations.split(', ')
-            for key in result:
-                result[key] = key in loaded
-            return result
-        return _get_default_destinations()
 
     def create_desktop_reel(self) -> None:
         """Create reel on bottom of the current desktop.

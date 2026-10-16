@@ -4,8 +4,11 @@ This module provides the MainWindow widget class for the main application
 interface.
 """
 
+from collections.abc import Set
+
 from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
 
+from continue_folder_destination import Destination
 from continue_folder_flame_button import FlameButton
 from continue_folder_flame_label import FlameLabel
 from continue_folder_flame_line_edit import FlameLineEdit
@@ -13,9 +16,6 @@ from continue_folder_flame_push_button import FlamePushButton
 from continue_folder_flame_push_button_menu import FlamePushButtonMenu
 from continue_folder_flame_token_push_button import FlameTokenPushButton
 from continue_folder_window_mixin import WindowMixin
-
-DESTINATION_REEL = 'Desktop Reel'
-DESTINATION_FOLDER = 'MediaHub Folder'
 
 
 class MainWindow(WindowMixin, QtWidgets.QWidget):
@@ -124,15 +124,16 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['cancel'] = FlameButton(
             'Cancel', self.signal_cancel.emit, button_width=110)
 
-        self._buttons['destination_reel'] = FlamePushButton(DESTINATION_REEL, True)
-        self._buttons['destination_folder'] = FlamePushButton(
-            DESTINATION_FOLDER, False)
+        self._destination_buttons = {
+            destination: FlamePushButton(destination.value, False)
+            for destination in Destination
+        }
 
     def _init_layouts(self) -> None:
         """Initialize and configure all layout managers for the window."""
         self._layouts['hbox1'] = QtWidgets.QHBoxLayout()
-        self._layouts['hbox1'].addWidget(self._buttons['destination_reel'])
-        self._layouts['hbox1'].addWidget(self._buttons['destination_folder'])
+        for button in self._destination_buttons.values():
+            self._layouts['hbox1'].addWidget(button)
         self._layouts['hbox1'].addStretch()
 
         self._layouts['grid'] = QtWidgets.QGridLayout()
@@ -252,16 +253,15 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
         self._buttons['output_tokens'].populate_menu(token_dict)
 
     @property
-    def destinations(self) -> dict[str, bool]:
-        """Get or set Desktop Reel / MediaHub Folder destination checks."""
+    def destinations(self) -> set[Destination]:
+        """Get or set the checked destinations."""
         return {
-            DESTINATION_REEL: self._buttons['destination_reel'].isChecked(),
-            DESTINATION_FOLDER: self._buttons['destination_folder'].isChecked(),
+            destination
+            for destination, button in self._destination_buttons.items()
+            if button.isChecked()
         }
 
     @destinations.setter
-    def destinations(self, values: dict[str, bool]) -> None:
-        self._buttons['destination_reel'].setChecked(
-            values.get(DESTINATION_REEL, False))
-        self._buttons['destination_folder'].setChecked(
-            values.get(DESTINATION_FOLDER, False))
+    def destinations(self, values: Set[Destination]) -> None:
+        for destination, button in self._destination_buttons.items():
+            button.setChecked(destination in values)
