@@ -5,7 +5,7 @@ Flame-themed message dialog windows.
 """
 
 
-from PySide6 import QtCore, QtGui, QtWidgets  # pylint: disable=import-error
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from continue_folder_flame_button import FlameButton
 from continue_folder_flame_colors import FlameColors
@@ -286,7 +286,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
             raise TypeError(
                 f'message must be a string, got {type(message).__name__}')
 
-    def paintEvent(self, event: QtGui.QPaintEvent) -> None:  # noqa: N802 pylint: disable=invalid-name,unused-argument
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         """Handle paint events for custom window drawing.
 
         Draws the colored side bar and horizontal line below the title based
@@ -306,7 +306,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         painter.setPen(QtGui.QPen(QtGui.QColor(71, 71, 71), .5, QtCore.Qt.SolidLine))
         painter.drawLine(0, 40, 500, 40)
 
-    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:  # noqa: N802 pylint: disable=invalid-name
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Handle mouse press events.
 
         Stores the initial mouse position when the mouse button is pressed.
@@ -317,7 +317,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         """
         self._start_position = event.globalPos()
 
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:  # noqa: N802 pylint: disable=invalid-name
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """Handle mouse move event.
 
         Moves the window when the mouse is dragged while pressed. This

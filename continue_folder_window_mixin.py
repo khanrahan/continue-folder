@@ -4,7 +4,7 @@ This module provides the WindowMixin class for centering windows on the
 primary screen.
 """
 
-from PySide6 import QtCore, QtGui  # pylint: disable=import-error
+from PySide6 import QtCore, QtGui
 
 from continue_folder_flame_colors import FlameColors
 

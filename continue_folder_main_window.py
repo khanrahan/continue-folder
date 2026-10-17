@@ -6,7 +6,7 @@ interface.
 
 from collections.abc import Set
 
-from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
+from PySide6 import QtCore, QtWidgets
 
 from continue_folder_destination import Destination
 from continue_folder_flame_button import FlameButton

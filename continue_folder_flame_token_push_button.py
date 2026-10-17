@@ -6,7 +6,7 @@ Flame-themed push buttons with token dropdown menus.
 
 from functools import partial
 
-from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
+from PySide6 import QtCore, QtWidgets
 
 from continue_folder_button_mixin import ButtonMixin
 from continue_folder_flame_colors import FlameColors

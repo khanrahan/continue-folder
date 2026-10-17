@@ -7,7 +7,7 @@ Flame-themed push buttons with dropdown menus.
 from collections.abc import Callable
 from functools import partial
 
-from PySide6 import QtCore, QtWidgets  # pylint: disable=import-error
+from PySide6 import QtCore, QtWidgets
 
 from continue_folder_flame_colors import FlameColors
 
