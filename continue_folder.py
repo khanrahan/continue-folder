@@ -78,15 +78,15 @@ class ContinueFolder:
             selection: Tuple of selected Flame objects provided by the Flame
             API.
         """
-        self.message(TITLE_VERSION)
-        self.message(f'Script called from {__file__}')
+        self._message(TITLE_VERSION)
+        self._message(f'Script called from {__file__}')
 
         self.path = selection[0].path
 
         # Settings store (presets XML)
         self._settings_file = Path(CONFIG_FOLDER).expanduser() / XML
         self._store = SettingsStore(self._settings_file, TITLE, VERSION)
-        self.message(f'Settings loaded from {self._settings_file}')
+        self._message(f'Settings loaded from {self._settings_file}')
 
         # Token stores
         self.input_token_store = InputTokenStore(self.path)
@@ -128,9 +128,9 @@ class ContinueFolder:
         self._windows['main'].show()
 
     @staticmethod
-    def message(string: str) -> None:
-        """Print message to shell window and append global MESSAGE_PREFIX."""
-        print(' '.join([MESSAGE_PREFIX, string]))
+    def _message(text: str) -> None:
+        """Print message to shell window and prepend global MESSAGE_PREFIX."""
+        print(MESSAGE_PREFIX, text)
 
     @staticmethod
     def _get_flame_parent() -> QtWidgets.QWidget | None:
@@ -222,7 +222,7 @@ class ContinueFolder:
             # the file that failed to update.
             self._store.load()
             return
-        self.message(
+        self._message(
             f'{preset_name} preset deleted from {self._settings_file}')
         self._store.load()
         self._windows['main'].presets = self._store.preset_names
@@ -274,7 +274,7 @@ class ContinueFolder:
             self._store.sort_presets()
         try:
             self._store.save()
-            self.message(
+            self._message(
                 f'{preset_name} preset saved to {self._settings_file}')
         except OSError:
             FlameMessageWindow.error(
@@ -300,12 +300,12 @@ class ContinueFolder:
             self.create_desktop_reel()
         if Destination.FOLDER in destinations:
             self.create_media_hub_folder()
-        self.message('Done!')
+        self._message('Done!')
         self._windows['main'].close()
 
     def _on_cancel_clicked(self) -> None:
         """Handle Cancel button."""
-        self.message('Cancelled!')
+        self._message('Cancelled!')
         self._windows['main'].close()
 
     def create_desktop_reel(self) -> None:
@@ -316,7 +316,7 @@ class ContinueFolder:
         """
         desktop = flame.project.current_project.current_workspace.desktop
         desktop.reel_groups[0].create_reel(self._windows['main'].folder_new)
-        self.message('Reel created!')
+        self._message('Reel created!')
 
     def create_media_hub_folder(self) -> None:
         """Create folder in MediaHub Folder.
@@ -326,7 +326,7 @@ class ContinueFolder:
         """
         Path(self.path, self._windows['main'].folder_new).mkdir()
         flame.execute_shortcut("Refresh the MediaHub's Folders and Files")
-        self.message('MediaHub folder created!')
+        self._message('MediaHub folder created!')
 
 
 def scope_folder(selection: tuple) -> bool:
