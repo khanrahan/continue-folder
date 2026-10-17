@@ -53,7 +53,7 @@ from continue_folder_token_store_output import OutputTokenStore
 
 TITLE = 'Continue Folder'
 VERSION_INFO = (3, 0, 0)
-VERSION = '.'.join([str(num) for num in VERSION_INFO])
+VERSION = '.'.join(map(str, VERSION_INFO))
 TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON]'
 
