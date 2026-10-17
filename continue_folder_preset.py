@@ -4,47 +4,59 @@ This module provides the Preset class for representing preset configuration
 objects with XML serialization support.
 """
 
-import xml.etree.ElementTree as Etree
-from typing import Any
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from xml.etree.ElementTree import Element
+
+from continue_folder_destination import Destination
+
+DEFAULT_INPUT_PATTERN = '{version}'
+DEFAULT_OUTPUT_PATTERN = '[version]'
 
 
+@dataclass(kw_only=True)
 class Preset:
-    """An single Preset object.
+    """A named pattern and destination configuration.
 
-    The Element Tree element would appear as below:
-    <preset name="preset name"></preset>
+    Attributes:
+        name: Unique preset identifier.
+        input_pattern: Curly-brace pattern used to scan existing folders.
+        output_pattern: Square-bracket pattern used to form the new name.
+        destinations: Where the new name is created.
     """
 
-    def __init__(self, *, name: str, **kwargs: Any) -> None:
-        """Initialize the object.
+    name: str
+    input_pattern: str = DEFAULT_INPUT_PATTERN
+    output_pattern: str = DEFAULT_OUTPUT_PATTERN
+    destinations: set[Destination] = field(
+        default_factory=Destination.default,
+    )
 
-        Args:
-            name: Name of the preset. Must be a non-empty string.
-            **kwargs: Additional preset attributes to store.
+    @classmethod
+    def from_element(cls, element: Element) -> Preset:
+        """Build a preset from an XML ``preset`` element.
 
-        Raises:
-            TypeError: If name is not a string.
-            ValueError: If name is empty.
+        Missing or empty pattern and destination attributes fall back to
+        the same defaults as a newly constructed ``Preset``.
         """
-        if not isinstance(name, str):
-            raise TypeError(
-                f'name must be a string, got {type(name).__name__}')
-        if not name:
-            raise ValueError('name cannot be empty')
-        self.name = name
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    @property
-    def element(self) -> Etree.Element:
-        """Add preset Element object to the presets Element Tree."""
-        preset = Etree.Element(
-            'preset',
-            attrib=self.__dict__,
+        attrib = element.attrib
+        return cls(
+            name=attrib.get('name', ''),
+            input_pattern=attrib.get('input_pattern') or DEFAULT_INPUT_PATTERN,
+            output_pattern=(
+                attrib.get('output_pattern') or DEFAULT_OUTPUT_PATTERN),
+            destinations=(
+                Destination.decode(attrib.get('destinations', ''))
+                or Destination.default()
+            ),
         )
-        return preset
 
-    @element.setter
-    def element(self, element: Etree.Element) -> None:
-        for attribute, value in element.attrib.items():
-            setattr(self, attribute, value)
+    def to_element(self) -> Element:
+        """Return a new XML ``preset`` element for this preset."""
+        return Element('preset', attrib={
+            'name': self.name,
+            'input_pattern': self.input_pattern,
+            'output_pattern': self.output_pattern,
+            'destinations': Destination.encode(self.destinations),
+        })

@@ -85,11 +85,7 @@ class ContinueFolder:
 
         # Settings store (presets XML)
         self._settings_file = Path(CONFIG_FOLDER).expanduser() / XML
-        self._store = SettingsStore(
-            self._settings_file, TITLE, VERSION,
-            preset_attributes=(
-                'name', 'input_pattern', 'output_pattern', 'destinations')
-            )
+        self._store = SettingsStore(self._settings_file, TITLE, VERSION)
         self.message(f'Settings loaded from {self._settings_file}')
 
         # Token stores
@@ -145,16 +141,6 @@ class ContinueFolder:
         return None
 
     @staticmethod
-    def _patterns_from_preset(preset: Preset) -> tuple[str, str]:
-        """Read input/output patterns from a preset, with legacy fallback."""
-        input_pattern = (
-            getattr(preset, 'input_pattern', None)
-            or '{version}'
-        )
-        output_pattern = getattr(preset, 'output_pattern', None) or '[version]'
-        return input_pattern, output_pattern
-
-    @staticmethod
     def _convert_to_ascii(text: str) -> str:
         """Convert a unicode string to ASCII, ignoring non-ASCII characters.
 
@@ -191,19 +177,13 @@ class ContinueFolder:
         startup (setText does not emit ``signal_preset``).
         """
         preset = self._store.presets.get(name) if name else None
+        if preset is None:
+            preset = Preset(name=name or '')
         main = self._windows['main']
-        if preset:
-            main.input_pattern, main.output_pattern = (
-                self._patterns_from_preset(preset))
-            main.destinations = (
-                Destination.decode(getattr(preset, 'destinations', ''))
-                or Destination.default())
-        else:
-            main.input_pattern = '{version}'
-            main.output_pattern = '[version]'
-            main.destinations = Destination.default()
-
-        main.preset = name or ''
+        main.input_pattern = preset.input_pattern
+        main.output_pattern = preset.output_pattern
+        main.destinations = preset.destinations
+        main.preset = preset.name
         self._refresh_folder_display()
 
     def _on_preset_change(self) -> None:
@@ -267,12 +247,12 @@ class ContinueFolder:
                 'Name field cannot be empty.', self._windows['main'])
             return
         duplicate = preset_name in self._store.preset_names
-        preset_details = {
-            'name': preset_name,
-            'input_pattern': self._windows['main'].input_pattern,
-            'output_pattern': self._windows['main'].output_pattern,
-            'destinations': Destination.encode(self._windows['main'].destinations),
-        }
+        preset = Preset(
+            name=preset_name,
+            input_pattern=self._windows['main'].input_pattern,
+            output_pattern=self._windows['main'].output_pattern,
+            destinations=self._windows['main'].destinations,
+        )
         if duplicate:
             if not FlameMessageWindow.confirm(
                     'Overwrite Existing Preset',
@@ -281,13 +261,13 @@ class ContinueFolder:
                     self._windows['main']):
                 return
             try:
-                self._store.overwrite_preset(**preset_details)
+                self._store.overwrite_preset(preset)
             except ValueError as error:
                 FlameMessageWindow.error(str(error), self._windows['main'])
                 return
         else:
             try:
-                self._store.add_preset(**preset_details)
+                self._store.add_preset(preset)
             except ValueError as error:
                 FlameMessageWindow.error(str(error), self._windows['main'])
                 return

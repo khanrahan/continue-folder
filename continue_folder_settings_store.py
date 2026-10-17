@@ -5,9 +5,7 @@ stored as XML.
 """
 
 import xml.etree.ElementTree as Etree
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
 
 from continue_folder_preset import Preset
 
@@ -28,25 +26,22 @@ class SettingsStore:
             <script_name>Script Name
                 <version>X.X.X
                     <presets>
-                        <preset name="preset_name" path="..." pattern="..." find="...">
+                        <preset name="..." input_pattern="..."
+                            output_pattern="..." destinations="...">
                         </preset>
                     </presets>
                 </version>
             </script_name>
         </settings>
 
-    Preset attribute names are passed in at initialization via preset_attributes.
-    The 'name' attribute must always be present in preset_attributes (it is the
-    required unique identifier).
-
     Example:
-        >>> attrs = ('name', 'path', 'pattern', 'find')
-        >>> store = SettingsStore(Path('/path/to/settings.xml'), 'Script Title', '1.0.0', attrs)
-        >>> store.add_preset(name='My Preset', path='/some/path', pattern='<DD>')
+        >>> store = SettingsStore(
+        ...     Path('/path/to/settings.xml'), 'Title', '1.0.0')
+        >>> store.add_preset(Preset(name='My Preset'))
         >>> store.save()
         >>> presets = store.preset_names
         >>> store.delete_preset(name='My Preset')
-    """  # noqa: W505
+    """
 
     # XML tree element names
     ELEMENT_ROOT = 'settings'
@@ -61,7 +56,6 @@ class SettingsStore:
         file: Path,
         title: str,
         version: str,
-        preset_attributes: Iterable[str],
     ) -> None:
         """Initialize the instance.
 
@@ -69,32 +63,13 @@ class SettingsStore:
             file: Path of an existing or to-be-created XML settings file.
             title: Script title for the XML structure.
             version: Script version for the XML structure.
-            preset_attributes: Iterable of preset XML attribute names. Must
-                include 'name' (the required unique identifier). Defines which
-                attributes presets may have.
-
-        Raises:
-            ValueError: If 'name' is not in preset_attributes.
         """
-        self._preset_attributes = tuple(preset_attributes)
-        self._check_name_attribute()
         self.file = file
         self.title = title
         self.version = version
         self.tree = None
         self._presets = None
         self.load()
-
-    def _check_name_attribute(self) -> None:
-        """Ensure preset_attributes includes the required 'name' attribute.
-
-        Raises:
-            ValueError: If 'name' is not in preset_attributes.
-        """
-        if 'name' not in self._preset_attributes:
-            raise ValueError(
-                "'name' must always be present in preset_attributes"
-            )
 
     def load(self) -> None:
         """Load settings from XML file and initialize the XML tree.
@@ -206,59 +181,41 @@ class SettingsStore:
             key=lambda preset: preset.get('name', '')
         )
 
-    def _check_attributes(self, kwargs: dict[str, Any]) -> None:
-        """Validate preset kwargs.
+    def add_preset(self, preset: Preset) -> None:
+        """Add a preset to the XML tree.
 
         Args:
-            kwargs: Preset attribute names and values.
+            preset: The preset to append.
 
         Raises:
-            ValueError: If 'name' is missing or empty, or if kwargs keys do
-                not exactly match preset_attributes.
+            ValueError: If the preset name is empty.
+
+        Note:
+            Changes are not persisted to disk until save() is called.
         """
-        if not kwargs.get('name'):
+        if not preset.name:
             raise ValueError("Preset must have a non-empty 'name' attribute")
-        if kwargs.keys() != set(self._preset_attributes):
-            raise ValueError(
-                f'Preset attributes must be exactly '
-                f'{sorted(self._preset_attributes)}, got {sorted(kwargs)}'
-            )
+        self._presets.append(preset.to_element())
 
-    def add_preset(self, **kwargs: Any) -> None:
-        """Add preset Element object to the presets Element Tree.
+    def overwrite_preset(self, preset: Preset) -> None:
+        """Replace attributes of an existing preset in the XML tree.
+
+        The preset name is used to locate the existing element.
 
         Args:
-            **kwargs: Preset attributes. Must include 'name' with a non-empty
-                value. Only attributes in preset_attributes are stored.
+            preset: The preset whose attributes replace the stored copy.
 
         Raises:
-            ValueError: If 'name' attribute is missing or empty.
+            ValueError: If a preset with the given name does not exist.
+
+        Note:
+            Changes are not persisted to disk until save() is called.
         """
-        self._check_attributes(kwargs)
-        preset = Preset(**kwargs)
-        self._presets.append(preset.element)
-
-    def overwrite_preset(self, **kwargs: Any) -> None:
-        """Update attributes of an existing preset in the XML tree.
-
-        The 'name' value is used to locate the preset. Kwargs must match
-        preset_attributes exactly (same validation as add_preset).
-
-        Args:
-            **kwargs: Full set of preset attributes. Must include 'name' and
-                all other preset_attributes.
-
-        Raises:
-            ValueError: If kwargs fail _check_attributes validation, or if a
-                preset with the given name does not exist.
-        """
-        self._check_attributes(kwargs)
-        name_value = kwargs['name']
-        preset = self._find_preset(name_value)
-        if preset is None:
-            raise ValueError(f'Preset "{name_value}" does not exist.')
-        for key, value in kwargs.items():
-            preset.set(key, value)
+        element = self._find_preset(preset.name)
+        if element is None:
+            raise ValueError(f'Preset "{preset.name}" does not exist.')
+        element.attrib.clear()
+        element.attrib.update(preset.to_element().attrib)
 
     def save(self) -> None:
         """Write the XML tree to the settings file.
@@ -295,15 +252,10 @@ class SettingsStore:
         """Return a dictionary of Preset objects keyed by preset name.
 
         Returns:
-            Dictionary mapping preset names to Preset objects. Each Preset
-            object wraps an ElementTree Element and provides convenient
-            attribute access.
+            Dictionary mapping preset names to Preset objects.
         """
-        results = {}
-        for preset_element in self._get_preset_elements():
-            preset_name = preset_element.get('name', '')
-            if preset_name:
-                preset = Preset(name=preset_name)
-                preset.element = preset_element
-                results[preset.name] = preset
-        return results
+        return {
+            name: Preset.from_element(element)
+            for element in self._get_preset_elements()
+            if (name := element.get('name'))
+        }
