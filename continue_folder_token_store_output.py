@@ -9,13 +9,13 @@ from continue_folder_token_store_input import InputTokenStore
 class OutputTokenStore:
     """Store tokens that form the new folder name.
 
-    Square-bracket tokens (``[DD]``, ``[YYYY]``, ``[version]``, …) are
-    resolved into the output pattern. When an ``InputTokenStore`` is provided,
+    Square-bracket tokens ([DD], [YYYY], [version], …) are
+    resolved into the output pattern. When an InputTokenStore is provided,
     values such as version are read from it at resolve time. Optional hashes
-    set zero-padding: ``[version###]``.
+    set zero-padding: [version###].
     """
 
-    def __init__(self, input_token_store: InputTokenStore,) -> None:
+    def __init__(self, input_token_store: InputTokenStore | None = None) -> None:
         """Initialize output tokens.
 
         Args:
@@ -25,6 +25,12 @@ class OutputTokenStore:
         self.input_token_store = input_token_store
         self.tokens: dict[str, Token] = {}
         self._build_tokens()
+
+    def _get_input_token_value(self, token_pattern: str) -> str | None:
+        """Get the value of an input token by name."""
+        if self.input_token_store is None:
+            return None
+        return self.input_token_store.captured_token_values[token_pattern]
 
     def _build_tokens(self) -> None:
         """Populate square-bracket output tokens keyed by pattern."""
@@ -40,7 +46,7 @@ class OutputTokenStore:
             TokenIncrement(
                 'Version',
                 'version',
-                self.input_token_store.captured_token_values['version'],
+                self._get_input_token_value('version'),
             ),
             Token('Year (YY)', 'YY', now.strftime('%y')),
             Token('Year (YYYY)', 'YYYY', now.strftime('%Y')),

@@ -41,14 +41,19 @@ def test_resolve_leaves_non_token_text(tmp_path: Path) -> None:
     assert outputs.resolve('shot_[version]_final') == 'shot_4_final'
 
 
-def test_date_tokens_are_replaced(tmp_path: Path) -> None:
-    outputs = OutputTokenStore(InputTokenStore(str(tmp_path)))
+def test_resolve_without_input_store_starts_at_one() -> None:
+    outputs = OutputTokenStore()
+    assert outputs.resolve('[version##]') == '01'
+
+
+def test_date_tokens_are_replaced() -> None:
+    outputs = OutputTokenStore()
     result = outputs.resolve('[YYYY]-[MM]-[DD]')
     assert '[' not in result
     assert result == dt.datetime.now().strftime('%Y-%m-%d')
 
 
-def test_name_token_pairs_use_display_names(tmp_path: Path) -> None:
-    outputs = OutputTokenStore(InputTokenStore(str(tmp_path)))
+def test_name_token_pairs_use_display_names() -> None:
+    outputs = OutputTokenStore()
     assert outputs.name_token_pairs['Version'] == '[version]'
     assert outputs.name_token_pairs['Year (YYYY)'] == '[YYYY]'
