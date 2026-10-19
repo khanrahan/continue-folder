@@ -204,7 +204,7 @@ class ContinueFolder:
         preset_name = main.preset
         if not FlameMessageWindow.confirm(
                 'Confirm Operation',
-                'Are you sure want to permanently delete this preset?<br/>'
+                'Are you sure you want to permanently delete this preset?<br/>'
                 'This operation cannot be undone.',
                 main):
             return
