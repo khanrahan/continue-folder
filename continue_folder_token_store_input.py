@@ -12,7 +12,7 @@ class InputTokenStore:
     """Store tokens that interpret destination folder names."""
 
     def __init__(self, path: str) -> None:
-        """Initialize input tokens for destination ``path``."""
+        """Initialize input tokens for destination path."""
         self.path = path
         self.tokens: dict[str, InputToken] = {}
         self.folders: list[tuple[str, dict[str, str]]] = []

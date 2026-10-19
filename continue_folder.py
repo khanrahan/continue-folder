@@ -64,11 +64,11 @@ XML = 'continue_folder.xml'
 class ContinueFolder:
     """Creates a new Desktop reel or MediaHub Folder using tokens.
 
-    Input Pattern uses curly-brace tokens (``{version}``, ``{YYYY}``, …) to
+    Input Pattern uses curly-brace tokens ({version}, {YYYY}, …) to
     interpret existing destination folders. Output Pattern uses square-bracket
-    tokens (``[version]``, ``[YYYY]``, …) to form the new folder name.
-    ``{version}`` continues a number sequence; optional hashes set padding
-    on output (``[version###]``).
+    tokens ([version], [YYYY], …) to form the new folder name.
+    {version} continues a number sequence; optional hashes set padding
+    on output ([version###]).
     """
 
     def __init__(self, selection: tuple) -> None:
@@ -176,7 +176,7 @@ class ContinueFolder:
 
         Missing or unknown names fall back to default patterns and
         destinations. Call this after the window exists, including on
-        startup (setText does not emit ``signal_preset``).
+        startup (setText does not emit signal_preset).
         """
         preset = self._store.presets.get(name) if name else None
         if preset is None:

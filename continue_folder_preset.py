@@ -35,10 +35,10 @@ class Preset:
 
     @classmethod
     def from_element(cls, element: Element) -> Preset:
-        """Build a preset from an XML ``preset`` element.
+        """Build a preset from an XML preset element.
 
         Missing or empty pattern and destination attributes fall back to
-        the same defaults as a newly constructed ``Preset``.
+        the same defaults as a newly constructed Preset.
         """
         attrib = element.attrib
         return cls(
@@ -53,7 +53,7 @@ class Preset:
         )
 
     def to_element(self) -> Element:
-        """Return a new XML ``preset`` element for this preset."""
+        """Return a new XML preset element for this preset."""
         return Element('preset', attrib={
             'name': self.name,
             'input_pattern': self.input_pattern,

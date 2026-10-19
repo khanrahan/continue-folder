@@ -38,7 +38,7 @@ class Token:
 
 @dataclass
 class TokenPadded(Token):
-    """Output token with optional zero-padding, e.g. ``[frame####]``."""
+    """Output token with optional zero-padding, e.g. [frame####]."""
 
     def resolve(self, text: str) -> str:
         """Return text with this token replaced and zero-padded per hash."""
