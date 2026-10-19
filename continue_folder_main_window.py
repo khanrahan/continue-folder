@@ -199,9 +199,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     @property
     def presets(self) -> list[str]:
         """Get or set the list of available preset names."""
-        return getattr(
-            self._buttons['preset'], 'menu_options',
-            [])
+        return self._buttons['preset'].menu_options
 
     @presets.setter
     def presets(self, preset_list: list[str]) -> None:
@@ -237,7 +235,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     @property
     def input_tokens(self) -> dict[str, str]:
         """Get or set the token dict for the input Add Token button."""
-        return getattr(self._buttons['input_tokens'], 'token_dict', {})
+        return self._buttons['input_tokens'].token_dict
 
     @input_tokens.setter
     def input_tokens(self, token_dict: dict[str, str]) -> None:
@@ -246,7 +244,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
     @property
     def output_tokens(self) -> dict[str, str]:
         """Get or set the token dict for the output Add Token button."""
-        return getattr(self._buttons['output_tokens'], 'token_dict', {})
+        return self._buttons['output_tokens'].token_dict
 
     @output_tokens.setter
     def output_tokens(self, token_dict: dict[str, str]) -> None:
