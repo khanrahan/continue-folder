@@ -6,7 +6,10 @@ from dataclasses import dataclass
 
 @dataclass
 class Token:
-    """Output token delimited with square brackets form the new result name.
+    """Output token to be replaced in a new folder name.
+
+    Token delimited with square brackets that will be resolved to values when
+    forming the new result name.
 
     Attributes:
         name: Display name for the Add Token menu.
@@ -60,13 +63,13 @@ class TokenIncrement(TokenPadded):
 class InputToken:
     """Input token delimited with curly braces.
 
-    Used with a InputTokenStore to store sections of a common string pattern.
+    Used with an InputTokenStore to store sections of a common string pattern.
 
     Attributes:
         name: Display name for the Add Token menu.
         pattern: Token excluding the curly-brace delimiters (e.g. version).
         regex: Capture regex used when scanning folder names.
-        value: Result after considering
+        value: Result after considering all captures.
     """
 
     name: str

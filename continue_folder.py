@@ -326,7 +326,7 @@ class ContinueFolder:
 
 
 def scope_folder(selection: tuple) -> bool:
-    """Determine if selection is a one folder in the MediaHub > Files tab."""
+    """Determine if selection is one folder in the MediaHub > Files tab."""
     return len(selection) == 1 and isinstance(selection[0], flame.PyMediaHubFilesFolder)
 
 
