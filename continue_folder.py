@@ -247,35 +247,29 @@ class ContinueFolder:
                 'Name field cannot be empty.', self._windows['main'])
             return
         duplicate = preset_name in self._store.preset_names
+        if duplicate and not FlameMessageWindow.confirm(
+                'Overwrite Existing Preset',
+                'Are you sure you want to permanently overwrite this '
+                'preset?<br/>This operation cannot be undone.',
+                self._windows['main']):
+            return
         preset = Preset(
             name=preset_name,
             input_pattern=self._windows['main'].input_pattern,
             output_pattern=self._windows['main'].output_pattern,
             destinations=self._windows['main'].destinations,
         )
-        if duplicate:
-            if not FlameMessageWindow.confirm(
-                    'Overwrite Existing Preset',
-                    'Are you sure you want to permanently overwrite this '
-                    'preset?<br/>This operation cannot be undone.',
-                    self._windows['main']):
-                return
-            try:
+        try:
+            if duplicate:
                 self._store.overwrite_preset(preset)
-            except ValueError as error:
-                FlameMessageWindow.error(str(error), self._windows['main'])
-                return
-        else:
-            try:
+            else:
                 self._store.add_preset(preset)
-            except ValueError as error:
-                FlameMessageWindow.error(str(error), self._windows['main'])
-                return
-            self._store.sort_presets()
+                self._store.sort_presets()
+        except ValueError as error:
+            FlameMessageWindow.error(str(error), self._windows['main'])
+            return
         try:
             self._store.save()
-            self._message(
-                f'{preset_name} preset saved to {self._settings_file}')
         except OSError:
             FlameMessageWindow.error(
                 f'Check permissions on {self._settings_file}',
@@ -283,6 +277,7 @@ class ContinueFolder:
             # put in memory & whats on disk back in sync
             self._store.load()
             return
+        self._message(f'{preset_name} preset saved to {self._settings_file}')
         self._windows['main'].presets = self._store.preset_names
         self.apply_preset(preset_name)
 
