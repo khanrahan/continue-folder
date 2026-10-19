@@ -43,6 +43,7 @@ You want to have a Library that will mirror a folder of exports on the server:
 ## Compatibility
 |Release Version|Flame Version|
 |---|---|
+|v4.X.X|Flame 2025 and newer|
 |v3.X.X|Flame 2025 and newer|
 |v2.X.X|Flame 2022 up to 2024.2|
 |v1.X.X|Flame 2021 up to 2021.2|
