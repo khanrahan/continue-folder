@@ -280,6 +280,8 @@ class ContinueFolder:
             FlameMessageWindow.error(
                 f'Check permissions on {self._settings_file}',
                 self._windows['main'])
+            # put in memory & whats on disk back in sync
+            self._store.load()
             return
         self._windows['main'].presets = self._store.preset_names
         self.apply_preset(preset_name)
