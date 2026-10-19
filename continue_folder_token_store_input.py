@@ -30,8 +30,8 @@ class InputTokenStore:
             InputToken('Minute', 'mm', '[0-9]{2}'),
             InputToken('Month', 'MM', '[0-9]{2}'),
             InputTokenMax('Version', 'version', '[0-9]+'),
-            InputToken('Year (##)', 'YY', '[0-9]{2}'),
-            InputToken('Year (####)', 'YYYY', '[0-9]{4}'),
+            InputToken('Year (YY)', 'YY', '[0-9]{2}'),
+            InputToken('Year (YYYY)', 'YYYY', '[0-9]{4}'),
         ]
         self.tokens = {token.pattern: token for token in tokens}
 

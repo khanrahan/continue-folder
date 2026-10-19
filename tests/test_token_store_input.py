@@ -65,4 +65,4 @@ def test_non_matching_folders_are_ignored(tmp_path: Path) -> None:
 def test_name_token_pairs_use_display_names(tmp_path: Path) -> None:
     store = InputTokenStore(str(tmp_path))
     assert store.name_token_pairs['Version'] == '{version}'
-    assert store.name_token_pairs['Year (####)'] == '{YYYY}'
+    assert store.name_token_pairs['Year (YYYY)'] == '{YYYY}'
