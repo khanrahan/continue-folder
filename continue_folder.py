@@ -121,9 +121,7 @@ class ContinueFolder:
         self._windows['main'].signal_ok.connect(self._on_ok_clicked)
         self._windows['main'].signal_cancel.connect(self._on_cancel_clicked)
 
-        preset_zero = (
-            self._store.preset_names[0] if self._store.preset_names else None)
-        self.apply_preset(preset_zero)
+        self.apply_preset(self._preset_name_zero())
 
         self._windows['main'].show()
 
@@ -168,6 +166,10 @@ class ContinueFolder:
         self.input_token_store.apply(main.input_pattern)
         result = self.output_token_store.resolve(main.output_pattern)
         main.folder_new = self._convert_to_ascii(result)
+
+    def _preset_name_zero(self) -> str | None:
+        """Return the first preset name, or None if no presets exist."""
+        return self._store.preset_names[0] if self._store.preset_names else None
 
     def apply_preset(self, name: str | None) -> None:
         """Load a preset into the model and push it to the main window.
@@ -226,9 +228,7 @@ class ContinueFolder:
             f'{preset_name} preset deleted from {self._settings_file}')
         self._store.load()
         self._windows['main'].presets = self._store.preset_names
-        next_preset = (
-            self._store.preset_names[0] if self._store.preset_names else None)
-        self.apply_preset(next_preset)
+        self.apply_preset(self._preset_name_zero())
 
     def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
