@@ -1,0 +1,63 @@
+[project]
+name = "continue-folder"
+requires-python = ">=3.11"  # Flame 2025 uses Python 3.11
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+output-format = "pylint"
+line-length = 88
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+preview = true
+select = [
+    "A",    # flake8-builtins
+    "ANN",  # flake8-annotations
+    "B",    # flake8-bugbear
+    "C90",  # mccabe
+    "D",    # pydocstyle
+    "E",    # pycodestyle errors
+    "ERA",  # eradicate
+    "F",    # Pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "Q",    # flake8-quotes
+    "RUF",  # Ruff-specific rules
+    "SIM",  # flake8-simplify
+    "UP",   # pyupgrade
+    "W",    # pycodestyle warnings
+]
+ignore = [
+    "ANN401",  # **kwargs: Any is required here
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = [
+    "paintEvent",
+    "mousePressEvent",
+    "mouseMoveEvent",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 79
+
+[tool.pylint.main]
+# Flame and its bundled PySide6 are only importable inside the application.
+ignored-modules = ["PySide6", "flame"]
