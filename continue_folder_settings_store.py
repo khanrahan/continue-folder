@@ -4,6 +4,7 @@ This module provides the SettingsStore class for managing application settings
 stored as XML.
 """
 
+import re
 import xml.etree.ElementTree as Etree
 from pathlib import Path
 
@@ -34,6 +35,11 @@ class SettingsStore:
             </script_name>
         </settings>
 
+    Presets are loaded from the <version> element whose major version
+    matches the running script. Older major-version blocks are left in the
+    file unused. Other children of <version> (for example history) can
+    be loaded the same way as presets.
+
     Example:
         >>> store = SettingsStore(
         ...     Path('/path/to/settings.xml'), 'Title', '1.0.0')
@@ -49,7 +55,6 @@ class SettingsStore:
     ELEMENT_VERSION = 'version'
     ELEMENT_PRESETS = 'presets'
     ELEMENT_PRESET = 'preset'
-    PRESETS_PATH = f'{ELEMENT_SCRIPT_NAME}/{ELEMENT_VERSION}/{ELEMENT_PRESETS}'
 
     def __init__(
         self,
@@ -68,7 +73,8 @@ class SettingsStore:
         self.title = title
         self.version = version
         self.tree = None
-        self._presets = None
+        self._version_element = None
+        self._presets_element = None
         self.load()
 
     def load(self) -> None:
@@ -78,8 +84,8 @@ class SettingsStore:
         or malformed XML), creates a new empty XML tree structure. If the file
         doesn't exist, creates a new empty XML tree structure.
 
-        After loading or creating the tree, initializes the presets container
-        element.
+        After loading or creating the tree, resolves the current major
+        version element and then the presets container beneath it.
         """
         if self.file.is_file():
             try:
@@ -90,36 +96,77 @@ class SettingsStore:
         else:
             self._init_tree()
 
+        self._load_version_element()
         self._load_presets_element()
 
     def _init_tree(self) -> None:
-        """Create a new empty XML tree with the required structure.
-
-        See class docstring for XML structure.
-        """
+        """Create a new empty XML tree with the settings root and title."""
         settings = Etree.Element(self.ELEMENT_ROOT)
 
         name = Etree.SubElement(settings, self.ELEMENT_SCRIPT_NAME)
         name.text = self.title
-
-        version = Etree.SubElement(name, self.ELEMENT_VERSION)
-        version.text = self.version
-
-        _presets = Etree.SubElement(version, self.ELEMENT_PRESETS)
         self.tree = Etree.ElementTree(settings)
 
-    def _load_presets_element(self) -> None:
-        """Store the presets container element from the XML tree.
+    @staticmethod
+    def _major(version: str) -> str:
+        """Return the major component of a dotted version string."""
+        return version.strip().split('.', 1)[0]
 
-        Locates and stores the presets container element. If the element cannot
-        be found (invalid XML structure), rebuilds the entire tree structure
-        and then locates the presets element again.
+    @staticmethod
+    def _version_key(version: str) -> tuple[int, ...]:
+        """Return a sortable key for a dotted version string.
+
+        Each dotted component contributes its leading integer, so
+        '3.10.0' sorts above '3.9.2'. Components without a leading
+        number (for example 'beta') count as 0.
         """
-        self._presets = self.tree.find(self.PRESETS_PATH)
-        if self._presets is None:
-            # Rebuild tree if structure is invalid
+        key = []
+        for part in version.strip().split('.'):
+            match = re.match(r'\d+', part)
+            key.append(int(match.group()) if match else 0)
+        return tuple(key)
+
+    def _load_version_element(self) -> None:
+        """Store the version element for the current major version.
+
+        Finds the highest saved <version> whose major number matches
+        self.version (for example, running 3.1.0 with 3.0.0 and
+        3.2.0 saved selects 3.2.0). If none exists, appends a new
+        empty version element. The selected element's text is then set to
+        self.version so the next save records the running version.
+        Other major-version blocks are left untouched so later siblings of
+        <presets> can share this same element.
+        """
+        script = self.tree.find(self.ELEMENT_SCRIPT_NAME)
+        if script is None:
             self._init_tree()
-            self._presets = self.tree.find(self.PRESETS_PATH)
+            script = self.tree.find(self.ELEMENT_SCRIPT_NAME)
+
+        target = self._major(self.version)
+        element = max(
+            (
+                child
+                for child in script.findall(self.ELEMENT_VERSION)
+                if self._major(child.text or '') == target
+            ),
+            key=lambda child: self._version_key(child.text or ''),
+            default=None,
+        )
+        if element is None:
+            element = Etree.SubElement(script, self.ELEMENT_VERSION)
+        element.text = self.version  # Update the current version
+        self._version_element = element
+
+    def _load_presets_element(self) -> None:
+        """Store the presets container under the current version element.
+
+        Creates an empty <presets> element if the version block does
+        not already have one.
+        """
+        element = self._version_element.find(self.ELEMENT_PRESETS)
+        if element is None:
+            element = Etree.SubElement(self._version_element, self.ELEMENT_PRESETS)
+        self._presets_element = element
 
     def _get_preset_elements(self) -> list[Etree.Element]:
         """Return a list of preset Element objects.
@@ -132,7 +179,7 @@ class SettingsStore:
             The returned elements are mutable references to the XML tree.
             Modifications to these elements will affect the underlying tree.
         """
-        return self._presets.findall(self.ELEMENT_PRESET)
+        return self._presets_element.findall(self.ELEMENT_PRESET)
 
     def _find_preset(self, name: str) -> Etree.Element | None:
         """Find a preset element by name.
@@ -163,7 +210,7 @@ class SettingsStore:
         preset = self._find_preset(name)
         if preset is None:
             raise ValueError(f'Preset "{name}" does not exist.')
-        self._presets.remove(preset)
+        self._presets_element.remove(preset)
 
     def sort_presets(self) -> None:
         """Alphabetically sort presets by name attribute.
@@ -176,8 +223,8 @@ class SettingsStore:
             This modifies the XML tree structure directly. Changes are not
             persisted to disk until save() is called.
         """
-        self._presets[:] = sorted(
-            self._presets,
+        self._presets_element[:] = sorted(
+            self._presets_element,
             key=lambda preset: preset.get('name', '')
         )
 
@@ -195,7 +242,7 @@ class SettingsStore:
         """
         if not preset.name:
             raise ValueError("Preset must have a non-empty 'name' attribute")
-        self._presets.append(preset.to_element())
+        self._presets_element.append(preset.to_element())
 
     def overwrite_preset(self, preset: Preset) -> None:
         """Replace attributes of an existing preset in the XML tree.

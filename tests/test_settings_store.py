@@ -1,5 +1,6 @@
 """Tests for XML preset persistence."""
 
+import xml.etree.ElementTree as Etree
 from pathlib import Path
 
 import pytest
@@ -119,3 +120,105 @@ def test_nameless_presets_are_skipped(tmp_path: Path) -> None:
     store = _store(path)
     assert store.preset_names == ['Keep']
     assert set(store.presets) == {'Keep'}
+
+
+def test_previous_major_version_presets_are_ignored(tmp_path: Path) -> None:
+    path = tmp_path / 'settings.xml'
+    path.write_text(
+        '<settings><script_name>Continue Folder'
+        '<version>2.0.0<presets>'
+        '<preset name="Legacy" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version></script_name></settings>'
+    )
+    store = _store(path)
+    assert store.preset_names == []
+
+    store.add_preset(_exports())
+    store.save()
+
+    script = Etree.parse(path).find('script_name')
+    versions = {
+        element.text: [
+            preset.get('name') for preset in element.find('presets')
+        ]
+        for element in script.findall('version')
+    }
+    assert versions['2.0.0'] == ['Legacy']
+    assert versions['3.0.0'] == ['Exports']
+
+
+def test_current_major_version_presets_are_used(tmp_path: Path) -> None:
+    path = tmp_path / 'settings.xml'
+    path.write_text(
+        '<settings><script_name>Continue Folder'
+        '<version>2.0.0<presets>'
+        '<preset name="Legacy" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '<version>3.0.0<presets>'
+        '<preset name="Current" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '</script_name></settings>'
+    )
+    store = _store(path)
+    assert store.preset_names == ['Current']
+
+
+def test_same_major_version_presets_are_reused(tmp_path: Path) -> None:
+    path = tmp_path / 'settings.xml'
+    path.write_text(
+        '<settings><script_name>Continue Folder'
+        '<version>3.0.0<presets>'
+        '<preset name="Keep" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version></script_name></settings>'
+    )
+    store = SettingsStore(path, 'Continue Folder', '3.1.0')
+    assert store.preset_names == ['Keep']
+
+
+def test_highest_same_major_version_is_used(tmp_path: Path) -> None:
+    path = tmp_path / 'settings.xml'
+    path.write_text(
+        '<settings><script_name>Continue Folder'
+        '<version>3.10.0<presets>'
+        '<preset name="Highest" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '<version>4.0.0<presets>'
+        '<preset name="Newer Major" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '<version>3.0.0<presets>'
+        '<preset name="Oldest" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '<version>3.9.2<presets>'
+        '<preset name="Middle" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version>'
+        '</script_name></settings>'
+    )
+    store = SettingsStore(path, 'Continue Folder', '3.1.0')
+    assert store.preset_names == ['Highest']
+
+
+def test_loaded_version_is_updated_to_running_version(tmp_path: Path) -> None:
+    path = tmp_path / 'settings.xml'
+    path.write_text(
+        '<settings><script_name>Continue Folder'
+        '<version>2.0.0<presets/></version>'
+        '<version>3.0.1<presets>'
+        '<preset name="Keep" input_pattern="{version}"'
+        ' output_pattern="[version]" destinations="Desktop Reel"/>'
+        '</presets></version></script_name></settings>'
+    )
+    store = SettingsStore(path, 'Continue Folder', '3.1.1')
+    assert store.preset_names == ['Keep']
+    store.save()
+
+    script = Etree.parse(path).find('script_name')
+    versions = [element.text for element in script.findall('version')]
+    assert versions == ['2.0.0', '3.1.1']
