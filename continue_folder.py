@@ -33,7 +33,7 @@ To Install:
 
     For a specific user on Mac, copy the files to:
     /Users/<user_name>/Library/Preferences/Autodesk/flame/python/
-"""
+"""  # noqa: D205, D212, D415
 
 
 import unicodedata
