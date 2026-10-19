@@ -226,7 +226,6 @@ class ContinueFolder:
             return
         self._message(
             f'{preset_name} preset deleted from {self._settings_file}')
-        self._store.load()
         self._windows['main'].presets = self._store.preset_names
         self.apply_preset(self._preset_name_zero())
 
