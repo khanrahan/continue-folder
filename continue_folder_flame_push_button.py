@@ -20,15 +20,15 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         Basic usage:
             >>> def on_click():
             ...     print('Button clicked')
-            >>> button = FlamePushButton('Click Me', False, on_click)
+            >>> button = FlamePushButton('Click Me', False)
+            ...     button.clicked.connect(on_click)
 
         With checked state:
-            >>> button = FlamePushButton('Toggle', True, on_click)
+            >>> button = FlamePushButton('Toggle', True)
 
         Custom button dimensions:
             >>> button = FlamePushButton(
-            ...     'Toggle', False, on_click, button_width=200,
-            ...     button_max_width=300)
+            ...     'Toggle', False, button_width=200, button_max_width=300)
     """
 
     # Type hints for instance attributes
