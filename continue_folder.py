@@ -2,13 +2,13 @@
 Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
-Script Version: 4.0.0
+Script Version: 4.0.1
 Flame Version: 2025
 
 URL: http://www.github.com/khanrahan/continue-folder
 
 Creation Date: 04.10.23
-Update Date: 10.19.26
+Update Date: 10.20.26
 
 Description:
 
@@ -52,7 +52,7 @@ from continue_folder_window_main import WindowMain
 from continue_folder_window_save_preset import WindowSavePreset
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (4, 0, 0)
+VERSION_INFO = (4, 0, 1)
 VERSION = '.'.join(map(str, VERSION_INFO))
 TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON]'
