@@ -1,6 +1,6 @@
 """Main Window Module.
 
-This module provides the MainWindow widget class for the main application
+This module provides the WindowMain widget class for the main application
 interface.
 """
 
@@ -9,16 +9,16 @@ from collections.abc import Set
 from PySide6 import QtCore, QtWidgets
 
 from continue_folder_destination import Destination
-from continue_folder_flame_button import FlameButton
-from continue_folder_flame_label import FlameLabel
-from continue_folder_flame_line_edit import FlameLineEdit
-from continue_folder_flame_push_button import FlamePushButton
-from continue_folder_flame_push_button_menu import FlamePushButtonMenu
-from continue_folder_flame_token_push_button import FlameTokenPushButton
+from continue_folder_pyflame_button import PyFlameButton
+from continue_folder_pyflame_label import PyFlameLabel
+from continue_folder_pyflame_line_edit import PyFlameLineEdit
+from continue_folder_pyflame_push_button import PyFlamePushButton
+from continue_folder_pyflame_push_button_menu import PyFlamePushButtonMenu
+from continue_folder_pyflame_token_push_button import PyFlameTokenPushButton
 from continue_folder_window_mixin import WindowMixin
 
 
-class MainWindow(WindowMixin, QtWidgets.QWidget):
+class WindowMain(WindowMixin, QtWidgets.QWidget):
     """Main application window for Continue Folder.
 
     This class provides the primary interface for the application, including:
@@ -65,7 +65,7 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
 
         Note:
             PySide can behave unexpectedly when a parent widget is not
-            provided. For example, the MainWindow could get lost behind the
+            provided. For example, the WindowMain could get lost behind the
             Flame app window.
         """
         super().__init__(parent=parent_widget)
@@ -78,54 +78,54 @@ class MainWindow(WindowMixin, QtWidgets.QWidget):
 
     def _init_labels(self) -> None:
         """Initialize all label widgets used in the window."""
-        self._labels['preset'] = FlameLabel('Preset', 'normal')
-        self._labels['input_pattern'] = FlameLabel('Input Pattern', 'normal')
-        self._labels['output_pattern'] = FlameLabel('Output Pattern', 'normal')
-        self._labels['folder'] = FlameLabel('New Folder', 'normal')
-        self._labels['folder_name'] = FlameLabel('', 'background')
-        self._labels['destination'] = FlameLabel('Destination', 'normal')
+        self._labels['preset'] = PyFlameLabel('Preset', 'normal')
+        self._labels['input_pattern'] = PyFlameLabel('Input Pattern', 'normal')
+        self._labels['output_pattern'] = PyFlameLabel('Output Pattern', 'normal')
+        self._labels['folder'] = PyFlameLabel('New Folder', 'normal')
+        self._labels['folder_name'] = PyFlameLabel('', 'background')
+        self._labels['destination'] = PyFlameLabel('Destination', 'normal')
 
     def _init_line_edits(self) -> None:
         """Initialize pattern line edits and read-only folder display."""
-        self._line_edits['input_pattern'] = FlameLineEdit('')
+        self._line_edits['input_pattern'] = PyFlameLineEdit('')
         self._line_edits['input_pattern'].textChanged.connect(
             self.signal_input_pattern.emit)
-        self._line_edits['output_pattern'] = FlameLineEdit('')
+        self._line_edits['output_pattern'] = PyFlameLineEdit('')
         self._line_edits['output_pattern'].textChanged.connect(
             self.signal_output_pattern.emit)
 
     def _init_buttons(self) -> None:
         """Initialize all button widgets used in the window."""
-        self._buttons['preset'] = FlamePushButtonMenu(
+        self._buttons['preset'] = PyFlamePushButtonMenu(
             '',
             [],
             menu_action=self.signal_preset.emit,
         )
         self._buttons['preset'].setMaximumSize(QtCore.QSize(4000, 28))
 
-        self._buttons['preset_save'] = FlameButton(
+        self._buttons['preset_save'] = PyFlameButton(
             'Save', self.signal_save.emit, button_width=110)
-        self._buttons['preset_delete'] = FlameButton(
+        self._buttons['preset_delete'] = PyFlameButton(
             'Delete', self.signal_delete.emit, button_width=110)
 
-        self._buttons['input_tokens'] = FlameTokenPushButton(
+        self._buttons['input_tokens'] = PyFlameTokenPushButton(
             'Add Token',
             {},
             self._line_edits['input_pattern'],
         )
-        self._buttons['output_tokens'] = FlameTokenPushButton(
+        self._buttons['output_tokens'] = PyFlameTokenPushButton(
             'Add Token',
             {},
             self._line_edits['output_pattern'],
         )
 
-        self._buttons['ok'] = FlameButton(
+        self._buttons['ok'] = PyFlameButton(
             'Ok', self.signal_ok.emit, button_color='blue', button_width=110)
-        self._buttons['cancel'] = FlameButton(
+        self._buttons['cancel'] = PyFlameButton(
             'Cancel', self.signal_cancel.emit, button_width=110)
 
         self._destination_buttons = {
-            destination: FlamePushButton(destination.value, False)
+            destination: PyFlamePushButton(destination.value, False)
             for destination in Destination
         }
 

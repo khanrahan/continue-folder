@@ -1,18 +1,18 @@
 """Save Preset Window Module.
 
-This module provides the SavePresetWindow dialog class for saving preset
+This module provides the WindowSavePreset dialog class for saving preset
 configurations with a name.
 """
 
 from PySide6 import QtWidgets
 
-from continue_folder_flame_button import FlameButton
-from continue_folder_flame_label import FlameLabel
-from continue_folder_flame_line_edit import FlameLineEdit
+from continue_folder_pyflame_button import PyFlameButton
+from continue_folder_pyflame_label import PyFlameLabel
+from continue_folder_pyflame_line_edit import PyFlameLineEdit
 from continue_folder_window_mixin import WindowMixin
 
 
-class SavePresetWindow(WindowMixin, QtWidgets.QDialog):
+class WindowSavePreset(WindowMixin, QtWidgets.QDialog):
     """Dialog window for saving presets with a name.
 
     This dialog provides a simple interface for users to enter a name when
@@ -31,7 +31,7 @@ class SavePresetWindow(WindowMixin, QtWidgets.QDialog):
         Access the entered name via the `name` property.
 
     Example:
-        >>> window = SavePresetWindow(parent_widget)
+        >>> window = WindowSavePreset(parent_widget)
         >>> window.name = 'Default Preset'  # Pre-fill the name
         >>> if window.exec() == QtWidgets.QDialog.Accepted:
         ...     preset_name = window.name
@@ -49,7 +49,7 @@ class SavePresetWindow(WindowMixin, QtWidgets.QDialog):
 
         Note:
             PySide can behave unexpectedly when a parent widget is not
-            provided. For example, the MainWindow could get lost behind the
+            provided. For example, the WindowMain could get lost behind the
             Flame app window.
         """
         super().__init__(parent)
@@ -62,15 +62,15 @@ class SavePresetWindow(WindowMixin, QtWidgets.QDialog):
     def _init_widgets(self) -> None:
         """Initialize all widgets used in the window."""
         # Labels
-        self._labels['preset_name'] = FlameLabel('Preset Name', 'normal')
+        self._labels['preset_name'] = PyFlameLabel('Preset Name', 'normal')
 
         # Line Edits
-        self._line_edits['preset_name'] = FlameLineEdit('')
+        self._line_edits['preset_name'] = PyFlameLineEdit('')
 
         # Buttons
-        self._buttons['save'] = FlameButton(
+        self._buttons['save'] = PyFlameButton(
             'Save', self.accept, button_color='blue', button_width=110)
-        self._buttons['cancel'] = FlameButton(
+        self._buttons['cancel'] = PyFlameButton(
             'Cancel', self.reject, button_width=110)
 
     def _init_layouts(self) -> None:

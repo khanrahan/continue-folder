@@ -1,17 +1,17 @@
-"""Flame Label Widget Module.
+"""PyFlame Label Widget Module.
 
-This module provides the FlameLabel widget class for creating Flame-themed
+This module provides the PyFlameLabel widget class for creating Flame-themed
 label widgets with customizable styling.
 """
 
 
 from PySide6 import QtCore, QtWidgets
 
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlameLabel(QtWidgets.QLabel):
-    """Custom Flame Label Widget.
+class PyFlameLabel(QtWidgets.QLabel):
+    """Custom PyFlame Label Widget.
 
     A custom label widget with Flame-style theming that displays text with
     customizable styling. The widget supports three style types: normal,
@@ -21,16 +21,16 @@ class FlameLabel(QtWidgets.QLabel):
 
     Examples:
         Basic usage:
-            >>> label = FlameLabel('Label Name')
+            >>> label = PyFlameLabel('Label Name')
 
         With underline style:
-            >>> label = FlameLabel('Section Title', 'underline')
+            >>> label = PyFlameLabel('Section Title', 'underline')
 
         With background style and custom width:
-            >>> label = FlameLabel('Header', 'background', 300)
+            >>> label = PyFlameLabel('Header', 'background', 300)
 
         Custom width only:
-            >>> label = FlameLabel('Label Text', label_width=250)
+            >>> label = PyFlameLabel('Label Text', label_width=250)
     """
     _DEFAULT_WIDTH = 150
     _LABEL_TYPES = ('normal', 'underline', 'background')
@@ -39,27 +39,27 @@ class FlameLabel(QtWidgets.QLabel):
     # Stylesheet constants
     _STYLESHEET_NORMAL = f"""
         QLabel {{
-            color: {FlameColors.TEXT_PRIMARY};
+            color: {PyFlameColors.TEXT_PRIMARY};
             font: 14px 'Discreet'}}
         QLabel:disabled {{
-            color: {FlameColors.TEXT_SECONDARY}}}"""
+            color: {PyFlameColors.TEXT_SECONDARY}}}"""
 
     _STYLESHEET_UNDERLINE = f"""
         QLabel {{
-            color: {FlameColors.TEXT_PRIMARY};
-            border-bottom: 1px inset {FlameColors.BORDER_LABEL};
+            color: {PyFlameColors.TEXT_PRIMARY};
+            border-bottom: 1px inset {PyFlameColors.BORDER_LABEL};
             font: 14px 'Discreet'}}
         QLabel:disabled {{
-            color: {FlameColors.TEXT_SECONDARY}}}"""
+            color: {PyFlameColors.TEXT_SECONDARY}}}"""
 
     _STYLESHEET_BACKGROUND = f"""
         QLabel {{
-            color: {FlameColors.TEXT_PRIMARY};
-            background-color: {FlameColors.BG_LABEL};
+            color: {PyFlameColors.TEXT_PRIMARY};
+            background-color: {PyFlameColors.BG_LABEL};
             padding-left: 5px;
             font: 14px 'Discreet'}}
         QLabel:disabled {{
-            color: {FlameColors.TEXT_SECONDARY}}}"""
+            color: {PyFlameColors.TEXT_SECONDARY}}}"""
 
     def __init__(
             self,
@@ -67,7 +67,7 @@ class FlameLabel(QtWidgets.QLabel):
             label_type: str = 'normal',
             label_width: int | None = None
     ) -> None:
-        """Initialize the FlameLabel instance.
+        """Initialize the PyFlameLabel instance.
 
         Validates all parameters, applies default values if not provided, and
         initializes the widget properties with Flame-themed styling.
@@ -97,14 +97,14 @@ class FlameLabel(QtWidgets.QLabel):
 
         # Use default value if not provided
         if label_width is None:
-            label_width = FlameLabel._DEFAULT_WIDTH
+            label_width = PyFlameLabel._DEFAULT_WIDTH
         self._check_label_width(label_width)
 
         # Stylesheet mapping for label types
         self._stylesheets = {
-            'normal': FlameLabel._STYLESHEET_NORMAL,
-            'underline': FlameLabel._STYLESHEET_UNDERLINE,
-            'background': FlameLabel._STYLESHEET_BACKGROUND
+            'normal': PyFlameLabel._STYLESHEET_NORMAL,
+            'underline': PyFlameLabel._STYLESHEET_UNDERLINE,
+            'background': PyFlameLabel._STYLESHEET_BACKGROUND
         }
 
         # Dimensions
@@ -151,9 +151,9 @@ class FlameLabel(QtWidgets.QLabel):
         if not isinstance(label_type, str):
             raise TypeError(
                 f'label_type must be a string, got {type(label_type).__name__}')
-        if label_type not in FlameLabel._LABEL_TYPES:
+        if label_type not in PyFlameLabel._LABEL_TYPES:
             raise ValueError(
-                f'label_type must be one of: {", ".join(FlameLabel._LABEL_TYPES)}. '
+                f'label_type must be one of: {", ".join(PyFlameLabel._LABEL_TYPES)}. '
                 f'Got {label_type}')
 
     def _check_label_width(self, label_width: int) -> None:
