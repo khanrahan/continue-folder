@@ -2,6 +2,12 @@
 
 This module provides the PyFlameButton widget class for creating Flame-themed
 push buttons with callback functionality.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/ or
+    http://github.com/logik-portal/pyflame
 """
 
 from collections.abc import Callable

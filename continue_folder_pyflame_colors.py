@@ -1,6 +1,11 @@
 """PyFlame Colors Module.
 
 This module provides centralized color constants for PyFlame UI styling.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 

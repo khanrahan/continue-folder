@@ -2,6 +2,11 @@
 
 This module provides the PyFlameMessageWindow widget class for creating
 Flame-themed message dialog windows.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 

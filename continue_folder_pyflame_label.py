@@ -2,6 +2,12 @@
 
 This module provides the PyFlameLabel widget class for creating Flame-themed
 label widgets with customizable styling.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/ or
+    http://github.com/logik-portal/pyflame
 """
 
 

@@ -2,6 +2,11 @@
 
 This module provides the PyFlamePushButton widget class for creating
 Flame-themed push buttons with toggle functionality.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 from PySide6 import QtCore, QtWidgets

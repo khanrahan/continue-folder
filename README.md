@@ -73,4 +73,5 @@ Finally, inside of Flame, go to Flame (fish) menu `->` Python `->` Rescan Python
 - Right-click a single selected folder in MediaHub Files `->` Create... `->` Continue Folder
 
 ## Acknowledgements
-UI Templates courtesy of [pyflame.com](http://www.pyflame.com)
+All the credit goes to Mike Vaglienty and his incredible PyFlame Library that he has very generously shared with us. You can find more information about the
+library and its usage at the [Logik Portal](http://logik-portal.com/#pyflame/) or [Github](http://github.com/logik-portal/pyflame)
