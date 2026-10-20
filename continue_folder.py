@@ -46,8 +46,8 @@ from continue_folder_destination import Destination
 from continue_folder_preset import Preset
 from continue_folder_pyflame_message_window import PyFlameMessageWindow
 from continue_folder_settings_store import SettingsStore
-from continue_folder_token_store_input import InputTokenStore
-from continue_folder_token_store_output import OutputTokenStore
+from continue_folder_token_store_input import TokenStoreInput
+from continue_folder_token_store_output import TokenStoreOutput
 from continue_folder_window_main import WindowMain
 from continue_folder_window_save_preset import WindowSavePreset
 
@@ -89,9 +89,9 @@ class ContinueFolder:
         self._message(f'Settings loaded from {self._settings_file}')
 
         # Token stores
-        self.input_token_store = InputTokenStore(self.path)
-        self.output_token_store = OutputTokenStore(
-            input_token_store=self.input_token_store,
+        self.token_store_input = TokenStoreInput(self.path)
+        self.token_store_output = TokenStoreOutput(
+            token_store_input=self.token_store_input,
         )
 
         # Windows
@@ -106,9 +106,9 @@ class ContinueFolder:
 
         self._windows['main'].presets = self._store.preset_names
         self._windows['main'].input_tokens = (
-            self.input_token_store.name_token_pairs)
+            self.token_store_input.name_token_pairs)
         self._windows['main'].output_tokens = (
-            self.output_token_store.name_token_pairs)
+            self.token_store_output.name_token_pairs)
 
         # Window signals
         self._windows['main'].signal_preset.connect(self._on_preset_change)
@@ -163,8 +163,8 @@ class ContinueFolder:
         differ from output pattern.
         """
         main = self._windows['main']
-        self.input_token_store.apply(main.input_pattern)
-        result = self.output_token_store.resolve(main.output_pattern)
+        self.token_store_input.apply(main.input_pattern)
+        result = self.token_store_output.resolve(main.output_pattern)
         main.folder_new = self._convert_to_ascii(result)
 
     def _preset_name_zero(self) -> str | None:

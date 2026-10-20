@@ -63,7 +63,7 @@ class TokenIncrement(TokenPadded):
 class InputToken:
     """Input token delimited with curly braces.
 
-    Used with an InputTokenStore to store sections of a common string pattern.
+    Used with a TokenStoreInput to store sections of a common string pattern.
 
     Attributes:
         name: Display name for the Add Token menu.

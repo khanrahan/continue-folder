@@ -8,7 +8,7 @@ from continue_folder_token import InputToken, InputTokenMax
 TOKEN_REGEX = re.compile(r'\{(?P<pattern>\w+)\}')
 
 
-class InputTokenStore:
+class TokenStoreInput:
     """Store tokens that interpret destination folder names."""
 
     def __init__(self, path: str) -> None:
