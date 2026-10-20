@@ -1,7 +1,12 @@
-"""Flame Push Button Menu Widget Module.
+"""PyFlame Push Button Menu Widget Module.
 
-This module provides the FlamePushButtonMenu widget class for creating
+This module provides the PyFlamePushButtonMenu widget class for creating
 Flame-themed push buttons with dropdown menus.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 from collections.abc import Callable
@@ -9,11 +14,11 @@ from functools import partial
 
 from PySide6 import QtCore, QtWidgets
 
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlamePushButtonMenu(QtWidgets.QPushButton):
-    """Custom Flame Menu Push Button Widget.
+class PyFlamePushButtonMenu(QtWidgets.QPushButton):
+    """Custom PyFlame Menu Push Button Widget.
 
     A custom push button widget with Flame-style theming that displays a
     dropdown menu of options. When a menu item is selected, the button text
@@ -23,20 +28,20 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
     Examples:
         Basic usage:
             >>> options = ['Option 1', 'Option 2', 'Option 3']
-            >>> button = FlamePushButtonMenu('Select', options)
+            >>> button = PyFlamePushButtonMenu('Select', options)
 
         With callback function:
             >>> def on_selection():
             ...     print('Option selected')
-            >>> button = FlamePushButtonMenu(
+            >>> button = PyFlamePushButtonMenu(
             ...     'Select', options, menu_action=on_selection)
 
         Using first option as button name:
             >>> options = ['First', 'Second', 'Third']
-            >>> button = FlamePushButtonMenu(options[0], options)
+            >>> button = PyFlamePushButtonMenu(options[0], options)
 
         Custom button dimensions:
-            >>> button = FlamePushButtonMenu(
+            >>> button = PyFlamePushButtonMenu(
             ...     'Select', options, menu_width=300, menu_max_width=500)
 
     Note:
@@ -54,7 +59,7 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
             menu_max_width: int = 2000,
             menu_action: Callable[[], None] | None = None
     ) -> None:
-        """Initialize the FlamePushButtonMenu instance.
+        """Initialize the PyFlamePushButtonMenu instance.
 
         Validates all parameters, stores instance variables, and initializes
         the button and menu widgets.
@@ -111,23 +116,23 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.setStyleSheet(f"""
             QPushButton {{
-                color: {FlameColors.TEXT_PRIMARY};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_PRIMARY};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none;
                 font: 14px 'Discreet';
                 padding-left: 9px;
                 text-align: left}}
             QPushButton:disabled {{
-                color: {FlameColors.TEXT_DISABLED};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_DISABLED};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none}}
             QPushButton:hover {{
-                border: 1px solid {FlameColors.BORDER_HOVER}}}
+                border: 1px solid {PyFlameColors.BORDER_HOVER}}}
             QPushButton::menu-indicator {{image: none}}
             QToolTip {{
-                color: {FlameColors.TEXT_TOOLTIP};
-                background-color: {FlameColors.BG_MEDIUM};
-                border: 10px solid {FlameColors.BG_MEDIUM}}}""")
+                color: {PyFlameColors.TEXT_TOOLTIP};
+                background-color: {PyFlameColors.BG_MEDIUM};
+                border: 10px solid {PyFlameColors.BG_MEDIUM}}}""")
 
     def _init_menu(self, menu_options: list[str]) -> None:
         """Initialize the menu widget.
@@ -145,13 +150,13 @@ class FlamePushButtonMenu(QtWidgets.QPushButton):
         self.menu.aboutToShow.connect(self._menu_match_width)
         self.menu.setStyleSheet(f"""
             QMenu {{
-                color: {FlameColors.TEXT_PRIMARY};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_PRIMARY};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none;
                 font: 14px 'Discreet'}}
             QMenu::item:selected {{
-                color: {FlameColors.TEXT_SELECTED};
-                background-color: {FlameColors.BG_SELECTED}}}""")
+                color: {PyFlameColors.TEXT_SELECTED};
+                background-color: {PyFlameColors.BG_SELECTED}}}""")
         self.populate_menu(menu_options)
         self.setMenu(self.menu)
 

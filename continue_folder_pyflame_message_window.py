@@ -1,20 +1,25 @@
-"""Flame Message Window Widget Module.
+"""PyFlame Message Window Widget Module.
 
-This module provides the FlameMessageWindow widget class for creating
+This module provides the PyFlameMessageWindow widget class for creating
 Flame-themed message dialog windows.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from continue_folder_flame_button import FlameButton
-from continue_folder_flame_colors import FlameColors
-from continue_folder_flame_label import FlameLabel
+from continue_folder_pyflame_button import PyFlameButton
+from continue_folder_pyflame_colors import PyFlameColors
+from continue_folder_pyflame_label import PyFlameLabel
 from continue_folder_window_mixin import WindowMixin
 
 
-class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
-    """Custom Flame Message Window Widget.
+class PyFlameMessageWindow(WindowMixin, QtWidgets.QDialog):
+    """Custom PyFlame Message Window Widget.
 
     A custom dialog window with Flame-style theming that displays a message
     to the user. The window can be used to show informational messages, errors,
@@ -24,21 +29,21 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
     Examples:
         Error message:
-            >>> FlameMessageWindow.error('An error occurred', parent)
+            >>> PyFlameMessageWindow.error('An error occurred', parent)
 
         Confirmation dialog:
-            >>> if FlameMessageWindow.confirm(
+            >>> if PyFlameMessageWindow.confirm(
             ...     'Confirm Operation',
             ...     'Are you sure you want to proceed?', parent):
             ...     print('User confirmed')
 
         Warning dialog:
-            >>> if FlameMessageWindow.warning(
+            >>> if PyFlameMessageWindow.warning(
             ...     'Warning', 'This operation cannot be undone', parent):
             ...     proceed_with_operation()
 
         Informational message:
-            >>> FlameMessageWindow(
+            >>> PyFlameMessageWindow(
             ...     'Information', 'message',
             ...     'Operation completed successfully', parent).exec()
 
@@ -57,13 +62,13 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
     # Type hints for instance attributes
     _start_position: QtCore.QPoint
-    cancel_button: FlameButton | None
-    confirm_button: FlameButton | None
+    cancel_button: PyFlameButton | None
+    confirm_button: PyFlameButton | None
     grid: QtWidgets.QGridLayout
-    main_label: FlameLabel
+    main_label: PyFlameLabel
     message_text_edit: QtWidgets.QTextEdit
     message_type: str
-    ok_button: FlameButton | None
+    ok_button: PyFlameButton | None
 
     def __init__(
             self,
@@ -72,7 +77,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
             message: str,
             parent: QtWidgets.QWidget | None = None
     ) -> None:
-        """Initialize the FlameMessageWindow instance.
+        """Initialize the PyFlameMessageWindow instance.
 
         Validates all parameters, stores instance variables, and initializes
         the window properties, UI widgets, and layout. The window is centered
@@ -108,10 +113,10 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
         # Side bar color mapping for message types
         self._side_bar_colors = {
-            'confirm': FlameMessageWindow._GREY,
-            'error': FlameMessageWindow._YELLOW_GOLD,
-            'message': FlameMessageWindow._BLUE,
-            'warning': FlameMessageWindow._RED,
+            'confirm': PyFlameMessageWindow._GREY,
+            'error': PyFlameMessageWindow._YELLOW_GOLD,
+            'message': PyFlameMessageWindow._BLUE,
+            'warning': PyFlameMessageWindow._RED,
         }
 
         # Store instance variables
@@ -176,9 +181,9 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         """
         self.grid = QtWidgets.QGridLayout()
 
-        self.main_label = FlameLabel(message_title, 'normal', label_width=500)
+        self.main_label = PyFlameLabel(message_title, 'normal', label_width=500)
         self.main_label.setStyleSheet(f"""
-            color: {FlameColors.TEXT_PRIMARY};
+            color: {PyFlameColors.TEXT_PRIMARY};
             font: 18px 'Discreet'""")
 
         self.message_text_edit = QtWidgets.QTextEdit(message)
@@ -187,12 +192,12 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
 
         # Create buttons based on message type
         if message_type in ('confirm', 'warning'):
-            self.confirm_button = FlameButton(
+            self.confirm_button = PyFlameButton(
                 'Confirm', self.accept, button_color='blue', button_width=110)
-            self.cancel_button = FlameButton('Cancel', self.reject, button_width=110)
+            self.cancel_button = PyFlameButton('Cancel', self.reject, button_width=110)
             self.ok_button = None
         else:
-            self.ok_button = FlameButton(
+            self.ok_button = PyFlameButton(
                 'Ok', self.accept, button_color='blue', button_width=110)
             self.confirm_button = None
             self.cancel_button = None
@@ -208,7 +213,7 @@ class FlameMessageWindow(WindowMixin, QtWidgets.QDialog):
         """
         self.setFixedSize(500, 330)
         self.setStyleSheet(f"""
-            background-color: {FlameColors.BG_DARKER}""")
+            background-color: {PyFlameColors.BG_DARKER}""")
         self.setWindowFlags(
             QtCore.Qt.Dialog | QtCore.Qt.FramelessWindowHint)
         # Set window modality to application

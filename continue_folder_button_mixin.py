@@ -1,6 +1,11 @@
 """Button Mixin Module.
 
 This module provides the ButtonMixin class for button dimension validation.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 

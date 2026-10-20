@@ -1,7 +1,12 @@
-"""Flame Token Push Button Widget Module.
+"""PyFlame Token Push Button Widget Module.
 
-This module provides the FlameTokenPushButton widget class for creating
+This module provides the PyFlameTokenPushButton widget class for creating
 Flame-themed push buttons with token dropdown menus.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 from functools import partial
@@ -9,11 +14,11 @@ from functools import partial
 from PySide6 import QtCore, QtWidgets
 
 from continue_folder_button_mixin import ButtonMixin
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
-    """Custom Flame Token Push Button Widget.
+class PyFlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
+    """Custom PyFlame Token Push Button Widget.
 
     A custom push button widget with Flame-style theming that displays a
     dropdown menu of tokens. When a token is selected from the menu, it is
@@ -28,15 +33,15 @@ class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
             ...     'User Name': '<user>'
             ... }
             >>> line_edit = QtWidgets.QLineEdit()
-            >>> button = FlameTokenPushButton(
+            >>> button = PyFlameTokenPushButton(
             ...     'Add Token', token_dict, line_edit)
 
         With sorting enabled:
-            >>> button = FlameTokenPushButton(
+            >>> button = PyFlameTokenPushButton(
             ...     'Add Token', token_dict, line_edit, sort=True)
 
         Custom button dimensions:
-            >>> button = FlameTokenPushButton(
+            >>> button = PyFlameTokenPushButton(
             ...     'Add Token', token_dict, line_edit,
             ...     button_width=150, button_max_width=400)
     """
@@ -59,7 +64,7 @@ class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
             button_max_width: int = 300,
             sort: bool = False
     ) -> None:
-        """Initialize the FlameTokenPushButton instance.
+        """Initialize the PyFlameTokenPushButton instance.
 
         Validates all parameters, stores instance variables, and initializes
         the button UI components.
@@ -157,22 +162,22 @@ class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.setStyleSheet(f"""
             QPushButton {{
-                color: {FlameColors.TEXT_PRIMARY};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_PRIMARY};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none;
                 font: 14px "Discreet";
                 padding-left: 6px;
                 text-align: left}}
             QPushButton:hover {{
-                border: 1px solid {FlameColors.BORDER_HOVER}}}
+                border: 1px solid {PyFlameColors.BORDER_HOVER}}}
             QPushButton:disabled {{
-                color: {FlameColors.TEXT_SECONDARY};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_SECONDARY};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none}}
             QToolTip {{
-                color: {FlameColors.TEXT_TOOLTIP};
-                background-color: {FlameColors.BG_MEDIUM};
-                border: 10px solid {FlameColors.BG_MEDIUM}}}""")
+                color: {PyFlameColors.TEXT_TOOLTIP};
+                background-color: {PyFlameColors.BG_MEDIUM};
+                border: 10px solid {PyFlameColors.BG_MEDIUM}}}""")
 
     def _insert_token(self, token: str) -> None:
         """Insert token value into token_dest LineEdit.
@@ -232,13 +237,13 @@ class FlameTokenPushButton(ButtonMixin, QtWidgets.QPushButton):
         self.token_menu.setFocusPolicy(QtCore.Qt.NoFocus)
         self.token_menu.setStyleSheet(f"""
             QMenu {{
-                color: {FlameColors.TEXT_PRIMARY};
-                background-color: {FlameColors.BG_WIDGET};
+                color: {PyFlameColors.TEXT_PRIMARY};
+                background-color: {PyFlameColors.BG_WIDGET};
                 border: none;
                 font: 14px "Discreet"}}
             QMenu::item:selected {{
-                color: {FlameColors.TEXT_SELECTED};
-                background-color: {FlameColors.BG_SELECTED}}}""")
+                color: {PyFlameColors.TEXT_SELECTED};
+                background-color: {PyFlameColors.BG_SELECTED}}}""")
         self.setMenu(self.token_menu)
 
         if self.sort:

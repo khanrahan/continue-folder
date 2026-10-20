@@ -6,7 +6,7 @@ primary screen.
 
 from PySide6 import QtCore, QtGui
 
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
 class WindowMixin:
@@ -18,10 +18,10 @@ class WindowMixin:
 
     _TEXT_EDIT_STYLESHEET = f"""
             QTextEdit {{
-                color: {FlameColors.TEXT_PRIMARY};
-                background-color: {FlameColors.BG_DARKER};
-                selection-color: {FlameColors.TEXT_BRIGHT};
-                selection-background-color: {FlameColors.BG_DARKER};
+                color: {PyFlameColors.TEXT_PRIMARY};
+                background-color: {PyFlameColors.BG_DARKER};
+                selection-color: {PyFlameColors.TEXT_BRIGHT};
+                selection-background-color: {PyFlameColors.BG_DARKER};
                 border: none;
                 padding-left: 20px;
                 padding-right: 20px;

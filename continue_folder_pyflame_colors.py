@@ -1,11 +1,16 @@
-"""Flame Colors Module.
+"""PyFlame Colors Module.
 
-This module provides centralized color constants for Flame UI styling.
+This module provides centralized color constants for PyFlame UI styling.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 
-class FlameColors:
-    """Centralized color constants for Flame UI styling.
+class PyFlameColors:
+    """Centralized color constants for PyFlame UI styling.
 
     Provides RGB color values as formatted strings for use in Qt stylesheets.
     Colors are organized by usage category.

@@ -1,18 +1,24 @@
-"""Flame Button Widget Module.
+"""PyFlame Button Widget Module.
 
-This module provides the FlameButton widget class for creating Flame-themed
+This module provides the PyFlameButton widget class for creating Flame-themed
 push buttons with callback functionality.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/ or
+    http://github.com/logik-portal/pyflame
 """
 
 from collections.abc import Callable
 
 from PySide6 import QtCore, QtWidgets
 
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlameButton(QtWidgets.QPushButton):
-    """Custom Flame Button Widget.
+class PyFlameButton(QtWidgets.QPushButton):
+    """Custom PyFlame Button Widget.
 
     A custom push button widget with Flame-style theming that executes a
     callback function when clicked. The widget supports two color styles:
@@ -23,18 +29,18 @@ class FlameButton(QtWidgets.QPushButton):
         Basic usage:
             >>> def do_something():
             ...     print('Button clicked')
-            >>> button = FlameButton('Click Me', do_something)
+            >>> button = PyFlameButton('Click Me', do_something)
 
         With blue color:
-            >>> button = FlameButton(
+            >>> button = PyFlameButton(
             ...     'Click Me', do_something, button_color='blue')
 
         With custom width:
-            >>> button = FlameButton(
+            >>> button = PyFlameButton(
             ...     'Click Me', do_something, button_width=200)
 
         With custom width and max width:
-            >>> button = FlameButton(
+            >>> button = PyFlameButton(
             ...     'Click Me', do_something,
             ...     button_width=200, button_max_width=400)
     """
@@ -47,44 +53,44 @@ class FlameButton(QtWidgets.QPushButton):
     # Stylesheet constants
     _STYLESHEET_NORMAL = f"""
         QPushButton {{
-            color: {FlameColors.TEXT_PRIMARY};
-            background-color: {FlameColors.BG_DARK};
+            color: {PyFlameColors.TEXT_PRIMARY};
+            background-color: {PyFlameColors.BG_DARK};
             border: none;
             font: 14px 'Discreet'}}
         QPushButton:hover {{
-            border: 1px solid {FlameColors.BORDER_HOVER}}}
+            border: 1px solid {PyFlameColors.BORDER_HOVER}}}
         QPushButton:pressed {{
-            color: {FlameColors.TEXT_HOVER};
-            background-color: {FlameColors.BG_PRESSED};
-            border: 1px solid {FlameColors.BORDER_HOVER}}}
+            color: {PyFlameColors.TEXT_HOVER};
+            background-color: {PyFlameColors.BG_PRESSED};
+            border: 1px solid {PyFlameColors.BORDER_HOVER}}}
         QPushButton:disabled {{
-            color: {FlameColors.TEXT_DISABLED};
-            background-color: {FlameColors.BG_DARK};
+            color: {PyFlameColors.TEXT_DISABLED};
+            background-color: {PyFlameColors.BG_DARK};
             border: none}}
         QToolTip {{
-            color: {FlameColors.TEXT_TOOLTIP};
-            background-color: {FlameColors.BG_MEDIUM};
-            border: 10px solid {FlameColors.BG_MEDIUM}}}"""
+            color: {PyFlameColors.TEXT_TOOLTIP};
+            background-color: {PyFlameColors.BG_MEDIUM};
+            border: 10px solid {PyFlameColors.BG_MEDIUM}}}"""
 
     _STYLESHEET_BLUE = f"""
         QPushButton {{
-            color: {FlameColors.TEXT_BRIGHT};
-            background-color: {FlameColors.BG_BLUE};
+            color: {PyFlameColors.TEXT_BRIGHT};
+            background-color: {PyFlameColors.BG_BLUE};
             border: none;
             font: 12px 'Discreet'}}
         QPushButton:hover {{
-            border: 1px solid {FlameColors.BORDER_HOVER}}}
+            border: 1px solid {PyFlameColors.BORDER_HOVER}}}
         QPushButton:pressed {{
-            color: {FlameColors.TEXT_HOVER};
-            border: 1px solid {FlameColors.BORDER_HOVER}}}
+            color: {PyFlameColors.TEXT_HOVER};
+            border: 1px solid {PyFlameColors.BORDER_HOVER}}}
         QPushButton:disabled {{
-            color: {FlameColors.TEXT_DISABLED};
-            background-color: {FlameColors.BG_DARK};
+            color: {PyFlameColors.TEXT_DISABLED};
+            background-color: {PyFlameColors.BG_DARK};
             border: none}}
         QToolTip {{
-            color: {FlameColors.TEXT_TOOLTIP};
-            background-color: {FlameColors.BG_MEDIUM};
-            border: 10px solid {FlameColors.BG_MEDIUM}}}"""
+            color: {PyFlameColors.TEXT_TOOLTIP};
+            background-color: {PyFlameColors.BG_MEDIUM};
+            border: 10px solid {PyFlameColors.BG_MEDIUM}}}"""
 
     def __init__(
             self,
@@ -94,7 +100,7 @@ class FlameButton(QtWidgets.QPushButton):
             button_width: int | None = None,
             button_max_width: int | None = None
     ) -> None:
-        """Initialize the FlameButton instance.
+        """Initialize the PyFlameButton instance.
 
         Validates all parameters, applies default values if not provided, and
         initializes the widget properties with Flame-themed styling. The widget
@@ -131,9 +137,9 @@ class FlameButton(QtWidgets.QPushButton):
 
         # Use default values if not provided
         if button_width is None:
-            button_width = FlameButton._DEFAULT_WIDTH
+            button_width = PyFlameButton._DEFAULT_WIDTH
         if button_max_width is None:
-            button_max_width = FlameButton._DEFAULT_MAX_WIDTH
+            button_max_width = PyFlameButton._DEFAULT_MAX_WIDTH
 
         # Validate parameters
         self._check_button_name(button_name)
@@ -145,8 +151,8 @@ class FlameButton(QtWidgets.QPushButton):
 
         # Stylesheet mapping for button colors
         self._stylesheets = {
-            'normal': FlameButton._STYLESHEET_NORMAL,
-            'blue': FlameButton._STYLESHEET_BLUE
+            'normal': PyFlameButton._STYLESHEET_NORMAL,
+            'blue': PyFlameButton._STYLESHEET_BLUE
         }
 
         # Dimensions
@@ -210,10 +216,10 @@ class FlameButton(QtWidgets.QPushButton):
         if not isinstance(button_color, str):
             raise TypeError(
                 f'button_color must be a string, got {type(button_color).__name__}')
-        if button_color not in FlameButton._BUTTON_COLORS:
+        if button_color not in PyFlameButton._BUTTON_COLORS:
             raise ValueError(
                 f'button_color must be one of: '
-                f'{", ".join(FlameButton._BUTTON_COLORS)}. '
+                f'{", ".join(PyFlameButton._BUTTON_COLORS)}. '
                 f'Got {button_color}')
 
     def _check_button_width(self, button_width: int) -> None:

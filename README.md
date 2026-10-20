@@ -29,16 +29,29 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `[YY]` / `[YYYY]` — Year
 - `[version]` — Next version from the input pattern scan. Optional hashes set zero-padding: `[version###]`.
 
-Example: Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version###]` → `2026_08_v004`
+## Example
+
+Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version###]` → `2026_08_v004`
 
 ## Example Workflow
-You want to have a Library that will mirror a folder of exports on the server:
- 1. Navigate to the filesystem folder of exports
- 2. Select the folder `->` right click `->` Create... `->` Continue Folder
- 3. Create a Desktop Reel that follows the preferred naming convention
- 4. Copy your clips for export to this new Desktop Reel
- 5. Drag this reel to the Library of exports
- 6. Finally, drag the reel from the Library of exports into the MediaHub Files section to create a folder with the same name as the reel containing your clips
+Say you want to have a Library that will mirror a folder of exports on the server.  The system folder of exports looks like below:
+```
+/exports
+├── test_v001
+├── test_v002
+└── test_v003
+```
+
+ 1. Navigate to the filesystem folder (`exports/` in the above example)
+ 2. Select the folder (`exports/` in the above example) `->` right click `->` Create... `->` Continue Folder
+ 3. Set the Input Pattern to `test_v{version}`
+ 4. Set the Output Pattern to `test_v[version###]`
+ 5. Set the Destination to Desktop Reel
+ 6. Press OK.  A new reel named `test_v004` will be created
+ 7. Copy the timelines you want to export into this new reel
+ 8. Drag the reel to the server folder to export
+ 9. Drag the reel into the Library storing all exports
+ 10. All done!
 
 ## Compatibility
 |Release Version|Flame Version|
@@ -73,4 +86,5 @@ Finally, inside of Flame, go to Flame (fish) menu `->` Python `->` Rescan Python
 - Right-click a single selected folder in MediaHub Files `->` Create... `->` Continue Folder
 
 ## Acknowledgements
-UI Templates courtesy of [pyflame.com](http://www.pyflame.com)
+All the credit goes to Mike Vaglienty and his incredible PyFlame Library that he has very generously shared with us. You can find more information about the
+library and its usage at the [Logik Portal](http://logik-portal.com/#pyflame/) or [Github](http://github.com/logik-portal/pyflame)

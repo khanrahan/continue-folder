@@ -2,13 +2,13 @@
 Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
-Script Version: 4.0.0
+Script Version: 4.0.1
 Flame Version: 2025
 
 URL: http://www.github.com/khanrahan/continue-folder
 
 Creation Date: 04.10.23
-Update Date: 10.19.26
+Update Date: 10.20.26
 
 Description:
 
@@ -43,16 +43,16 @@ import flame
 from PySide6 import QtWidgets
 
 from continue_folder_destination import Destination
-from continue_folder_flame_message_window import FlameMessageWindow
-from continue_folder_main_window import MainWindow
 from continue_folder_preset import Preset
-from continue_folder_save_preset_window import SavePresetWindow
+from continue_folder_pyflame_message_window import PyFlameMessageWindow
 from continue_folder_settings_store import SettingsStore
-from continue_folder_token_store_input import InputTokenStore
-from continue_folder_token_store_output import OutputTokenStore
+from continue_folder_token_store_input import TokenStoreInput
+from continue_folder_token_store_output import TokenStoreOutput
+from continue_folder_window_main import WindowMain
+from continue_folder_window_save_preset import WindowSavePreset
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (4, 0, 0)
+VERSION_INFO = (4, 0, 1)
 VERSION = '.'.join(map(str, VERSION_INFO))
 TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON]'
@@ -89,9 +89,9 @@ class ContinueFolder:
         self._message(f'Settings loaded from {self._settings_file}')
 
         # Token stores
-        self.input_token_store = InputTokenStore(self.path)
-        self.output_token_store = OutputTokenStore(
-            input_token_store=self.input_token_store,
+        self.token_store_input = TokenStoreInput(self.path)
+        self.token_store_output = TokenStoreOutput(
+            token_store_input=self.token_store_input,
         )
 
         # Windows
@@ -100,15 +100,15 @@ class ContinueFolder:
             'main': None,
             'save': None,
         }
-        self._windows['main'] = MainWindow(
+        self._windows['main'] = WindowMain(
             TITLE_VERSION, self._windows['parent'])
-        self._windows['save'] = SavePresetWindow(self._windows['main'])
+        self._windows['save'] = WindowSavePreset(self._windows['main'])
 
         self._windows['main'].presets = self._store.preset_names
         self._windows['main'].input_tokens = (
-            self.input_token_store.name_token_pairs)
+            self.token_store_input.name_token_pairs)
         self._windows['main'].output_tokens = (
-            self.output_token_store.name_token_pairs)
+            self.token_store_output.name_token_pairs)
 
         # Window signals
         self._windows['main'].signal_preset.connect(self._on_preset_change)
@@ -163,8 +163,8 @@ class ContinueFolder:
         differ from output pattern.
         """
         main = self._windows['main']
-        self.input_token_store.apply(main.input_pattern)
-        result = self.output_token_store.resolve(main.output_pattern)
+        self.token_store_input.apply(main.input_pattern)
+        result = self.token_store_output.resolve(main.output_pattern)
         main.folder_new = self._convert_to_ascii(result)
 
     def _preset_name_zero(self) -> str | None:
@@ -196,7 +196,7 @@ class ContinueFolder:
         """Input or Output pattern change.
 
         Recompute folder and update display.  Ignore the string emitted by
-        FlameLineEdit.
+        PyFlameLineEdit.
         """
         self._refresh_folder_display()
 
@@ -204,7 +204,7 @@ class ContinueFolder:
         """Handle preset delete button; confirm then delete and reload."""
         main = self._windows['main']
         preset_name = main.preset
-        if not FlameMessageWindow.confirm(
+        if not PyFlameMessageWindow.confirm(
                 'Confirm Operation',
                 'Are you sure you want to permanently delete this preset?<br/>'
                 'This operation cannot be undone.',
@@ -213,12 +213,12 @@ class ContinueFolder:
         try:
             self._store.delete_preset(name=preset_name)
         except ValueError as error:
-            FlameMessageWindow.error(str(error), main)
+            PyFlameMessageWindow.error(str(error), main)
             return
         try:
             self._store.save()
         except OSError:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 f'Check permissions on {self._settings_file}', main)
             # delete_preset() already removed the preset from memory; reload
             # the file that failed to update.
@@ -232,7 +232,7 @@ class ContinueFolder:
     def _on_preset_save(self) -> None:
         """Show save preset dialog and save or overwrite preset on accept."""
         if not self._windows['main'].destinations:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 'Select at least one destination before saving a preset.',
                 self._windows['main'])
             return
@@ -242,11 +242,11 @@ class ContinueFolder:
         # Strip leading/trailing whitespace to avoid names of only spaces.
         preset_name = self._windows['save'].name.strip()
         if not preset_name:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 'Name field cannot be empty.', self._windows['main'])
             return
         duplicate = preset_name in self._store.preset_names
-        if duplicate and not FlameMessageWindow.confirm(
+        if duplicate and not PyFlameMessageWindow.confirm(
                 'Overwrite Existing Preset',
                 'Are you sure you want to permanently overwrite this '
                 'preset?<br/>This operation cannot be undone.',
@@ -265,12 +265,12 @@ class ContinueFolder:
                 self._store.add_preset(preset)
                 self._store.sort_presets()
         except ValueError as error:
-            FlameMessageWindow.error(str(error), self._windows['main'])
+            PyFlameMessageWindow.error(str(error), self._windows['main'])
             return
         try:
             self._store.save()
         except OSError:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 f'Check permissions on {self._settings_file}',
                 self._windows['main'])
             # put in memory & whats on disk back in sync
@@ -283,13 +283,13 @@ class ContinueFolder:
     def _on_ok_clicked(self) -> None:
         """Handle OK button; create reel or folder then close."""
         if not self._windows['main'].folder_new:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 'New Folder field is empty.  Check your input and output patterns.',
                 self._windows['main'])
             return
         destinations = self._windows['main'].destinations
         if not destinations:
-            FlameMessageWindow.error(
+            PyFlameMessageWindow.error(
                 'Select at least one destination.', self._windows['main'])
             return
         if Destination.REEL in destinations:

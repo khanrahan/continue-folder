@@ -1,17 +1,22 @@
-"""Flame Push Button Widget Module.
+"""PyFlame Push Button Widget Module.
 
-This module provides the FlamePushButton widget class for creating Flame-themed
-push buttons with toggle functionality.
+This module provides the PyFlamePushButton widget class for creating
+Flame-themed push buttons with toggle functionality.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 from PySide6 import QtCore, QtWidgets
 
 from continue_folder_button_mixin import ButtonMixin
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
-    """Custom Flame Push Button Widget.
+class PyFlamePushButton(ButtonMixin, QtWidgets.QPushButton):
+    """Custom PyFlame Push Button Widget.
 
     A custom push button widget with Flame-style theming that can be toggled
     between checked and unchecked states.
@@ -20,14 +25,14 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         Basic usage:
             >>> def on_click():
             ...     print('Button clicked')
-            >>> button = FlamePushButton('Click Me', False)
+            >>> button = PyFlamePushButton('Click Me', False)
             ...     button.clicked.connect(on_click)
 
         With checked state:
-            >>> button = FlamePushButton('Toggle', True)
+            >>> button = PyFlamePushButton('Toggle', True)
 
         Custom button dimensions:
-            >>> button = FlamePushButton(
+            >>> button = PyFlamePushButton(
             ...     'Toggle', False, button_width=200, button_max_width=300)
     """
 
@@ -42,7 +47,7 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
             button_width: int = 150,
             button_max_width: int = 150
     ) -> None:
-        """Initialize the FlamePushButton instance.
+        """Initialize the PyFlamePushButton instance.
 
         Validates all parameters, stores instance variables, and initializes
         the button UI components with Flame-themed styling.
@@ -135,54 +140,54 @@ class FlamePushButton(ButtonMixin, QtWidgets.QPushButton):
         # Apply stylesheet
         self.setStyleSheet(f"""
             QPushButton {{
-                color: {FlameColors.TEXT_PRIMARY};
+                color: {PyFlameColors.TEXT_PRIMARY};
                 background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_DARK},
-                    stop: .94 {FlameColors.BORDER_ACCENT});
+                    stop: .93 {PyFlameColors.BG_DARK},
+                    stop: .94 {PyFlameColors.BORDER_ACCENT});
                 text-align: left;
                 border-top: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_DARK},
-                    stop: .94 {FlameColors.BORDER_ACCENT});
+                    stop: .93 {PyFlameColors.BG_DARK},
+                    stop: .94 {PyFlameColors.BORDER_ACCENT});
                 border-bottom: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_DARK},
-                    stop: .94 {FlameColors.BORDER_ACCENT});
-                border-left: 1px solid {FlameColors.BG_DARK};
-                border-right: 1px solid {FlameColors.BORDER_ACCENT};
+                    stop: .93 {PyFlameColors.BG_DARK},
+                    stop: .94 {PyFlameColors.BORDER_ACCENT});
+                border-left: 1px solid {PyFlameColors.BG_DARK};
+                border-right: 1px solid {PyFlameColors.BORDER_ACCENT};
                 padding-left: 5px;
                 font: 14px 'Discreet'}}
             QPushButton:checked {{
-                color: {FlameColors.TEXT_SELECTED};
+                color: {PyFlameColors.TEXT_SELECTED};
                 background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_MEDIUM},
-                    stop: .94 {FlameColors.BORDER_CHECKED});
+                    stop: .93 {PyFlameColors.BG_MEDIUM},
+                    stop: .94 {PyFlameColors.BORDER_CHECKED});
                 text-align: left;
                 border-top: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_MEDIUM},
-                    stop: .94 {FlameColors.BORDER_CHECKED});
+                    stop: .93 {PyFlameColors.BG_MEDIUM},
+                    stop: .94 {PyFlameColors.BORDER_CHECKED});
                 border-bottom: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_MEDIUM},
-                    stop: .94 {FlameColors.BORDER_CHECKED});
-                border-left: 1px solid {FlameColors.BG_MEDIUM};
-                border-right: 1px solid {FlameColors.BORDER_CHECKED};
+                    stop: .93 {PyFlameColors.BG_MEDIUM},
+                    stop: .94 {PyFlameColors.BORDER_CHECKED});
+                border-left: 1px solid {PyFlameColors.BG_MEDIUM};
+                border-right: 1px solid {PyFlameColors.BORDER_CHECKED};
                 padding-left: 5px;
                 font: italic}}
             QPushButton:hover {{
-                border: 1px solid {FlameColors.BORDER_HOVER}}}
+                border: 1px solid {PyFlameColors.BORDER_HOVER}}}
             QPushButton:disabled {{
-                color: {FlameColors.TEXT_SECONDARY};
+                color: {PyFlameColors.TEXT_SECONDARY};
                 background-color: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: .93 {FlameColors.BG_DARK},
-                    stop: .94 {FlameColors.BG_DISABLED});
+                    stop: .93 {PyFlameColors.BG_DARK},
+                    stop: .94 {PyFlameColors.BG_DISABLED});
                 font: light;
                 border: none}}
             QToolTip {{
-                color: {FlameColors.TEXT_TOOLTIP};
-                background-color: {FlameColors.BG_MEDIUM};
-                border: 10px solid {FlameColors.BG_MEDIUM}}}""")
+                color: {PyFlameColors.TEXT_TOOLTIP};
+                background-color: {PyFlameColors.BG_MEDIUM};
+                border: 10px solid {PyFlameColors.BG_MEDIUM}}}""")

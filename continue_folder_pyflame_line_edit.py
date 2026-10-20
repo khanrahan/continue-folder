@@ -1,17 +1,22 @@
-"""Flame Line Edit Widget Module.
+"""PyFlame Line Edit Widget Module.
 
-This module provides the FlameLineEdit widget class for creating Flame-themed
+This module provides the PyFlameLineEdit widget class for creating Flame-themed
 line edit widgets with customizable width constraints.
+
+Credits:
+    All the credit goes to Mike Vaglienty and his incredible PyFlame Library
+    that he has very generously shared with us. You can find more information
+    about the library and its usage at http://logik-portal.com/#pyflame/
 """
 
 
 from PySide6 import QtCore, QtWidgets
 
-from continue_folder_flame_colors import FlameColors
+from continue_folder_pyflame_colors import PyFlameColors
 
 
-class FlameLineEdit(QtWidgets.QLineEdit):
-    """Custom Flame Line Edit Widget.
+class PyFlameLineEdit(QtWidgets.QLineEdit):
+    """Custom PyFlame Line Edit Widget.
 
     A custom line edit widget with Flame-style theming that provides a
     text input field with customizable width constraints. The widget supports
@@ -20,13 +25,13 @@ class FlameLineEdit(QtWidgets.QLineEdit):
 
     Examples:
         Basic usage:
-            >>> line_edit = FlameLineEdit('Some text here')
+            >>> line_edit = PyFlameLineEdit('Some text here')
 
         With custom width:
-            >>> line_edit = FlameLineEdit('Enter value', width=300)
+            >>> line_edit = PyFlameLineEdit('Enter value', width=300)
 
         With custom width and max width:
-            >>> line_edit = FlameLineEdit(
+            >>> line_edit = PyFlameLineEdit(
             ...     'Enter value', width=200, max_width=500)
     """
 
@@ -35,24 +40,24 @@ class FlameLineEdit(QtWidgets.QLineEdit):
     _MINIMUM_HEIGHT = 28
     _STYLESHEET = f"""
         QLineEdit {{
-            color: {FlameColors.TEXT_PRIMARY};
-            background-color: {FlameColors.BG_WIDGET_LIGHT};
-            selection-color: {FlameColors.SELECTION_TEXT};
-            selection-background-color: {FlameColors.SELECTION_BG};
-            border: 1px solid {FlameColors.BG_WIDGET_LIGHT};
+            color: {PyFlameColors.TEXT_PRIMARY};
+            background-color: {PyFlameColors.BG_WIDGET_LIGHT};
+            selection-color: {PyFlameColors.SELECTION_TEXT};
+            selection-background-color: {PyFlameColors.SELECTION_BG};
+            border: 1px solid {PyFlameColors.BG_WIDGET_LIGHT};
             padding-left: 5px;
             font: 14px 'Discreet'}}
         QLineEdit:focus {{
-            background-color: {FlameColors.BG_LINEEDIT_FOCUS}}}
+            background-color: {PyFlameColors.BG_LINEEDIT_FOCUS}}}
         QLineEdit:hover {{
-            border: 1px solid {FlameColors.BORDER_HOVER}}}
+            border: 1px solid {PyFlameColors.BORDER_HOVER}}}
         QLineEdit:disabled {{
-            color: {FlameColors.TEXT_SECONDARY};
-            background-color: {FlameColors.BG_DISABLED};
-            border: 1px solid {FlameColors.BG_DISABLED}}}
+            color: {PyFlameColors.TEXT_SECONDARY};
+            background-color: {PyFlameColors.BG_DISABLED};
+            border: 1px solid {PyFlameColors.BG_DISABLED}}}
         QToolTip {{
-            color: {FlameColors.TEXT_TOOLTIP};
-            background-color: {FlameColors.BG_MEDIUM};
+            color: {PyFlameColors.TEXT_TOOLTIP};
+            background-color: {PyFlameColors.BG_MEDIUM};
             border: none}}"""
 
     def _check_text(self, text: str) -> None:
@@ -122,7 +127,7 @@ class FlameLineEdit(QtWidgets.QLineEdit):
             width: int | None = None,
             max_width: int | None = None
     ) -> None:
-        """Initialize the FlameLineEdit instance.
+        """Initialize the PyFlameLineEdit instance.
 
         Validates all parameters, applies default values if not provided, and
         initializes the widget properties with Flame-themed styling. The widget
@@ -149,9 +154,9 @@ class FlameLineEdit(QtWidgets.QLineEdit):
 
         # Use default values if not provided
         if width is None:
-            width = FlameLineEdit._DEFAULT_WIDTH
+            width = PyFlameLineEdit._DEFAULT_WIDTH
         if max_width is None:
-            max_width = FlameLineEdit._DEFAULT_MAX_WIDTH
+            max_width = PyFlameLineEdit._DEFAULT_MAX_WIDTH
 
         # Validate parameters
         self._check_text(text)

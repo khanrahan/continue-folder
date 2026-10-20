@@ -3,34 +3,34 @@
 import datetime as dt
 
 from continue_folder_token import Token, TokenIncrement
-from continue_folder_token_store_input import InputTokenStore
+from continue_folder_token_store_input import TokenStoreInput
 
 
-class OutputTokenStore:
+class TokenStoreOutput:
     """Store tokens that form the new folder name.
 
     Square-bracket tokens ([DD], [YYYY], [version], …) are
-    resolved into the output pattern. When an InputTokenStore is provided,
+    resolved into the output pattern. When a TokenStoreInput is provided,
     values such as version are read from it at resolve time. Optional hashes
     set zero-padding: [version###].
     """
 
-    def __init__(self, input_token_store: InputTokenStore | None = None) -> None:
+    def __init__(self, token_store_input: TokenStoreInput | None = None) -> None:
         """Initialize output tokens.
 
         Args:
-            input_token_store: Optional store used to supply derived values
+            token_store_input: Optional store used to supply derived values
                 (e.g. version) when resolving the output pattern.
         """
-        self.input_token_store = input_token_store
+        self.token_store_input = token_store_input
         self.tokens: dict[str, Token] = {}
         self._build_tokens()
 
     def _get_input_token_value(self, token_pattern: str) -> str | None:
         """Get the value of an input token by name."""
-        if self.input_token_store is None:
+        if self.token_store_input is None:
             return None
-        return self.input_token_store.captured_token_values[token_pattern]
+        return self.token_store_input.captured_token_values[token_pattern]
 
     def _build_tokens(self) -> None:
         """Populate square-bracket output tokens keyed by pattern."""

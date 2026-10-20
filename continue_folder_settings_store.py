@@ -108,7 +108,7 @@ class SettingsStore:
         self.tree = Etree.ElementTree(settings)
 
     @staticmethod
-    def _major(version: str) -> str:
+    def _semver_major(version: str) -> str:
         """Return the major component of a dotted version string."""
         return version.strip().split('.', 1)[0]
 
@@ -142,12 +142,12 @@ class SettingsStore:
             self._init_tree()
             script = self.tree.find(self.ELEMENT_SCRIPT_NAME)
 
-        target = self._major(self.version)
+        target = self._semver_major(self.version)
         element = max(
             (
                 child
                 for child in script.findall(self.ELEMENT_VERSION)
-                if self._major(child.text or '') == target
+                if self._semver_major(child.text or '') == target
             ),
             key=lambda child: self._version_key(child.text or ''),
             default=None,
