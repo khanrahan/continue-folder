@@ -7,11 +7,10 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 ![screenshot](screenshot.png)
 
 ## Tokens
-
 **Input Pattern** uses curly braces to interpret existing destination folders.
 **Output Pattern** uses square brackets to form the new folder name.
 
-**Input** (match / continue):
+**Input**:
 - `{PP}` / `{pp}` — AM/PM
 - `{DD}` — Day
 - `{hh}` / `{HH}` — Hour (12hr / 24hr)
@@ -20,7 +19,7 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `{YY}` / `{YYYY}` — Year
 - `{version}` — Scan matching folders and continue the number sequence (*similar* to the version token for pattern browsing).
 
-**Output** (new folder name):
+**Output**:
 - `[PP]` / `[pp]` — AM/PM
 - `[DD]` — Day
 - `[hh]` / `[HH]` — Hour (12hr / 24hr)
@@ -30,7 +29,6 @@ Create a new reel on the Desktop and/or a system folder in MediaHub Files using 
 - `[version]` — Next version from the input pattern scan. Optional hashes set zero-padding: `[version###]`.
 
 ## Example
-
 Input `{YYYY}_{MM}_v{version}` + Output `[YYYY]_[MM]_v[version###]` → `2026_08_v004`
 
 ## Example Workflow
@@ -62,10 +60,12 @@ Say you want to have a Library that will mirror a folder of exports on the serve
 |v1.X.X|Flame 2021 up to 2021.2|
 
 ## Installation
+Use either the [Logik Portal](http://logik-portal.com) or download the latest release from [Github](http://github.com/khanrahan/continue-folder/releases).
+For older versions of this project, instead of releases, check the [tags](http://github.com/khanrahan/continue-folder/tags) section.
 
+If downloading a Github release, extract the zip and copy the `continue-folder-#.#.#/` folder to the appropriate location below:
+ 
 ### Flame 2025 and newer
-The script is split across several modules, so copy all of the `continue_folder*.py` files together into the same folder.
-
 To make available to all users on the workstation, copy the files to `/opt/Autodesk/shared/python/`
 
 For specific users, copy the files to the appropriate path below...

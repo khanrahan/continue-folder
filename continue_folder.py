@@ -2,7 +2,7 @@
 Script Name: Continue Folder
 Written By: Kieran Hanrahan
 
-Script Version: 4.0.1
+Script Version: 4.0.2
 Flame Version: 2025
 
 URL: http://www.github.com/khanrahan/continue-folder
@@ -52,7 +52,7 @@ from continue_folder_window_main import WindowMain
 from continue_folder_window_save_preset import WindowSavePreset
 
 TITLE = 'Continue Folder'
-VERSION_INFO = (4, 0, 1)
+VERSION_INFO = (4, 0, 2)
 VERSION = '.'.join(map(str, VERSION_INFO))
 TITLE_VERSION = f'{TITLE} v{VERSION}'
 MESSAGE_PREFIX = '[PYTHON]'
